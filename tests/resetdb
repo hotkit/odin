@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+cd $(dirname $0)
+set -ex
+
+: "${1:?Need to pass in the path to the Postgres unix domain socket}"
+
+dropdb -h $1 odin-test || echo "OK, odin-test database hasn't been created before"
+dropdb -h $1 odin || echo "OK, odin user database hasn't been created before"
+createuser -h $1 -dl odin || echo "User odin already exists"
+createdb -h $1 -O odin odin
+createdb -h $1 -O odin odin-test
+psql -h $1 -U odin odin-test < ../Schema/core/001-initial.blue.sql
+psql -h $1 -U odin odin-test < ../Schema/authn/001-initial.blue.sql
