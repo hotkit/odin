@@ -1,6 +1,20 @@
 CREATE SCHEMA odin;
 
 
+CREATE TABLE module (
+    name text NOT NULL,
+    CONSTRAINT module_pk PRIMARY KEY(name)
+);
+INSERT INTO module VALUES ('core');
+
+CREATE TABLE migration (
+    module_name text NOT NULL,
+    migration text NOT NULL,
+    CONSTRAINT migration_pk PRIMARY KEY (module_name, migration)
+);
+INSERT INTO migration VALUES('core', '001-initial.blue.sql');
+
+
 CREATE TABLE identity (
     id text NOT NULL,
     CONSTRAINT identity_pk PRIMARY KEY (id)
@@ -24,6 +38,3 @@ CREATE TRIGGER identity_ledger_insert_trigger
     AFTER INSERT ON identity_ledger
     FOR EACH ROW
     EXECUTE PROCEDURE identity_ledger_insert();
-
-INSERT INTO identity_ledger VALUES (current_user);
-
