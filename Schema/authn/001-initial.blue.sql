@@ -12,11 +12,11 @@ CREATE TABLE odin.credentials (
     login text NOT NULL,
     CONSTRAINT credentials_login_ix UNIQUE (login),
     -- The password/hash value
-    password text NOT NULL,
+    password__hash text NULL,
     -- The process for generating the password hash
-    process jsonb NOT NULL,
+    password__process jsonb NULL,
     --- When the password was last set
-    changed timestamp with time zone NOT NULL
+    password__changed timestamp with time zone NULL
 );
 
 
@@ -45,12 +45,15 @@ CREATE TABLE odin.credentials_password_ledger (
 );
 CREATE FUNCTION odin.credentials_ledger_insert() RETURNS TRIGGER AS $body$
     BEGIN
-        INSERT INTO odin.credentials (identity_id, login, password, process, changed)
-                VALUES (NEW.identity_id, NEW.identity_id, NEW.password, NEW.process, NEW.changed)
+        INSERT
+            INTO odin.credentials (identity_id, login, password__hash,
+                password__process, password__changed)
+            VALUES (NEW.identity_id, NEW.identity_id, NEW.password, NEW.process, NEW.changed)
             ON CONFLICT (identity_id) DO UPDATE
-                SET password = EXCLUDED.password,
-                    process = EXCLUDED.process,
-                    changed = EXCLUDED.changed;
+                SET
+                    password__hash = EXCLUDED.password__hash,
+                    password__process = EXCLUDED.password__process,
+                    password__changed = EXCLUDED.password__changed;
         IF NEW.hardens IS NOT NULL THEN
             UPDATE odin.credentials_password_ledger SET password=NULL
                 WHERE identity_id=NEW.identity_id AND changed=NEW.hardens;
