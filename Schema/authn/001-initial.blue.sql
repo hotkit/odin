@@ -18,7 +18,9 @@ CREATE TABLE odin.credentials (
     -- The process for generating the password hash
     password__process jsonb NULL,
     --- When the password was last set
-    password__changed timestamp with time zone NULL
+    password__changed timestamp with time zone NULL,
+    --- When the password expires
+    password__expires timestamp with time zone NULL
 );
 
 
