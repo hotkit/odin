@@ -8,11 +8,11 @@ CREATE TABLE odin.credentials (
         FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
-    CONSTRAINT credentials_pk PRIMARY KEY (identity_id),
 
     -- Login name, the name used by the user in the log in form
     login text NOT NULL,
-    CONSTRAINT credentials_login_ix UNIQUE (login),
+    CONSTRAINT credentials_login_ix PRIMARY KEY (login),
+
     -- The password/hash value
     password__hash text NULL,
     -- The process for generating the password hash
