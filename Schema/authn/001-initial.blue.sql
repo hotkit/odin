@@ -1,5 +1,5 @@
-INSERT INTO module VALUES('authn');
-INSERT INTO migration VALUES('authn', '001-initial.blue.sql');
+INSERT INTO odin.module VALUES('authn');
+INSERT INTO odin.migration VALUES('authn', '001-initial.blue.sql');
 
 
 CREATE TABLE odin.credentials (

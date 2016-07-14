@@ -10,6 +10,5 @@ createuser -h $1 -dl odin || echo "User odin already exists"
 createdb -h $1 -O odin odin
 createdb -h $1 -O odin odin-test
 psql -h $1 -U odin odin-test < ../Schema/core/001-initial.blue.sql
-psql -h $1 -U odin odin-test < ../Schema/authn/001-initial.blue.sql
 
-../Python/bin/odin -h $1 -d odin-test user odin password123
+odin -h $1 -d odin-test include setup.odin

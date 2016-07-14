@@ -11,7 +11,10 @@ class Connection(object):
         self.pg = connect(dsn)
         self.pg.set_session(isolation_level=ISOLATION_LEVEL_SERIALIZABLE)
         self.cursor = self.pg.cursor()
+        self.load_modules()
 
+
+    def load_modules(self):
         self.cursor.execute("SELECT name FROM odin.module")
         self.modules = set([m[0] for m in self.cursor.fetchall()])
 
