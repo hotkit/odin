@@ -1,0 +1,7 @@
+
+fost-lib-autotest odin-views
+    :
+        Cpp/odin-views
+    :
+        ../../../fost-web/Cpp/fost-urlhandler
+    ;

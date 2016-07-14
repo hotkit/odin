@@ -1,0 +1,28 @@
+{
+
+    "webserver": {
+        "load": ["fostgres", "odin-views"],
+
+        "hosts": {
+            "localhost:8001": "root"
+        },
+
+        "views": {
+            "root": {
+                "view": "fost.view.pathprefix",
+                "configuration": {
+                    "": "redirect",
+                    "odin/": "odin"
+                }
+            },
+            "redirect": {
+                "view": "fost.response.302",
+                "configuration": {
+                    "location": "/odin/"
+                }
+            }
+        }
+    }
+
+}
+

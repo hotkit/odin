@@ -1,0 +1,7 @@
+
+install odin-web-config :
+        odin-views.json
+        odin-webserver.json
+    :
+        <location>$(PREFIX)/Configuration
+    ;

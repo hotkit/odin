@@ -1,0 +1,10 @@
+{
+    "webserver": {
+        "views/odin": {
+            "view": "fost.view.pathprefix",
+            "configuration": {
+                "": "fost.response.501"
+            }
+        }
+    }
+}
