@@ -28,6 +28,7 @@ alias odin :
         ../fost-orm//fost
         ../fost-postgres//fost
         ../fost-web//fost
+        ../fostgres//fostgres
         Configuration
         Cpp/odin-views
     ;

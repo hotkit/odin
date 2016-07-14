@@ -1,7 +1,7 @@
 {
 
     "webserver": {
-        "load": ["fostgres", "odin-views"],
+        "Load": ["fostgres", "odin-views"],
 
         "hosts": {
             "localhost:8001": "root"
