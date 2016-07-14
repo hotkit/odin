@@ -9,7 +9,14 @@ These schemas are intended to be run in numerical order with blue before green. 
 
 So, run all `001.blue` scripts for the modules you need before you run any `001.green` ones. Then you can move on to `002` etc.
 
+Before any of the modules can be loaded the `bootstrap.sql` must be run in the database you want to put the Odin data into.
+
+Individual migration files can be easily run using the Python `odin` command.
+
+
 ## core ##
+
+Central management of the identity of the users of a system.
 
 
 ## authn ##
@@ -29,7 +36,7 @@ Handles management of user authorization through Postgres roles.
 
 # Schema rationale #
 
-The schema is designed to provide tracking of changes for auditability.
+The schema is designed to provide tracking of changes for auditability. It is also designed to enforce as much as possible of the data storage rules.
 
 In general application code is expected to write entries into the `leger` tables whose triggers then make the requested change in the underlying data table.
 
