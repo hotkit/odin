@@ -1,3 +1,5 @@
+from odin.user import createuser
+
 
 SHORTOPTS = '?d:h:'
 OPTMAP = {
@@ -30,4 +32,11 @@ def makedsn(opts, args):
         if arg in opts:
             dsnargs[opt] = opts[arg]
     return ' '.join(["%s='%s'" % (n, v) for n, v in dsnargs.items()])
+
+
+def command(cnx, cmd, *args):
+    if cmd == "user":
+        createuser(cnx, *args)
+    else:
+        print("Unknown command", cmd)
 
