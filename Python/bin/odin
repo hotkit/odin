@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+from getopt import gnu_getopt
+from odin.cmdline import SHORTOPTS, makedsn
+from psycopg2 import connect
+import sys
+
+
+if __name__ == "__main__":
+    optlist, args = gnu_getopt(sys.argv, SHORTOPTS)
+    opts = dict(optlist)
+    print(opts, args)
+
+    dsn = makedsn(opts, args)
+    print(dsn)
+    cnx = connect(dsn)
