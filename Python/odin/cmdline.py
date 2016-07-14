@@ -47,7 +47,7 @@ def include(cnx, filename):
     with open(filename) as f:
         lines = f.readlines()
         for line in lines:
-            command(cnx, *[l.strip() for l in line.split(' ')])
+            command(cnx, *[l.strip() for l in line.split()])
 
 
 def sql(cnx, filename):
