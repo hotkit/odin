@@ -11,7 +11,7 @@ CREATE TABLE odin.credentials (
 
     -- Login name, the name used by the user in the log in form
     login text NOT NULL,
-    CONSTRAINT credentials_login_ix PRIMARY KEY (login),
+    CONSTRAINT credentials_login_pk PRIMARY KEY (login),
 
     -- The password/hash value
     password__hash text NULL,
@@ -53,7 +53,7 @@ CREATE FUNCTION odin.credentials_ledger_insert() RETURNS TRIGGER AS $body$
             INTO odin.credentials (identity_id, login, password__hash,
                 password__process, password__changed)
             VALUES (NEW.identity_id, NEW.identity_id, NEW.password, NEW.process, NEW.changed)
-            ON CONFLICT (identity_id) DO UPDATE
+            ON CONFLICT (login) DO UPDATE
                 SET
                     password__hash = EXCLUDED.password__hash,
                     password__process = EXCLUDED.password__process,

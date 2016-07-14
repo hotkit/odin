@@ -2,6 +2,10 @@ from psycopg2 import connect
 from psycopg2.extensions import ISOLATION_LEVEL_SERIALIZABLE
 
 
+class ModuleNotPresent(Exception):
+    pass
+
+
 class Connection(object):
     def __init__(self, dsn):
         self.pg = connect(dsn)
@@ -10,6 +14,11 @@ class Connection(object):
 
         self.cursor.execute("SELECT name FROM odin.module")
         self.modules = set([m[0] for m in self.cursor.fetchall()])
+
+
+    def assert_module(self, module):
+        if not module in self.modules:
+            raise ModuleNotPresent(module)
 
 
     def execute(self, cmd, *args, **kwargs):
