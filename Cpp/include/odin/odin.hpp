@@ -9,19 +9,14 @@
 #pragma once
 
 
-#include <fost/urlhandler>
+#include <fost/core>
 
 
 namespace odin {
 
 
-    namespace view {
-
-
-        extern const fostlib::urlhandler::view &login;
-
-
-    }
+    /// Module
+    extern const fostlib::module c_odin;
 
 
 }

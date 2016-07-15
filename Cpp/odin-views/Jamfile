@@ -5,4 +5,6 @@ fost-lib-autotest odin-views
     :
         ../../../fost-internet/Cpp/fost-inet
         ../../../fost-web/Cpp/fost-urlhandler
+        ../../../fostgres/Cpp/fostgres
+        ../odin
     ;

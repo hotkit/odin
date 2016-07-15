@@ -6,6 +6,7 @@
 */
 
 
+#include <odin/login.hpp>
 #include <odin/views.hpp>
 
 
@@ -26,7 +27,27 @@ namespace {
                 auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
                 fostlib::json body = fostlib::json::parse(body_str);
-                throw fostlib::exceptions::not_implemented(__FUNCTION__);
+                if ( !body.has_key("username") || !body.has_key("password") ) {
+                    throw fostlib::exceptions::not_implemented("odin.login",
+                        "Must pass both username and password fields");
+                }
+                const auto username = fostlib::coerce<fostlib::string>(body["username"]);
+                const auto password = fostlib::coerce<fostlib::string>(body["password"]);
+                if ( username.empty() || password.empty() ) {
+                    throw fostlib::exceptions::not_implemented("odin.login",
+                        "Must pass both a username and password");
+                }
+                fostlib::pg::connection cnx{config};
+                auto user = odin::credentials(cnx, username, password);
+                if ( user.isnull() ) {
+                    throw fostlib::exceptions::not_implemented("Not authenticated");
+                } else {
+                    const bool pretty = fostlib::coerce<fostlib::nullable<bool>>(config["pretty"]).value(true);
+                    boost::shared_ptr<fostlib::mime> response(
+                            new fostlib::text_body(fostlib::json::unparse(user, pretty),
+                                fostlib::mime::mime_headers(), L"application/json"));
+                    return std::make_pair(response, 200);
+                }
             }
     } c_login;
 
@@ -34,5 +55,5 @@ namespace {
 }
 
 
-const fostlib::urlhandler::view &odin::view::c_login = ::c_login;
+const fostlib::urlhandler::view &odin::view::login = c_login;
 

@@ -4,7 +4,14 @@
             "view": "fost.view.pathprefix",
             "configuration": {
                 "": "fost.response.501",
-                "api/login/": "odin.login"
+                "api/login/": "odin/login"
+            }
+        },
+        "views/odin/login": {
+            "view": "odin.login",
+            "configuration": {
+                "dbname": "odin-test",
+                "host": "/home/kirit/Projects/varanus/dist/postgres/run"
             }
         }
     }

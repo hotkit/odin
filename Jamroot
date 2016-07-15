@@ -19,6 +19,7 @@ fost-project odin
         <include>../fost-orm/Cpp/include
         <include>../fost-postgres/Cpp/include
         <include>../fost-web/Cpp/include
+        <include>../fostgres/Cpp/include
     ;
 
 # The parts of the system that need to be built
@@ -30,5 +31,6 @@ alias odin :
         ../fost-web//fost
         ../fostgres//fostgres
         Configuration
+        Cpp/odin
         Cpp/odin-views
     ;

@@ -1,0 +1,8 @@
+
+fost-lib-autotest odin
+    :
+        Cpp/odin
+    :
+        ../../../fost-postgres/Cpp/fost-postgres
+        ../../../fostgres/Cpp/fostgres
+    ;

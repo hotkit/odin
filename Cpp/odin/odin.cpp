@@ -6,23 +6,8 @@
 */
 
 
-#pragma once
+#include <odin/odin.hpp>
 
 
-#include <fost/urlhandler>
-
-
-namespace odin {
-
-
-    namespace view {
-
-
-        extern const fostlib::urlhandler::view &login;
-
-
-    }
-
-
-}
+const fostlib::module odin::c_odin("odin");
 
