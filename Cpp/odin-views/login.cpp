@@ -6,7 +6,7 @@
 */
 
 
-#include <fost/urlhandler>
+#include <odin/views.hpp>
 
 
 namespace {
@@ -23,6 +23,9 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &
             ) const {
+                auto body_str = fostlib::coerce<fostlib::string>(
+                    fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
+                fostlib::json body = fostlib::json::parse(body_str);
                 throw fostlib::exceptions::not_implemented(__FUNCTION__);
             }
     } c_login;
@@ -30,4 +33,6 @@ namespace {
 
 }
 
+
+const fostlib::urlhandler::view &odin::view::c_login = ::c_login;
 

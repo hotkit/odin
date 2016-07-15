@@ -3,5 +3,6 @@ fost-lib-autotest odin-views
     :
         Cpp/odin-views
     :
+        ../../../fost-internet/Cpp/fost-inet
         ../../../fost-web/Cpp/fost-urlhandler
     ;
