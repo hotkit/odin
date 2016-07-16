@@ -70,3 +70,30 @@ CREATE TRIGGER credentials_ledger_trigger
     FOR EACH ROW
     EXECUTE PROCEDURE odin.credentials_ledger_insert();
 
+
+CREATE TABLE odin.login_attempt (
+    username text NOT NULL,
+    attempt timestamp with time zone NOT NULL DEFAULT now(),
+
+    source_address inet NULL,
+    annotation jsonb NOT NULL DEFAULT '{}'
+);
+
+CREATE TABLE odin.login_failed (
+    CONSTRAINT login_attempt_pt PRIMARY KEY (username, attempt)
+) INHERITS (odin.login_attempt);
+CREATE INDEX login_attempt_failed_source_ix
+    ON odin.login_failed (source_address, attempt)
+    WHERE source_address IS NOT NULL;
+
+CREATE TABLE odin.login_success (
+    CONSTRAINT login_success_username_fkey
+        FOREIGN KEY (username)
+        REFERENCES odin.credentials (login) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE
+) INHERITS (odin.login_attempt);
+CREATE INDEX login_success_source_ix
+    ON odin.login_attempt (source_address, attempt)
+    WHERE source_address IS NOT NULL;
+
+

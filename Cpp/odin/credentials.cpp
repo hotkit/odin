@@ -16,7 +16,9 @@
 
 fostlib::json odin::credentials(
     fostlib::pg::connection &cnx,
-    const fostlib::string &username, const fostlib::string &password
+    const fostlib::string &username, const fostlib::string &password,
+    const fostlib::nullable<fostlib::host> &source,
+    const fostlib::json &annotation
 ) {
     static const fostlib::string sql("SELECT "
             "odin.identity.tableoid AS identity__tableoid, "
@@ -25,6 +27,7 @@ fostlib::json odin::credentials(
         "FROM odin.credentials "
         "JOIN odin.identity ON odin.identity.id=odin.credentials.identity_id "
         "WHERE odin.credentials.login = $1");
+
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{username});
     auto &rs = data.second;
     auto row = rs.begin();
@@ -51,12 +54,20 @@ fostlib::json odin::credentials(
         for ( const auto &p : parts ) pos /= p;
         fostlib::insert(user, pos, record[index]);
     }
+
+    fostlib::json attempt;
+    fostlib::insert(attempt, "username", username);
+    fostlib::insert(attempt, "source_address", source);
+    fostlib::insert(attempt, "annotation", annotation);
+
     if ( user["credentials"]["password"]["hash"] == fostlib::json(password) ) {
+        cnx.insert("odin.login_success", attempt);
         return user;
     } else {
-        fostlib::log::debug(c_odin)
+        fostlib::log::warning(c_odin)
             ("", "Password mismatch")
             ("username", username);
+        cnx.insert("odin.login_failed", attempt);
         return fostlib::json();
     }
 }

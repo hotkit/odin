@@ -39,6 +39,7 @@ namespace {
                 }
                 fostlib::pg::connection cnx{config};
                 auto user = odin::credentials(cnx, username, password);
+                cnx.commit();
                 if ( user.isnull() ) {
                     throw fostlib::exceptions::not_implemented("Not authenticated");
                 } else {

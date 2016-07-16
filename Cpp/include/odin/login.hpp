@@ -9,6 +9,7 @@
 #pragma once
 
 
+#include <fost/internet>
 #include <fost/postgres>
 
 
@@ -22,7 +23,9 @@ namespace odin {
     fostlib::json credentials(
         fostlib::pg::connection &cnx,
         const fostlib::string &username,
-        const fostlib::string &password);
+        const fostlib::string &password,
+        const fostlib::nullable<fostlib::host> &source = fostlib::null,
+        const fostlib::json &annotation = fostlib::json::object_t());
 
 
 }
