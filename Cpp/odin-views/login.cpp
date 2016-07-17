@@ -9,6 +9,9 @@
 #include <odin/credentials.hpp>
 #include <odin/views.hpp>
 
+#include <fost/crypto>
+#include <fost/insert>
+
 
 namespace {
 
@@ -43,10 +46,12 @@ namespace {
                 if ( user.isnull() ) {
                     throw fostlib::exceptions::not_implemented("Not authenticated");
                 } else {
-                    const bool pretty = fostlib::coerce<fostlib::nullable<bool>>(config["pretty"]).value(true);
+                    fostlib::jwt::mint jwt(fostlib::sha256, "secret");
+                    jwt.subject(fostlib::coerce<fostlib::string>(user["identity"]["id"]));
+
                     boost::shared_ptr<fostlib::mime> response(
-                            new fostlib::text_body(fostlib::json::unparse(user, pretty),
-                                fostlib::mime::mime_headers(), L"application/json"));
+                            new fostlib::text_body(fostlib::utf8_string(jwt.token()),
+                                fostlib::mime::mime_headers(), L"application/jwt"));
                     return std::make_pair(response, 200);
                 }
             }
