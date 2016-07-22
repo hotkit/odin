@@ -5,10 +5,7 @@ set -ex
 : "${1:?Need to pass in the path to the Postgres unix domain socket}"
 
 dropdb -h $1 odin-test || echo "OK, odin-test database hasn't been created before"
-dropdb -h $1 odin || echo "OK, odin user database hasn't been created before"
-createuser -h $1 -dl odin || echo "User odin already exists"
-createdb -h $1 -O odin odin
-createdb -h $1 -O odin odin-test
-psql -h $1 -U odin odin-test < ../Schema/bootstrap.sql
+createdb -h $1 odin-test
+psql -h $1 odin-test < ../Schema/bootstrap.sql
 
 odin -h $1 -d odin-test include setup.odin
