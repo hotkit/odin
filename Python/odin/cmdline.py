@@ -1,4 +1,5 @@
-from odin.user import createuser
+import csv
+from odin.user import createuser, setfullname
 
 
 SHORTOPTS = '?d:h:'
@@ -44,10 +45,10 @@ def makedsn(opts, args):
 
 
 def include(cnx, filename):
-    with open(filename) as f:
-        lines = f.readlines()
+    with open(filename, newline='') as f:
+        lines = csv.reader(f, delimiter=' ')
         for line in lines:
-            command(cnx, *[l.strip() for l in line.split()])
+            command(cnx, *[p for p in line if p])
 
 
 def sql(cnx, filename):
@@ -58,7 +59,8 @@ def sql(cnx, filename):
     print("Executed", filename)
 
 
-COMMANDS = dict(include=include, sql=sql, user=createuser)
+COMMANDS = {'include': include, 'sql': sql, 'user': createuser,
+    'full-name': setfullname}
 
 
 class UnknownCommand(Exception):

@@ -34,6 +34,11 @@ Athorization. Primarily to do with ascertaining what a user is allowed to do in 
 Handles management of user authorization through Postgres roles.
 
 
+## opts ##
+
+There are various optional modules under opts.
+
+
 # Schema rationale #
 
 The schema is designed to provide tracking of changes for auditability. It is also designed to enforce as much as possible of the data storage rules.

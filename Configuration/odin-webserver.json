@@ -3,8 +3,9 @@
     "webserver": {
         "Load": ["fostgres", "odin-views"],
 
+        "Port": 9000,
         "hosts": {
-            "localhost:8001": "root"
+            "localhost:9000": "root"
         },
 
         "views": {

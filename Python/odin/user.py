@@ -6,6 +6,10 @@ INSERT_USER = '''INSERT INTO odin.identity_ledger (identity_id)
     ON CONFLICT (identity_id) DO NOTHING
     RETURNING *'''
 
+SET_FULLNAME = '''INSERT INTO odin.identity_full_name_ledger
+        (identity_id, full_name)
+    VALUES (%s, %s)
+    RETURNING *'''
 SET_PASSWORD = '''INSERT INTO odin.credentials_password_ledger
         (identity_id, password, process)
     VALUES (%s, %s, %s)
@@ -19,6 +23,12 @@ def createuser(cnx, username, password=None):
         print(username, "already present")
     if password:
         setpassword(cnx, username, password)
+
+
+def setfullname(cnx, username, full_name):
+    cnx.assert_module('opt.full-name')
+    cnx.execute(SET_FULLNAME, (username, full_name))
+    print(username, "full name set")
 
 
 def setpassword(cnx, username, password):

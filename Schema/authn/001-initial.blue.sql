@@ -31,7 +31,7 @@ CREATE TABLE odin.credentials_password_ledger (
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
     changed timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT password_pk PRIMARY KEY (identity_id, changed),
+    CONSTRAINT odin_credentials_password_ledger_pk PRIMARY KEY (identity_id, changed),
 
     -- The password/hash value
     password text NULL,
@@ -40,7 +40,7 @@ CREATE TABLE odin.credentials_password_ledger (
 
     -- Set this if the new hash is a hardened old hash (which must be cleared)
     hardens timestamp with time zone NULL,
-    CONSTRAINT credentials_ledger_hardens_fkey
+    CONSTRAINT odin_credentials_ledger_hardens_fkey
         FOREIGN KEY (identity_id, hardens)
         REFERENCES odin.credentials_password_ledger (identity_id, changed) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
@@ -50,14 +50,13 @@ CREATE TABLE odin.credentials_password_ledger (
 CREATE FUNCTION odin.credentials_ledger_insert() RETURNS TRIGGER AS $body$
     BEGIN
         INSERT
-            INTO odin.credentials (identity_id, login, password__hash,
-                password__process, password__changed)
+            INTO odin.credentials
+                (identity_id, login, password__hash, password__process, password__changed)
             VALUES (NEW.identity_id, NEW.identity_id, NEW.password, NEW.process, NEW.changed)
-            ON CONFLICT (login) DO UPDATE
-                SET
-                    password__hash = EXCLUDED.password__hash,
-                    password__process = EXCLUDED.password__process,
-                    password__changed = EXCLUDED.password__changed;
+            ON CONFLICT (login) DO UPDATE SET
+                password__hash = EXCLUDED.password__hash,
+                password__process = EXCLUDED.password__process,
+                password__changed = EXCLUDED.password__changed;
         IF NEW.hardens IS NOT NULL THEN
             UPDATE odin.credentials_password_ledger SET password=NULL
                 WHERE identity_id=NEW.identity_id AND changed=NEW.hardens;
@@ -65,7 +64,7 @@ CREATE FUNCTION odin.credentials_ledger_insert() RETURNS TRIGGER AS $body$
         RETURN NULL;
     END;
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
-CREATE TRIGGER credentials_ledger_trigger
+CREATE TRIGGER odin_credentials_ledger_insert_trigger
     AFTER INSERT ON odin.credentials_password_ledger
     FOR EACH ROW
     EXECUTE PROCEDURE odin.credentials_ledger_insert();
