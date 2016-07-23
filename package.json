@@ -1,5 +1,5 @@
 {
-  "license" : "SEE LICENSE IN LICENSE_1_0.txt",
+  "license": "BSL-1.0",
   "repository": "KayEss/odin",
   "devDependencies": {
     "bootstrap": "^3.3.6"
