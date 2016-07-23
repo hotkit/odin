@@ -3,8 +3,14 @@
         "views/odin": {
             "view": "fost.view.pathprefix",
             "configuration": {
-                "": "fost.response.501",
+                "": "odin/static",
                 "api/login/": "odin/login"
+            }
+        },
+        "views/odin/static": {
+            "view": "fost.static",
+            "configuration": {
+                "root": "Static/odin"
             }
         },
         "views/odin/login": {
