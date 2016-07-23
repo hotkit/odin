@@ -33,5 +33,6 @@ alias odin :
         Configuration
         Cpp/odin
         Cpp/odin-views
+        Site/less
         Site/www
     ;
