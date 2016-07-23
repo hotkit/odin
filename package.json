@@ -1,0 +1,7 @@
+{
+  "license" : "SEE LICENSE IN LICENSE_1_0.txt",
+  "repository": "KayEss/odin",
+  "devDependencies": {
+    "bootstrap": "^3.3.6"
+  }
+}
