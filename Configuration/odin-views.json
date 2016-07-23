@@ -10,7 +10,8 @@
         "views/odin/login": {
             "view": "odin.login",
             "configuration": {
-                "dbname": "odin-test"
+                "dbname": "odin-test",
+                "expires": {"hours": 2}
             }
         }
     }

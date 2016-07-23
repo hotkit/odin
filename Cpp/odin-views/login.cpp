@@ -51,12 +51,15 @@ namespace {
             } else {
                 fostlib::jwt::mint jwt(fostlib::sha256, "secret");
                 jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
+                auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
                 if ( user.has_key(full_name) )
                     jwt.claim("name", user[full_name]);
 
+                fostlib::mime::mime_headers headers;
+                headers.add("Expiress", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
                 boost::shared_ptr<fostlib::mime> response(
                         new fostlib::text_body(fostlib::utf8_string(jwt.token()),
-                            fostlib::mime::mime_headers(), L"application/jwt"));
+                            headers, L"application/jwt"));
                 return std::make_pair(response, 200);
             }
         }
