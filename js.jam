@@ -10,9 +10,18 @@ type.register ES6 : js ;
 generators.register-standard js.webpack : ES6 : JAVASCRIPT ;
 
 
+type.register JSCOVER ;
+type.register JSTESTRESULT ;
+
+generators.register-standard js.mocha : ES6 : JSTESTRESULT ;
+generators.register-composing js.coverage : JSTESTRESULT : JSCOVER ;
+
+
 rule init ( node-modules ) {
     .NPM = $(node-modules) ;
     .BABEL = $(node-modules)/.bin/babel ;
+    .NYC = $(node-modules)/.bin/nyc ;
+    .MOCHA = $(node-modules)/.bin/_mocha ;
     .WEBPACK = $(node-modules)/.bin/webpack ;
 }
 
@@ -46,6 +55,12 @@ type.set-scanner ES6 : es6-scanner ;
 
 actions babel {
     $(.BABEL) $(>) --source-maps true --out-file $(<)
+}
+actions coverage {
+    #"coverage" $(>) $(<)
+}
+actions mocha {
+    $(.BABEL)-node $(.MOCHA) $(>) && touch $(<)
 }
 actions webpack {
     $(.WEBPACK)  --colors \

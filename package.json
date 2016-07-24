@@ -10,6 +10,8 @@
     "babel-preset-react": "^6.11.1",
     "bootstrap": "^3.3.6",
     "less": "^2.7.1",
+    "mocha": "^2.5.3",
+    "nyc": "^7.0.0",
     "webpack": "^1.13.1"
   }
 }

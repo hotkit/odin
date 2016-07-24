@@ -1,6 +1,8 @@
+import path ;
 
 
 javascript sitejs : index.js ;
+jscover jscover : [ path.glob $(TOP)/Site/js : *.spec.js ] ;
 
 
 install static :
