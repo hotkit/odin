@@ -6,7 +6,8 @@ include ../boost-version.jam ;
 include ../fost-base/fost.jam ;
 
 # Extra build tools used
-using less :  "../odin/node_modules/less/bin/lessc" ;
+using js  : "../odin/node_modules/.bin/babel" ;
+using less :  "../odin/node_modules/.bin/lessc" ;
 
 
 # Bring in the projects used
@@ -37,6 +38,7 @@ alias odin :
         Configuration
         Cpp/odin
         Cpp/odin-views
+        Site/js
         Site/less
         Site/www
     ;

@@ -1,0 +1,19 @@
+import generators ;
+import scanner ;
+import type ;
+
+
+type.register JAVASCRIPT : js ;
+
+generators.register-standard js.babel : JAVASCRIPT : JAVASCRIPT ;
+
+
+rule init ( babel ) {
+    .BABEL = $(babel) ;
+}
+
+
+actions babel {
+    $(.BABEL) $(>) -d $(<)
+}
+
