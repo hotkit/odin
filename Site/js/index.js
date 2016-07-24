@@ -1,3 +1,3 @@
-import "part";
+import {foo} from "./part";
 
 let f = () => {};

@@ -10,15 +10,17 @@ type.register ES6 : js ;
 generators.register-standard js.webpack : ES6 : JAVASCRIPT ;
 
 
-rule init ( babel ) {
-    .BABEL = $(babel) ;
-    .WEBPACK = "../odin/node_modules/.bin/webpack" ;
+rule init ( node-modules ) {
+    .NPM = $(node-modules) ;
+    .BABEL = $(node-modules)/.bin/babel ;
+    .WEBPACK = $(node-modules)/.bin/webpack ;
 }
 
 
 class es6-scanner : common-scanner {
     rule pattern ( ) {
-        return "import[ ]*\"([^\"]*)\"" ;
+        return "import[ ]*\"([^\"]*)\""
+            "from[ ]*\"([^\"]*)\"" ;
     }
     rule process ( target : matches * : binding )
     {
@@ -46,7 +48,8 @@ actions babel {
     $(.BABEL) $(>) --source-maps true --out-file $(<)
 }
 actions webpack {
-    $(.WEBPACK) $(>) $(<)
+    $(.WEBPACK)  --colors \
+        --module-bind 'js=$(.NPM)/babel-loader/index?presets[]=react&presets[]=es2015' \
+        $(>) $(<) --bail
 }
-
 
