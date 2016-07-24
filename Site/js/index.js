@@ -1,2 +1,3 @@
+import "part";
 
 let f = () => {};

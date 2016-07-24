@@ -1,4 +1,10 @@
 
 
-javascript site : index.js ;
+javascript sitejs : index.js ;
 
+
+install static :
+        sitejs
+    :
+        <location>$(PREFIX)/Static/odin
+    ;

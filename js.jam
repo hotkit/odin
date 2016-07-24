@@ -3,17 +3,50 @@ import scanner ;
 import type ;
 
 
-type.register JAVASCRIPT : js ;
+type.register ES5 : 5.js ;
+type.register JAVASCRIPT : : ES5 ;
+type.register ES6 : js ;
 
-generators.register-standard js.babel : JAVASCRIPT : JAVASCRIPT ;
+generators.register-standard js.webpack : ES6 : JAVASCRIPT ;
 
 
 rule init ( babel ) {
     .BABEL = $(babel) ;
+    .WEBPACK = "../odin/node_modules/.bin/webpack" ;
 }
+
+
+class es6-scanner : common-scanner {
+    rule pattern ( ) {
+        return "import[ ]*\"([^\"]*)\"" ;
+    }
+    rule process ( target : matches * : binding )
+    {
+        # The .js is optional so try with adding them back in
+        local old_matches = $(matches) ;
+        for match in $(old_matches) {
+            matches += "$(match).js" ;
+        }
+
+        local target_path = [ NORMALIZE_PATH $(binding:D) ] ;
+
+        NOCARE $(matches) ;
+        INCLUDES $(target) : $(matches) ;
+        SEARCH on $(matches) = $(target_path) $(self.includes:G=) ;
+        ISFILE $(matches) ;
+
+        scanner.propagate $(__name__) : $(matches) : $(target) ;
+    }
+}
+scanner.register es6-scanner ;
+type.set-scanner ES6 : es6-scanner ;
 
 
 actions babel {
-    $(.BABEL) $(>) -d $(<)
+    $(.BABEL) $(>) --source-maps true --out-file $(<)
 }
+actions webpack {
+    $(.WEBPACK) $(>) $(<)
+}
+
 
