@@ -1,7 +1,7 @@
 import {foo} from "./part";
 
 describe("Test test", () => {
-    it("passess", () => {
+    it("foo can be called", () => {
         foo();
     });
 });
