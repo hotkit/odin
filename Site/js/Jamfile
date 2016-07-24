@@ -2,7 +2,7 @@ import path ;
 
 
 javascript sitejs : index.js ;
-jscover jscover : [ path.glob $(TOP)/Site/js : *.spec.js ] ;
+jscover specs : [ glob-tree *.spec.js ] ;
 
 
 install static :
