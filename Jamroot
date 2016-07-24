@@ -5,6 +5,10 @@ path-constant TOP : . ;
 include ../boost-version.jam ;
 include ../fost-base/fost.jam ;
 
+# Extra build tools used
+using less :  "../odin/node_modules/less/bin/lessc" ;
+
+
 # Bring in the projects used
 use-project fost-base : ../fost-base ;
 use-project fost-internet : ../fost-internet ;

@@ -9,7 +9,8 @@ type.register CSS : css ;
 generators.register-standard less.lessc : LESS : CSS ;
 
 
-rule init ( ) {
+rule init (  less-compiler ) {
+    .LESSC = $(less-compiler) ;
 }
 
 
@@ -23,6 +24,6 @@ type.set-scanner LESS : less-scanner ;
 
 
 actions lessc {
-    "../odin/node_modules/less/bin/lessc" $(>) $(<)
+    $(.LESSC) $(>) $(<)
 }
 
