@@ -1,11 +1,9 @@
+using less ;
 
-make site.css : site.less : @lessc ;
-actions lessc {
-    "$(TOP)/node_modules/less/bin/lessc" $(>) $(<)
-}
+css site : site.less ;
 
 install static :
-        site.css
+        site
     :
         <location>$(PREFIX)/Static/odin
     ;
