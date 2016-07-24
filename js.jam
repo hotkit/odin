@@ -64,7 +64,7 @@ actions instrument {
     $(.NYC) instrument $(>) $(<)
 }
 actions mocha {
-    $(.BABEL)-node $(.MOCHA) $(>) && touch $(<)
+    $(.BABEL)-node $(.MOCHA) --reporter list $(>) && touch $(<)
 }
 actions webpack {
     $(.WEBPACK)  --colors \
