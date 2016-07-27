@@ -6,6 +6,7 @@
 */
 
 
+#include <odin/odin.hpp>
 #include <odin/views.hpp>
 
 #include <fost/crypto>
@@ -29,7 +30,8 @@ namespace {
             if ( req.headers().exists("Authorization") ) {
                 auto parts = fostlib::partition(req.headers()["Authorization"].value(), " ");
                 if ( parts.first == "Bearer" && not parts.second.isnull() ) {
-                    auto jwt = fostlib::jwt::token::load("secret", parts.second.value());
+                    auto jwt = fostlib::jwt::token::load(
+                        odin::c_jwt_secret.value(), parts.second.value());
                     if ( not jwt.isnull() ) {
                         return execute(config["secure"], path, req, host);
                     }

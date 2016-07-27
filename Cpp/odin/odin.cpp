@@ -7,7 +7,12 @@
 
 
 #include <odin/odin.hpp>
+#include <odin/nonce.hpp>
 
 
 const fostlib::module odin::c_odin("odin");
+
+
+const fostlib::setting<fostlib::string> odin::c_jwt_secret(
+    "odin/odin.cpp", "odin", "JWT secret", odin::nonce(), true);
 

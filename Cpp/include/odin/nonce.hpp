@@ -15,12 +15,11 @@
 namespace odin {
 
 
-    /// Module
-    extern const fostlib::module c_odin;
-
-
-    /// The secret used for JWT tokens
-    extern const fostlib::setting<fostlib::string> c_jwt_secret;
+    /// Return a string with enough entropy for use in nonces
+    /// suitable for salting password hashes or for SHA256-HMAC
+    /// secrets. The string contains 32 bytes with 192 bits worth
+    /// of entropy.
+    fostlib::string nonce();
 
 
 }

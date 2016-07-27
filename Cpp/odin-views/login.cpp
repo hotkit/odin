@@ -7,6 +7,7 @@
 
 
 #include <odin/credentials.hpp>
+#include <odin/odin.hpp>
 #include <odin/views.hpp>
 
 #include <fost/crypto>
@@ -49,7 +50,7 @@ namespace {
             if ( user.isnull() ) {
                 throw fostlib::exceptions::not_implemented("Not authenticated");
             } else {
-                fostlib::jwt::mint jwt(fostlib::sha256, "secret");
+                fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
                 jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
                 auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
                 if ( user.has_key(full_name) )

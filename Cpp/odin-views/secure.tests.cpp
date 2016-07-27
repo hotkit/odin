@@ -6,7 +6,9 @@
 */
 
 
+#include <odin/odin.hpp>
 #include <odin/views.hpp>
+
 #include <fost/crypto>
 #include <fost/test>
 #include <fost/exception/parse_error.hpp>
@@ -58,7 +60,7 @@ FSL_TEST_FUNCTION(check_unsecure_04_wrong_token) {
 }
 
 FSL_TEST_FUNCTION(check_secure) {
-    fostlib::jwt::mint jwt(fostlib::sha256, "secret");
+    fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
     jwt.subject("test-user");
     fostlib::http::server::request req("GET", "/");
     req.headers().set("Authorization", ("Bearer " + jwt.token()).c_str());
