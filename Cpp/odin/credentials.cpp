@@ -6,8 +6,9 @@
 */
 
 
-#include <odin/odin.hpp>
 #include <odin/credentials.hpp>
+#include <odin/odin.hpp>
+#include <odin/pwhashproc.hpp>
 
 #include <fost/insert>
 #include <fost/log>
@@ -62,7 +63,10 @@ fostlib::json odin::credentials(
         fostlib::insert(user, pos, record[index]);
     }
 
-    if ( user["credentials"]["password"]["hash"] == fostlib::json(password) ) {
+    const auto hash = fostlib::coerce<fostlib::string>(
+        user["credentials"]["password"]["hash"]);
+    const auto process = user["credentials"]["password"]["process"];
+    if ( check_password(password, hash, process) ) {
         cnx.insert("odin.login_success", attempt);
         return user;
     } else {
