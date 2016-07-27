@@ -27,9 +27,10 @@ namespace {
         }
 
         std::pair<boost::shared_ptr<fostlib::mime>, int> operator () (
-            const fostlib::json &config, const fostlib::string &,
+            const fostlib::json &config,
+            const fostlib::string &path,
             fostlib::http::server::request &req,
-            const fostlib::host &
+            const fostlib::host &host
         ) const {
             auto body_str = fostlib::coerce<fostlib::string>(
                 fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
@@ -48,7 +49,7 @@ namespace {
             auto user = odin::credentials(cnx, username, password);
             cnx.commit();
             if ( user.isnull() ) {
-                throw fostlib::exceptions::not_implemented("Not authenticated");
+                return execute(config["failure"], path, req, host);
             } else {
                 fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
                 jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));

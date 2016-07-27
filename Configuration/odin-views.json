@@ -18,7 +18,15 @@
             "view": "odin.login",
             "configuration": {
                 "dbname": "odin-test",
-                "expires": {"hours": 2}
+                "expires": {"hours": 2},
+                "failure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
             }
         },
         "views/odin/api": {
