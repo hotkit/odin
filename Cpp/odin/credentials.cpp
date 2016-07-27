@@ -69,7 +69,7 @@ fostlib::json odin::credentials(
         fostlib::log::warning(c_odin)
             ("", "Password mismatch")
             ("username", username);
-        cnx.insert("odin.login_failedd", attempt);
+        cnx.insert("odin.login_failed", attempt);
         return fostlib::json();
     }
 }
