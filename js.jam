@@ -58,7 +58,7 @@ actions babel {
     $(.BABEL) $(>) --source-maps true --out-file $(<)
 }
 actions coverage {
-    #"coverage" $(>) $(<)
+    touch $(<)
 }
 actions instrument {
     $(.NYC) instrument $(>) $(<)
