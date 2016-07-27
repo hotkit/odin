@@ -4,6 +4,7 @@
             "view": "fost.view.pathprefix",
             "configuration": {
                 "": "odin/static",
+                "api/": "odin/api",
                 "api/login/": "odin/login"
             }
         },
@@ -18,6 +19,25 @@
             "configuration": {
                 "dbname": "odin-test",
                 "expires": {"hours": 2}
+            }
+        },
+        "views/odin/api": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "fost.view.pathprefix",
+                    "configuration": {
+                        "": "fost.response.500"
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
             }
         }
     }
