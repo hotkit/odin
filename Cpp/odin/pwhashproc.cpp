@@ -9,12 +9,22 @@
 #include <odin/odin.hpp>
 #include <odin/pwhashproc.hpp>
 
+#include <fost/crypto>
+
 
 bool odin::check_password(
     const fostlib::string &password,
     const fostlib::string &hash,
     const fostlib::json &procedure
 ) {
-    return password == hash;
+    const auto salt = fostlib::coerce<std::vector<unsigned char>>(
+        fostlib::base64_string(
+            fostlib::coerce<fostlib::string>(procedure["salt"]).c_str()));
+    const auto hashb = fostlib::coerce<std::vector<unsigned char>>(
+        fostlib::base64_string(hash.c_str()));
+    const auto hashed = fostlib::pbkdf2_hmac_sha256(
+        fostlib::coerce<fostlib::utf8_string>(password),
+        salt, 300000, 32);
+    return fostlib::crypto_compare(hashed, hashb);
 }
 
