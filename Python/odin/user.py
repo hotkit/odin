@@ -1,3 +1,6 @@
+import base64
+import hashlib
+import os
 from psycopg2.extras import Json
 
 
@@ -33,7 +36,11 @@ def setfullname(cnx, username, full_name):
 
 def setpassword(cnx, username, password):
     cnx.assert_module('authn')
-    cnx.execute(SET_PASSWORD, (username, password, Json(dict())))
+    salt = os.urandom(24)
+    process = dict(name='pbkdf2-sha256', rounds=300000, length=32,
+        salt=base64.b64encode(salt).decode('utf8'))
+    pwhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf8'), salt, 300000)
+    cnx.execute(SET_PASSWORD, (username, base64.b64encode(pwhash).decode('utf8'), Json(process)))
     print(username, "password set")
 
 
