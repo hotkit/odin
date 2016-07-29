@@ -10,10 +10,16 @@
 
         "views": {
             "root": {
-                "view": "fost.view.pathprefix",
+                "view": "fost.middleware.request",
                 "configuration": {
-                    "": "redirect",
-                    "odin/": "odin"
+                    "headers": {
+                        "__dbname": "odin-test"
+                    },
+                    "view": "fost.view.pathprefix",
+                    "configuration": {
+                        "": "redirect",
+                        "odin/": "odin"
+                    }
                 }
             },
             "redirect": {
@@ -24,6 +30,5 @@
             }
         }
     }
-
 }
 

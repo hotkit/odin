@@ -12,6 +12,7 @@
 
 #include <fost/crypto>
 #include <fost/insert>
+#include <fostgres/sql.hpp>
 
 
 namespace {
@@ -45,7 +46,7 @@ namespace {
                 throw fostlib::exceptions::not_implemented("odin.login",
                     "Must pass both a username and password");
             }
-            fostlib::pg::connection cnx{config};
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto user = odin::credentials(cnx, username, password);
             cnx.commit();
             if ( user.isnull() ) {

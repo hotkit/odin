@@ -17,7 +17,9 @@
         "views/odin/login": {
             "view": "odin.login",
             "configuration": {
-                "dbname": "odin-test",
+                "host": ["request", "headers", "__host"],
+                "user": ["request", "headers", "__user"],
+                "dbname": ["request", "headers", "__dbname"],
                 "expires": {"hours": 2},
                 "failure": {
                     "view": "fost.response.401",
