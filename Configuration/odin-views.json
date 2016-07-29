@@ -37,7 +37,7 @@
                 "secure": {
                     "view": "fost.view.pathprefix",
                     "configuration": {
-                        "": "fost.response.500"
+                        "": "fost.response.404"
                     }
                 },
                 "unsecure": {
