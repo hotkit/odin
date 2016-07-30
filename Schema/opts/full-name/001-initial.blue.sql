@@ -5,7 +5,6 @@ INSERT INTO odin.migration VALUES('opt.full-name', '001-initial.blue.sql');
 ALTER TABLE odin.identity  ADD COLUMN
     full_name text NULL;
 
-
 CREATE TABLE odin.identity_full_name_ledger (
     identity_id text NOT NULL,
     CONSTRAINT credentials_password_ledger_identity_fkey
