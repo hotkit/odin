@@ -33,6 +33,9 @@ namespace {
                     auto jwt = fostlib::jwt::token::load(
                         odin::c_jwt_secret.value(), parts.second.value());
                     if ( not jwt.isnull() ) {
+                        req.headers().set("__jwt", jwt.value().payload, "sub");
+                        req.headers().set("__user",
+                            fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]));
                         return execute(config["secure"], path, req, host);
                     }
                 }

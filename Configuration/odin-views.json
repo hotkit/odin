@@ -76,11 +76,19 @@
                     {
                         "return": "object",
                         "path": [],
-                        "GET": "SELECT
-                            'odin/handshake'::text AS \"@context\",
-                            array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
-                            'login/'::text AS odin__login,
-                            'something/'::text AS odin__some_api"
+                        "GET": {
+                            "command": "SELECT
+                                    'odin/handshake'::text AS \"@context\",
+                                    array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
+                                    'login/'::text AS odin__login,
+                                    'something/'::text AS odin__some_api,
+                                    identity.tableoid AS user__tableoid,
+                                    identity.*
+                                FROM odin.identity WHERE identity.id = $1",
+                            "arguments": [
+                                ["request", "headers", "__user"]
+                            ]
+                        }
                     }
                 ]
             }
