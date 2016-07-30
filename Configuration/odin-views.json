@@ -17,9 +17,9 @@
         "views/odin/login": {
             "view": "odin.login",
             "configuration": {
-                "host": ["request", "headers", "__host"],
-                "user": ["request", "headers", "__user"],
-                "dbname": ["request", "headers", "__dbname"],
+                "host": ["request", "headers", "__pgdsn", "host"],
+                "user": ["request", "headers", "__pgdsn", "user"],
+                "dbname": ["request", "headers", "__pgdsn", "dbname"],
                 "expires": {"hours": 2},
                 "failure": {
                     "view": "fost.response.401",
@@ -48,9 +48,9 @@
                         },
                         "view": "fostgres.sql",
                         "configuration": {
-                            "host": ["request", "headers", "__host"],
-                            "user": ["request", "headers", "__user"],
-                            "dbname": ["request", "headers", "__dbname"],
+                            "host": ["request", "headers", "__pgdsn", "host"],
+                            "user": ["request", "headers", "__pgdsn", "user"],
+                            "dbname": ["request", "headers", "__pgdsn", "dbname"],
                             "sql": [
                                 {
                                     "return": "object",
@@ -69,9 +69,9 @@
         "views/odin/sql": {
             "view": "fostgres.sql",
             "configuration": {
-                "host": ["request", "headers", "__host"],
-                "user": ["request", "headers", "__user"],
-                "dbname": ["request", "headers", "__dbname"],
+                "host": ["request", "headers", "__pgdsn", "host"],
+                "user": ["request", "headers", "__pgdsn", "user"],
+                "dbname": ["request", "headers", "__pgdsn", "dbname"],
                 "sql": [
                     {
                         "return": "object",
