@@ -37,7 +37,7 @@
                 "secure": {
                     "view": "fost.view.pathprefix",
                     "configuration": {
-                        "": "fost.response.404"
+                        "": "odin/sql"
                     }
                 },
                 "unsecure": {
@@ -45,10 +45,46 @@
                     "configuration": {
                         "schemes": {
                             "Bearer": {}
+                        },
+                        "view": "fostgres.sql",
+                        "configuration": {
+                            "host": ["request", "headers", "__host"],
+                            "user": ["request", "headers", "__user"],
+                            "dbname": ["request", "headers", "__dbname"],
+                            "sql": [
+                                {
+                                    "return": "object",
+                                    "path": [],
+                                    "GET": "SELECT
+                                        'odin/handshake'::text AS \"@context\",
+                                        array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
+                                        'login/'::text AS odin__login"
+                                }
+                            ]
                         }
                     }
                 }
             }
+        },
+        "views/odin/sql": {
+            "view": "fostgres.sql",
+            "configuration": {
+                "host": ["request", "headers", "__host"],
+                "user": ["request", "headers", "__user"],
+                "dbname": ["request", "headers", "__dbname"],
+                "sql": [
+                    {
+                        "return": "object",
+                        "path": [],
+                        "GET": "SELECT
+                            'odin/handshake'::text AS \"@context\",
+                            array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
+                            'login/'::text AS odin__login,
+                            'something/'::text AS odin__some_api"
+                    }
+                ]
+            }
         }
     }
 }
+
