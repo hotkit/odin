@@ -38,6 +38,10 @@ Handles management of user authorization through Postgres roles.
 
 There are various optional modules under opts.
 
+### full-name ###
+
+Adds a full name field to the identity.
+
 
 # Schema rationale #
 
