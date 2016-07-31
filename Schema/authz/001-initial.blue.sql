@@ -19,10 +19,10 @@ CREATE TABLE odin.identity_superuser_ledger (
 );
 CREATE FUNCTION odin.identity_superuser_ledger_insert() RETURNS TRIGGER AS $body$
     BEGIN
-        INSERT INTO odin.identity (id, superuser)
-            VALUES (NEW.identity_id, is_superuser)
+        INSERT INTO odin.identity (id, is_superuser)
+            VALUES (NEW.identity_id, NEW.superuser)
             ON CONFLICT (id) DO UPDATE SET
-                is_superuser = EXCLUDED.superuser;
+                is_superuser = EXCLUDED.is_superuser;
         RETURN NULL;
     END
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;

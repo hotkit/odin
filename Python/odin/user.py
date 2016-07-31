@@ -17,6 +17,10 @@ SET_PASSWORD = '''INSERT INTO odin.credentials_password_ledger
         (identity_id, password, process)
     VALUES (%s, %s, %s)
     RETURNING *'''
+SET_SUPERUSER = '''INSERT INTO odin.identity_superuser_ledger
+        (identity_id, superuser, annotation)
+    VALUES (%s, %s, %s)
+    RETURNING *'''
 
 
 def createuser(cnx, username, password=None):
@@ -42,6 +46,12 @@ def setpassword(cnx, username, password):
     pwhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf8'), salt, 300000)
     cnx.execute(SET_PASSWORD, (username, base64.b64encode(pwhash).decode('utf8'), Json(process)))
     print(username, "password set")
+
+
+def setsuperuser(cnx, username, su=True, annotation=dict()):
+    cnx.assert_module('authz')
+    cnx.execute(SET_SUPERUSER, (username, su, Json(annotation)))
+    print(username, "super user set" if su else "unpriviliged user")
 
 
 class User(object):

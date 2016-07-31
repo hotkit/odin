@@ -1,5 +1,5 @@
 import csv
-from odin.user import createuser, setfullname
+from odin.user import createuser, setfullname, setsuperuser
 
 
 SHORTOPTS = '?d:h:'
@@ -48,7 +48,8 @@ def include(cnx, filename):
     with open(filename, newline='') as f:
         lines = csv.reader(f, delimiter=' ')
         for line in lines:
-            command(cnx, *[p for p in line if p])
+            if len(line):
+                command(cnx, *[p for p in line if p])
 
 
 def sql(cnx, filename):
@@ -60,7 +61,7 @@ def sql(cnx, filename):
 
 
 COMMANDS = {'include': include, 'sql': sql, 'user': createuser,
-    'full-name': setfullname}
+    'full-name': setfullname, 'set-superuser': setsuperuser}
 
 
 class UnknownCommand(Exception):
