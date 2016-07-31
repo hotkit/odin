@@ -36,7 +36,7 @@ CREATE TRIGGER odin_identity_superuser_ledger_insert_trigger
 
 
 CREATE TABLE odin.group (
-    slug text NOT NULL,
+    slug text NOT NULL CHECK (odin.url_safe(slug)),
     CONSTRAINT odin_group_pk PRIMARY KEY (slug),
 
     description text NOT NULL DEFAULT ''
@@ -76,7 +76,7 @@ CREATE TABLE odin.group_membership (
 
 
 CREATE TABLE odin.permission (
-    slug text NOT NULL,
+    slug text NOT NULL CHECK (odin.url_safe(slug)),
     CONSTRAINT odin_permission_pk PRIMARY KEY (slug),
 
     description text NOT NULL DEFAULT ''

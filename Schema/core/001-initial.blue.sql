@@ -2,8 +2,20 @@ INSERT INTO odin.module VALUES ('core');
 INSERT INTO odin.migration VALUES('core', '001-initial.blue.sql');
 
 
+CREATE FUNCTION odin.url_safe(str text) RETURNS boolean AS $body$
+    BEGIN
+        -- Disallow back slash, forward slash, fraction slash (2044),
+        -- division slash (2215), reverse solidus operator (29f5),
+        -- big solidus (29f8), big reverse solidus (29f9),
+        -- small reverse solidus (fe68), fullwidth solidus (ff0f),
+        -- full width reverse solidus (ff3c)
+        RETURN str !~ '\\|/|\u2044|\u2215|\u29f5|\u29f8|\u29f9|\ufe68|\uff0f|\uff3c';
+    END
+$body$ LANGUAGE plpgsql;
+
+
 CREATE TABLE odin.identity (
-    id text NOT NULL,
+    id text NOT NULL CHECK (odin.url_safe(id)),
     CONSTRAINT identity_pk PRIMARY KEY (id)
 );
 
