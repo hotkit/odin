@@ -30,9 +30,18 @@ comand is one of:
         execution. This is useful for choosing migrations scripts to run.
 
     user:
-            user username
-        Ensure the requested user is in the system
+            user username [password]
+        Ensure the requested user is in the system. Setting the password
+        requires the module `authn`.
 
+    full-name:
+            full-name username "Full Name"
+        Set the full name field. Requres module `opt/full-name`
+
+    set-superuser:
+            superuser username [True|False]
+        Sets the superuser bit (defaults to True). Requires the `authz`
+        module.
 """
 
 
@@ -48,7 +57,7 @@ def include(cnx, filename):
     with open(filename, newline='') as f:
         lines = csv.reader(f, delimiter=' ')
         for line in lines:
-            if len(line):
+            if len(line) and not line[0].startswith('#'):
                 command(cnx, *[p for p in line if p])
 
 
@@ -60,8 +69,13 @@ def sql(cnx, filename):
     print("Executed", filename)
 
 
-COMMANDS = {'include': include, 'sql': sql, 'user': createuser,
-    'full-name': setfullname, 'set-superuser': setsuperuser}
+COMMANDS = {
+        'full-name': setfullname,
+        'include': include,
+        'sql': sql,
+        'superuser': setsuperuser,
+        'user': createuser,
+    }
 
 
 class UnknownCommand(Exception):
