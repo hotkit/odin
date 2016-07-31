@@ -18,20 +18,22 @@ CREATE TABLE odin.credentials (
     -- The process for generating the password hash
     password__process jsonb NULL,
     --- When the password was last set
-    password__changed timestamp with time zone NULL,
+    password__reference text NULL,
     --- When the password expires
     password__expires timestamp with time zone NULL
 );
 
-
 CREATE TABLE odin.credentials_password_ledger (
+    reference text NOT NULL,
     identity_id text NOT NULL,
     CONSTRAINT credentials_password_ledger_identity_fkey
         FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    CONSTRAINT odin_credentials_password_ledger_pk PRIMARY KEY (reference, identity_id),
+
     changed timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT odin_credentials_password_ledger_pk PRIMARY KEY (identity_id, changed),
+    pg_user text NOT NULL DEFAULT current_user,
 
     -- The password/hash value
     password text NULL,
@@ -39,10 +41,10 @@ CREATE TABLE odin.credentials_password_ledger (
     process jsonb NOT NULL,
 
     -- Set this if the new hash is a hardened old hash (which must be cleared)
-    hardens timestamp with time zone NULL,
+    hardens text NULL,
     CONSTRAINT odin_credentials_ledger_hardens_fkey
-        FOREIGN KEY (identity_id, hardens)
-        REFERENCES odin.credentials_password_ledger (identity_id, changed) MATCH SIMPLE
+        FOREIGN KEY (hardens, identity_id)
+        REFERENCES odin.credentials_password_ledger (reference, identity_id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
 
     annotation jsonb NOT NULL DEFAULT '{}'
@@ -51,15 +53,15 @@ CREATE FUNCTION odin.credentials_ledger_insert() RETURNS TRIGGER AS $body$
     BEGIN
         INSERT
             INTO odin.credentials
-                (identity_id, login, password__hash, password__process, password__changed)
-            VALUES (NEW.identity_id, NEW.identity_id, NEW.password, NEW.process, NEW.changed)
+                (identity_id, login, password__hash, password__process, password__reference)
+            VALUES (NEW.identity_id, NEW.identity_id, NEW.password, NEW.process, NEW.reference)
             ON CONFLICT (login) DO UPDATE SET
                 password__hash = EXCLUDED.password__hash,
                 password__process = EXCLUDED.password__process,
-                password__changed = EXCLUDED.password__changed;
+                password__reference = EXCLUDED.password__reference;
         IF NEW.hardens IS NOT NULL THEN
             UPDATE odin.credentials_password_ledger SET password=NULL
-                WHERE identity_id=NEW.identity_id AND changed=NEW.hardens;
+                WHERE identity_id=NEW.identity_id AND reference=NEW.hardens;
         END IF;
         RETURN NULL;
     END;

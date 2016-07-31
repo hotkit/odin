@@ -6,15 +6,19 @@ ALTER TABLE odin.identity ADD COLUMN
     is_superuser boolean NOT NULL DEFAULT 'f';
 
 CREATE TABLE odin.identity_superuser_ledger (
+    reference text NOT NULL,
     identity_id text NOT NULL,
     CONSTRAINT credentials_superuser_ledger_identity_fkey
         FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    CONSTRAINT odin_identity_superuser_ledger_pk PRIMARY KEY (reference, identity_id),
+
     changed timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT odin_identity_superuser_ledger_pk PRIMARY KEY (identity_id, changed),
+    pg_user text NOT NULL DEFAULT current_user,
 
     superuser boolean NOT NULL,
+
     annotation json NOT NULL DEFAULT '{}'
 );
 CREATE FUNCTION odin.identity_superuser_ledger_insert() RETURNS TRIGGER AS $body$
@@ -36,6 +40,23 @@ CREATE TABLE odin.group (
     CONSTRAINT odin_group_pk PRIMARY KEY (slug),
 
     description text NOT NULL DEFAULT ''
+);
+
+CREATE TABLE odin.group_ledger (
+    reference text NOT NULL,
+    group_slug text NOT NULL,
+    CONSTRAINT odin_group_ledger_group_fkey
+        FOREIGN KEY (group_slug)
+        REFERENCES odin.group (slug) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    CONSTRAINT odin_group_ledger_pk PRIMARY KEY (reference, group_slug),
+
+    changed timestamp with time zone NOT NULL DEFAULT now(),
+    pg_user text NOT NULL DEFAULT current_user,
+
+    description text NOT NULL DEFAULT '',
+
+    annotation json NOT NULL DEFAULT '{}'
 );
 
 

@@ -9,8 +9,10 @@ CREATE TABLE odin.identity (
 
 
 CREATE TABLE odin.identity_ledger (
+    reference text NOT NULL,
     identity_id text NOT NULL,
-    CONSTRAINT odint_identity_ledger_pk PRIMARY KEY (identity_id),
+    CONSTRAINT odin_identity_ledger_pk PRIMARY KEY (reference, identity_id),
+
     created timestamp with time zone NOT NULL DEFAULT now(),
     pg_user text NOT NULL DEFAULT current_user,
     annotation jsonb NOT NULL DEFAULT '{}'
@@ -25,3 +27,4 @@ CREATE TRIGGER identity_ledger_insert_trigger
     AFTER INSERT ON odin.identity_ledger
     FOR EACH ROW
     EXECUTE PROCEDURE identity_ledger_insert();
+

@@ -6,15 +6,19 @@ ALTER TABLE odin.identity  ADD COLUMN
     full_name text NULL;
 
 CREATE TABLE odin.identity_full_name_ledger (
+    reference text NOT NULL,
     identity_id text NOT NULL,
     CONSTRAINT credentials_password_ledger_identity_fkey
         FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    CONSTRAINT odin_identity_full_name_ledger_pk PRIMARY KEY (reference, identity_id),
+
     changed timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT odin_identity_full_name_ledger_pk PRIMARY KEY (identity_id, changed),
+    pg_user text NOT NULL DEFAULT current_user,
 
     full_name text NOT NULL,
+
     annotation json NOT NULL DEFAULT '{}'
 );
 CREATE FUNCTION odin.identity_full_name_ledger_insert() RETURNS TRIGGER AS $body$
