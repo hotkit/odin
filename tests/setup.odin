@@ -21,3 +21,6 @@ permission create-user "Can create a user"
 permission create-group "Can create a group"
 
 # Assign permissions to groups
+
+# Assign group memberships
+membership anonymous auditor

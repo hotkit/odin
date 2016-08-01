@@ -1,5 +1,5 @@
 import csv
-from odin.group import setgroup
+from odin.group import addmembership, setgroup
 from odin.permission import setpermission
 from odin.user import createuser, setfullname, setsuperuser
 
@@ -31,6 +31,9 @@ Comand is one of:
 
     include filename
         Find commands (one per line) in the specified file and run them
+
+    membership user group1 [group2 [group3 ...]]
+        Add the user to one or more groups.
 
     permission name [description]
         Set up a permission and its description.
@@ -77,6 +80,7 @@ COMMANDS = {
         'full-name': setfullname,
         'group': setgroup,
         'include': include,
+        'membership': addmembership,
         'permission': setpermission,
         'sql': sql,
         'superuser': setsuperuser,
