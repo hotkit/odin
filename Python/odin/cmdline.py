@@ -1,5 +1,6 @@
 import csv
 from odin.group import setgroup
+from odin.permission import setpermission
 from odin.user import createuser, setfullname, setsuperuser
 
 
@@ -19,28 +20,30 @@ opts are one or more of:
     -h hostname             Postgres host
     -d database             Database  name
 
-comand is one of:
+Comand is one of:
 
-    include:
-            include filename
+    full-name username "Full Name"
+
+        Set the full name field. Requres module `opt/full-name`
+
+    group name [description]
+        Set up a group and its description.
+
+    include filename
         Find commands (one per line) in the specified file and run them
 
-    sql:
-            sql filename
+    permission name [description]
+        Set up a permission and its description.
+
+    sql filename
         Load the filename and present the SQL in it to the database for
         execution. This is useful for choosing migrations scripts to run.
 
-    user:
-            user username [password]
+    user username [password]
         Ensure the requested user is in the system. Setting the password
         requires the module `authn`.
 
-    full-name:
-            full-name username "Full Name"
-        Set the full name field. Requres module `opt/full-name`
-
-    set-superuser:
-            superuser username [True|False]
+    superuser username [True|False]
         Sets the superuser bit (defaults to True). Requires the `authz`
         module.
 """
@@ -74,6 +77,7 @@ COMMANDS = {
         'full-name': setfullname,
         'group': setgroup,
         'include': include,
+        'permission': setpermission,
         'sql': sql,
         'superuser': setsuperuser,
         'user': createuser,

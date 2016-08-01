@@ -64,7 +64,7 @@ CREATE FUNCTION odin.group_ledger_insert() RETURNS TRIGGER AS $body$
             VALUES (NEW.group_slug, NEW.description)
             ON CONFLICT (slug) DO UPDATE SET
                 description = EXCLUDED.description;
-        RETURN NULL;
+        RETURN NEW;
     END
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
 CREATE TRIGGER odin_group_ledger_insert_trigger
@@ -93,6 +93,36 @@ CREATE TABLE odin.permission (
 
     description text NOT NULL DEFAULT ''
 );
+
+CREATE TABLE odin.permission_ledger (
+    reference text NOT NULL,
+    permission_slug text NOT NULL,
+    CONSTRAINT odin_permission_ledger_permission_fkey
+        FOREIGN KEY (permission_slug)
+        REFERENCES odin.permission (slug) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    CONSTRAINT odin_permission_ledger_pk PRIMARY KEY (reference, permission_slug),
+
+
+    changed timestamp with time zone NOT NULL DEFAULT now(),
+    pg_user text NOT NULL DEFAULT current_user,
+
+    description text NOT NULL DEFAULT '',
+
+    annotation json NOT NULL DEFAULT '{}'
+);
+CREATE FUNCTION odin.permission_ledger_insert() RETURNS TRIGGER AS $body$
+    BEGIN
+        INSERT INTO odin.permission (slug, description)
+            VALUES (NEW.permission_slug, NEW.description)
+            ON CONFLICT (slug) DO UPDATE SET
+                description = EXCLUDED.description;
+        RETURN NEW;
+    END
+    $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
+CREATE TRIGGER odin_permission_ledger_insert_trigger
+    BEFORE INSERT ON odin.permission_ledger
+    FOR EACH ROW EXECUTE PROCEDURE odin.permission_ledger_insert();
 
 
 CREATE TABLE odin.group_grant (
