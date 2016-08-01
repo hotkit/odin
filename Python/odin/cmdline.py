@@ -1,5 +1,5 @@
 import csv
-from odin.group import addmembership, setgroup
+from odin.group import addmembership, assignpermission, setgroup
 from odin.permission import setpermission
 from odin.user import createuser, setfullname, setsuperuser
 
@@ -22,8 +22,10 @@ opts are one or more of:
 
 Comand is one of:
 
-    full-name username "Full Name"
+    assign group permission1 [permission2 [permission3 ...]]
+        Assign one or more permissions to a group.
 
+    full-name username "Full Name"
         Set the full name field. Requres module `opt/full-name`
 
     group name [description]
@@ -77,6 +79,7 @@ def sql(cnx, filename):
 
 
 COMMANDS = {
+        'assign': assignpermission,
         'full-name': setfullname,
         'group': setgroup,
         'include': include,

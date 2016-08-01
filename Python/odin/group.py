@@ -9,6 +9,10 @@ SET_MEMBERSHIP = '''INSERT INTO odin.group_membership_ledger
     (reference, identity_id, group_slug, member)
     VALUES (%s, %s, %s, %s)
     RETURNING *'''
+SET_PERMISSION = '''INSERT INTO odin.group_grant_ledger
+    (reference, group_slug, permission_slug, allows)
+    VALUES (%s, %s, %s, %s)
+    RETURNING *'''
 
 
 def setgroup(cnx, group, description=''):
@@ -22,4 +26,11 @@ def addmembership(cnx, user, *groups):
     for group in groups:
         cnx.execute(SET_MEMBERSHIP, (cnx.reference, user, group, True))
         print(user, "is a member of", group)
+
+
+def assignpermission(cnx, group, *permissions):
+    cnx.assert_module('authz')
+    for permission in permissions:
+        cnx.execute(SET_PERMISSION, (cnx.reference, group, permission, True))
+        print(group, "now allows", permission)
 

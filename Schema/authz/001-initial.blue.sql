@@ -175,10 +175,50 @@ CREATE TABLE odin.group_grant (
         REFERENCES odin.group (slug) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
     permission_slug text NOT NULL,
-    CONSTRAINT odin_group_grant_pemmission_fkey
+    CONSTRAINT odin_group_grant_permission_fkey
         FOREIGN KEY (permission_slug)
         REFERENCES odin.permission (slug) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
     CONSTRAINT odin_group_grant_pk PRIMARY KEY (group_slug, permission_slug)
 );
+
+CREATE TABLE odin.group_grant_ledger (
+    reference text NOT NULL,
+    group_slug text NOT NULL,
+    CONSTRAINT odin_group_grant_ledger_group_fkey
+        FOREIGN KEY (group_slug)
+        REFERENCES odin.group (slug) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    permission_slug text NOT NULL,
+    CONSTRAINT odin_group_grant_ledger_permission_fkey
+        FOREIGN KEY (permission_slug)
+        REFERENCES odin.permission (slug) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    CONSTRAINT odin_group_grant_ledger_pk PRIMARY KEY
+        (reference, group_slug, permission_slug),
+
+    changed timestamp with time zone NOT NULL DEFAULT now(),
+    pg_user text NOT NULL DEFAULT current_user,
+
+    -- Inserrt with true to add the permission, with false to remove it
+    allows boolean NOT NULL,
+
+    annotation json NOT NULL DEFAULT '{}'
+);
+CREATE FUNCTION odin.group_grant_ledger_insert() RETURNS TRIGGER AS $body$
+    BEGIN
+        IF NEW.allows THEN
+            INSERT INTO odin.group_grant (group_slug, permission_slug)
+                VALUES (NEW.group_slug, NEW.permission_slug)
+                ON CONFLICT DO NOTHING;
+        ELSE
+            DELETE FROM odin.group_grant
+                WHERE group_slug = NEW.group_slug AND permission_slug = NEW.permission_slug;
+        END if;
+        RETURN NEW;
+    END
+    $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
+CREATE TRIGGER odin_group_grant_ledger_insert_trigger
+    BEFORE INSERT ON odin.group_grant_ledger
+    FOR EACH ROW EXECUTE PROCEDURE odin.group_grant_ledger_insert();
 
