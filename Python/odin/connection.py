@@ -1,7 +1,11 @@
 import base64
+from datetime import datetime, timezone
 import os
 from psycopg2 import connect
 from psycopg2.extensions import ISOLATION_LEVEL_SERIALIZABLE
+
+
+EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 
 class ModuleNotPresent(Exception):
@@ -20,8 +24,11 @@ class Connection(object):
 
 
     def new_reference(self):
-        refb = os.urandom(48)
-        self.reference = base64.b64encode(refb).decode('utf8')
+        epoch_time = (datetime.now(timezone.utc) - EPOCH).total_seconds()
+        ref = base64.b64encode(os.urandom(3)).decode('utf8')
+        self.reference = "%s-%s" % (epoch_time, ref)
+        self.cursor.execute("""SET LOCAL odin.reference=%s;""", (self.reference,))
+
 
     def load_modules(self):
         self.cursor.execute("SELECT name FROM odin.module")
@@ -50,5 +57,6 @@ class Connection(object):
 
     def commit(self):
         self.pg.commit()
+        print("* Changes commited")
         self.new_reference()
 

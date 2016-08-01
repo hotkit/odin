@@ -73,6 +73,11 @@ CREATE TRIGGER odin_group_ledger_insert_trigger
     BEFORE INSERT ON odin.group_ledger
     FOR EACH ROW EXECUTE PROCEDURE odin.group_ledger_insert();
 
+INSERT INTO odin.group_ledger
+    (reference, group_slug, description) VALUES
+    (current_setting('odin.reference'), 'admin-group',
+        'Can create groups and assign permissions to them');
+
 
 -- Users can be assigned to any number of groups
 CREATE TABLE odin.group_membership (
