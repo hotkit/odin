@@ -10,3 +10,7 @@ superuser root
 
 # Create an account to be used by anonymous users
 user anonymous
+
+group auditor "Can view most of the user and group set up and audit trails in the system"
+group admin-group "Can create groups and assign permissions to them"
+group admin-user "Can create users and assign groups to them"

@@ -58,6 +58,18 @@ CREATE TABLE odin.group_ledger (
 
     annotation json NOT NULL DEFAULT '{}'
 );
+CREATE FUNCTION odin.group_ledger_insert() RETURNS TRIGGER AS $body$
+    BEGIN
+        INSERT INTO odin.group (slug, description)
+            VALUES (NEW.group_slug, NEW.description)
+            ON CONFLICT (slug) DO UPDATE SET
+                description = EXCLUDED.description;
+        RETURN NULL;
+    END
+    $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
+CREATE TRIGGER odin_group_ledger_insert_trigger
+    BEFORE INSERT ON odin.group_ledger
+    FOR EACH ROW EXECUTE PROCEDURE odin.group_ledger_insert();
 
 
 CREATE TABLE odin.group_membership (

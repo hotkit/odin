@@ -1,4 +1,5 @@
 import csv
+from odin.group import setgroup
 from odin.user import createuser, setfullname, setsuperuser
 
 
@@ -71,6 +72,7 @@ def sql(cnx, filename):
 
 COMMANDS = {
         'full-name': setfullname,
+        'group': setgroup,
         'include': include,
         'sql': sql,
         'superuser': setsuperuser,
