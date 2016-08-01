@@ -75,8 +75,12 @@ CREATE TRIGGER odin_group_ledger_insert_trigger
 
 INSERT INTO odin.group_ledger
     (reference, group_slug, description) VALUES
+    (current_setting('odin.reference'), 'auditor',
+        'Can view most of the user and group set up and audit trails in the system'),
     (current_setting('odin.reference'), 'admin-group',
-        'Can create groups and assign permissions to them');
+        'Can create groups and assign permissions to them'),
+    (current_setting('odin.reference'), 'admin-user',
+        'Can create users and assign groups to ');
 
 
 -- Users can be assigned to any number of groups
@@ -171,6 +175,13 @@ CREATE TRIGGER odin_permission_ledger_insert_trigger
     BEFORE INSERT ON odin.permission_ledger
     FOR EACH ROW EXECUTE PROCEDURE odin.permission_ledger_insert();
 
+INSERT INTO odin.permission_ledger
+    (reference, permission_slug, description) VALUES
+    (current_setting('odin.reference'), 'create-user',
+        'Can create a user'),
+    (current_setting('odin.reference'), 'create-group',
+        'Can create a group');
+
 
 -- Groups are granted any number of permissions
 CREATE TABLE odin.group_grant (
@@ -226,4 +237,9 @@ CREATE FUNCTION odin.group_grant_ledger_insert() RETURNS TRIGGER AS $body$
 CREATE TRIGGER odin_group_grant_ledger_insert_trigger
     BEFORE INSERT ON odin.group_grant_ledger
     FOR EACH ROW EXECUTE PROCEDURE odin.group_grant_ledger_insert();
+
+INSERT INTO odin.group_grant_ledger
+    (reference, group_slug, permission_slug, allows) VALUES
+    (current_setting('odin.reference'), 'admin-group', 'create-group', 't'),
+    (current_setting('odin.reference'), 'admin-user', 'create-user', 't');
 

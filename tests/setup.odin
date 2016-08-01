@@ -12,17 +12,21 @@ superuser root
 user anonymous
 
 # Only three groups to start with
-group auditor "Can view most of the user and group set up and audit trails in the system"
-group admin-user "Can create users and assign groups to them"
+group testers "Test users"
 
 # Various permissions are needed
-permission create-user "Can create a user"
-permission create-group "Can create a group"
+permission run-test "Allowed to run a test"
 
 # Assign permissions to groups
-assign admin-group create-group
-assign admin-user create-user
+assign testers run-test
 
-# Assign group memberships
-membership anonymous auditor
+# Create some test users
+
+user fred password123
+full-name fred "Fred Flintstone"
+membership fred auditor admin-group admin-user
+
+user barney password123
+full-name barney "Barney Rubble"
+membership barney testers auditor admin-user
 
