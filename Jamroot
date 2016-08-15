@@ -38,7 +38,11 @@ alias odin :
         Configuration
         Cpp/odin
         Cpp/odin-views
+    ;
+
+alias odin-web :
         Site/js
         Site/less
         Site/www
     ;
+explicit odin-web ;
