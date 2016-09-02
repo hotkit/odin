@@ -1,0 +1,2 @@
+GET odin /api/ 401 {"odin": {"login": "./login/"}}
+GET odin/api / 401 {"odin": {"login": "./login/"}}

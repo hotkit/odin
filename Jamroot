@@ -53,3 +53,9 @@ alias odin-web :
         Site/www
     ;
 explicit odin-web ;
+
+alias test :
+        Cpp/odin-fg
+    ;
+explicit test ;
+
