@@ -38,9 +38,14 @@ alias odin :
         Configuration
         Cpp/odin
         Cpp/odin-views
+    ;
+
+# This target is probably never needed as distutils will be used instead
+alias odin-python :
         Python/bin
         Python/odin
     ;
+explicit odin-python ;
 
 alias odin-web :
         Site/js
