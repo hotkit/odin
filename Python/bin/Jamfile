@@ -1,0 +1,7 @@
+
+install odin-py-bin :
+        [ glob-tree * : Jamfile ]
+    :
+        <location>$(PREFIX)/bin
+        <install-source-root>$(TOP)/Python/bin
+    ;

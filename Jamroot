@@ -38,6 +38,8 @@ alias odin :
         Configuration
         Cpp/odin
         Cpp/odin-views
+        Python/bin
+        Python/odin
     ;
 
 alias odin-web :
