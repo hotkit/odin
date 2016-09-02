@@ -4,10 +4,11 @@ from odin.permission import setpermission
 from odin.user import createuser, setfullname, setsuperuser
 
 
-SHORTOPTS = '?d:h:'
+SHORTOPTS = '?d:h:U:'
 PGOPTMAP = {
         '-d': 'dbname',
         '-h': 'host',
+        '-U': 'user',
     }
 
 HELPTEXT = """Manage an Odin database
@@ -19,6 +20,7 @@ opts are one or more of:
     -?                      Print this text
     -h hostname             Postgres host
     -d database             Database  name
+    -U username             Database username
 
 Comand is one of:
 
