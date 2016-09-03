@@ -22,5 +22,10 @@ namespace odin {
         const fostlib::json &procedure);
 
 
+    /// Set the given user's password
+    std::pair<fostlib::string, fostlib::json> set_password(
+        const fostlib::string &password);
+
+
 }
 

@@ -6,20 +6,16 @@
 */
 
 
-#include <odin/fg/native.hpp>
+#include <fostgres/fg/fg.extension.hpp>
 
 
-namespace {
+namespace odin {
 
 
-    fg::json jwt(
-        fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end
-    ) {
-        return fg::json();
+    namespace lib {
+        extern fg::frame::builtin jwt;
     }
 
 
 }
 
-
-fg::frame::builtin odin::lib::jwt = ::jwt;

@@ -27,6 +27,7 @@ run ../../../fostgres/Cpp/fostgres-test//fostgres-test :
         ../../Schema/bootstrap.sql
         ../odin-views//odin-views
         login.fg
+        odin-fg
     :
     :
         odin-test-login

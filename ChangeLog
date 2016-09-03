@@ -1,2 +1,5 @@
+2016-09-03  Kirit Saelensminde  <kirit@felspar.com>
+ Add in the fostgres-test testing language and use it to test the login API.
+
 2016-07-09  Kirit Saelensminde  <kirit@felspar.com>
  Added ChangeLog

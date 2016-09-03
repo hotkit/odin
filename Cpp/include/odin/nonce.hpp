@@ -9,7 +9,7 @@
 #pragma once
 
 
-#include <fost/core>
+#include <fost/postgres>
 
 
 namespace odin {
@@ -20,6 +20,19 @@ namespace odin {
     /// secrets. The string contains 32 bytes with 192 bits worth
     /// of entropy.
     fostlib::string nonce();
+
+
+    /// Return a reference value to be used with SQL commands
+    fostlib::string reference();
+
+
+    /// Sets a new reference on the database connection so that
+    /// updates can be tied together.
+    fostlib::pg::connection &reference(fostlib::pg::connection &);
+
+
+    /// Sets the specified reference on a connection.
+    fostlib::pg::connection &reference(fostlib::pg::connection &, const fostlib::string &);
 
 
 }
