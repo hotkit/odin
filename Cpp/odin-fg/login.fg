@@ -1,0 +1,9 @@
+# The login API is mounted in the odin view as a special
+# case in order to bypass the security check generally
+# done in the odin/api view
+
+GET odin /api/ 401 {"odin": {"login": "./login/"}}
+GET odin /api/login/ 501
+
+# It's also its own view
+GET odin/login / 501

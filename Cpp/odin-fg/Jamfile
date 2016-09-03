@@ -18,3 +18,16 @@ run ../../../fostgres/Cpp/fostgres-test//fostgres-test :
     :
         odin-test-no-auth
     ;
+
+
+run ../../../fostgres/Cpp/fostgres-test//fostgres-test :
+        odin-test-login
+    :
+        ../../Configuration/odin-views.json
+        ../../Schema/bootstrap.sql
+        ../odin-views//odin-views
+        login.fg
+    :
+    :
+        odin-test-login
+    ;
