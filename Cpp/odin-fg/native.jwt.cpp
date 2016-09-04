@@ -22,4 +22,4 @@ namespace {
 }
 
 
-fg::frame::builtin odin::lib::jwt = ::jwt;
+const fg::frame::builtin odin::lib::jwt = ::jwt;

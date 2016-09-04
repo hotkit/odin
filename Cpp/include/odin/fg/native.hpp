@@ -7,13 +7,18 @@
 
 
 #include <fostgres/fg/fg.extension.hpp>
+#include <fost/postgres>
 
 
 namespace odin {
 
 
+    /// Connect and set hte reference option on the connection
+    fostlib::pg::connection connect(fg::frame &);
+
+
     namespace lib {
-        extern fg::frame::builtin jwt;
+        const extern fg::frame::builtin jwt, user;
     }
 
 
