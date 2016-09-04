@@ -1,0 +1,26 @@
+
+run ../../fostgres/Cpp/fostgres-test//fostgres-test :
+        odin-test-no-auth
+    :
+        ../Configuration/odin-views.json
+        ../Cpp/odin-views//odin-views
+        ../Schema/bootstrap.sql
+        no-auth.fg
+    :
+    :
+        odin-test-no-auth
+    ;
+
+
+run ../../fostgres/Cpp/fostgres-test//fostgres-test :
+        odin-test-login
+    :
+        ../Configuration/odin-views.json
+        ../Cpp/odin-fg//odin-fg
+        ../Cpp/odin-views//odin-views
+        ../Schema/bootstrap.sql
+        login.fg
+    :
+    :
+        odin-test-login
+    ;

@@ -56,6 +56,7 @@ explicit odin-web ;
 
 alias test :
         Cpp/odin-fg
+        tests
     ;
 explicit test ;
 

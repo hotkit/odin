@@ -6,29 +6,3 @@ fost-lib-autotest odin-fg
         ../odin
     ;
 
-
-run ../../../fostgres/Cpp/fostgres-test//fostgres-test :
-        odin-test-no-auth
-    :
-        ../../Configuration/odin-views.json
-        ../../Schema/bootstrap.sql
-        ../odin-views//odin-views
-        no-auth.fg
-    :
-    :
-        odin-test-no-auth
-    ;
-
-
-run ../../../fostgres/Cpp/fostgres-test//fostgres-test :
-        odin-test-login
-    :
-        ../../Configuration/odin-views.json
-        ../../Schema/bootstrap.sql
-        ../odin-views//odin-views
-        login.fg
-        odin-fg
-    :
-    :
-        odin-test-login
-    ;
