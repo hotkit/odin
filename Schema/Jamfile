@@ -1,0 +1,7 @@
+
+install odin-schemas :
+        [ glob-tree *.* : Jamfile ]
+    :
+        <location>$(PREFIX)/share/odin/Schema
+        <install-source-root>$(TOP)/Schema
+    ;

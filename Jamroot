@@ -38,6 +38,7 @@ alias odin :
         Configuration
         Cpp/odin
         Cpp/odin-views
+        Schema
     ;
 
 # This target is probably never needed as distutils will be used instead
