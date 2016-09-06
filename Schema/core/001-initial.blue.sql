@@ -31,7 +31,10 @@ CREATE TABLE odin.identity_ledger (
 );
 CREATE FUNCTION identity_ledger_insert() RETURNS TRIGGER AS $body$
     BEGIN
-        INSERT INTO odin.identity VALUES (NEW.identity_id);
+        INSERT
+            INTO odin.identity
+            VALUES (NEW.identity_id)
+            ON CONFLICT DO NOTHING;
         RETURN NULL;
     END;
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
