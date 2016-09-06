@@ -6,6 +6,7 @@
 */
 
 
+#include <odin/nonce.hpp>
 #include <odin/odin.hpp>
 #include <odin/views.hpp>
 
@@ -27,6 +28,10 @@ namespace {
             fostlib::http::server::request &req,
             const fostlib::host &host
         ) const {
+            // Set the reference header
+            auto ref = odin::reference();
+            req.headers().set("__odin_reference", ref);
+            // Now check which sub-view to enter
             if ( req.headers().exists("Authorization") ) {
                 auto parts = fostlib::partition(req.headers()["Authorization"].value(), " ");
                 if ( parts.first == "Bearer" && not parts.second.isnull() ) {
