@@ -20,8 +20,8 @@ namespace {
 
 
     const class login : public fostlib::urlhandler::view {
-        fostlib::jcursor subject = fostlib::jcursor("identity", "id");
-        fostlib::jcursor full_name = fostlib::jcursor("identity", "full_name");
+        const static fostlib::jcursor subject;
+        const static fostlib::jcursor full_name;
 
     public:
         login()
@@ -74,6 +74,10 @@ namespace {
             }
         }
     } c_login;
+
+
+    const fostlib::jcursor login::subject("identity", "id");
+    const fostlib::jcursor login::full_name("identity", "full_name");
 
 
 }
