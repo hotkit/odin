@@ -49,6 +49,7 @@
                         "view": "fost.view.pathprefix",
                         "configuration": {
                             "": "odin/unsecure/sql",
+                            "me/": "fost.response.403",
                             "user/": {
                                 "view": "odin.user.unsecure",
                                 "configuration": "odin/unsecure/sql"
@@ -73,6 +74,7 @@
                                     'odin/handshake'::text AS \"@context\",
                                     array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
                                     './login/'::text AS odin__login,
+                                    './me/permissions'::text AS odin__my__permissions,
                                     './user/:user-id/'::text AS odin__user,
                                     identity.tableoid AS user__tableoid,
                                     identity.*
@@ -81,6 +83,10 @@
                                 ["request", "headers", "__user"]
                             ]
                         }
+                    },
+                    {
+                        "path": ["/me", "/permissions"],
+                        "GET": "SELECT * FROM odin.permission"
                     },
                     {
                         "return": "object",
@@ -120,6 +126,7 @@
                             'odin/handshake'::text AS \"@context\",
                             array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
                             './login/'::text AS odin__login,
+                            './me/permissions'::text AS odin__my__permissions,
                             './user/:user-id/'::text AS odin__user"
                     },
                     {

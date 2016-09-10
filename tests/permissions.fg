@@ -1,0 +1,16 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+
+# Set up test permissions and group
+
+# When not logged in get a 403 or 401
+GET odin/api / 401 {"odin": {"my": {"permissions": "./me/permissions"}}}
+GET odin/api /me/permissions 401
+
+# Set up a user account
+odin.user test
+odin.jwt.authorization test-user
+
+GET odin/api /me/permissions 200
