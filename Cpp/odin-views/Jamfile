@@ -6,6 +6,7 @@ fost-lib-autotest odin-views
         ../../../fost-base/Cpp/fost-crypto
         ../../../fost-internet/Cpp/fost-inet
         ../../../fost-web/Cpp/fost-urlhandler
+        ../../../fostgres/Cpp/fost-csj
         ../../../fostgres/Cpp/fostgres
         ../odin
     ;
