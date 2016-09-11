@@ -33,6 +33,7 @@ namespace {
     const fg::register_builtins g_odin(
         [](fg::frame &stack) {
             stack.symbols["odin.reference"] = odin::reference();
+            stack.native["odin.assign"] = odin::lib::assign;
             stack.native["odin.group"] = odin::lib::group;
             stack.native["odin.jwt.authorization"] = odin::lib::jwt;
             stack.native["odin.permission"] = odin::lib::permission;

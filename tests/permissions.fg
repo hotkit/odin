@@ -7,6 +7,7 @@ odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
 odin.permission test-perm "Test permission"
 odin.permission not-granted "Another permission"
 odin.group public "Public access"
+odin.assign public test-perm create-group
 
 # When not logged in get a 403 or 401
 GET odin/api / 401 {"odin": {"my": {"permissions": "./me/permissions"}}}
