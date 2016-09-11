@@ -18,7 +18,7 @@ namespace odin {
 
 
     namespace lib {
-        const extern fg::frame::builtin jwt, user;
+        const extern fg::frame::builtin jwt, permission, user;
     }
 
 

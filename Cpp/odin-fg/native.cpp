@@ -34,6 +34,7 @@ namespace {
         [](fg::frame &stack) {
             stack.symbols["odin.reference"] = odin::reference();
             stack.native["odin.jwt.authorization"] = odin::lib::jwt;
+            stack.native["odin.permission"] = odin::lib::permission;
             stack.native["odin.sql.file"] = sql_file;
             stack.native["odin.user"] = odin::lib::user;
         });
