@@ -48,3 +48,24 @@ const fg::frame::builtin odin::lib::group =
         return fostlib::json();
     };
 
+
+const fg::frame::builtin odin::lib::membership =
+    [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
+        auto cnx = connect(stack);
+        fg::json row;
+        fostlib::insert(row, "reference", stack.lookup("odin.reference"));
+        fostlib::insert(row, "member", true);
+        fostlib::insert(row, "identity_id",
+            stack.resolve_string(stack.argument("user", pos, end)));
+        fostlib::insert(row, "group_slug",
+            stack.resolve_string(stack.argument("group", pos, end)));
+        cnx.insert("odin.group_membership_ledger", row);
+        while ( pos != end ) {
+            fostlib::jcursor("group_slug").replace(row,
+                stack.resolve_string(stack.argument("group", pos, end)));
+            cnx.insert("odin.group_membership_ledger", row);
+        }
+        cnx.commit();
+        return fostlib::json();
+    };
+

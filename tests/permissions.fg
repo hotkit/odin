@@ -15,6 +15,7 @@ GET odin/api /me/permissions 401
 
 # Set up a user account
 odin.user test
+odin.membership test public
 odin.jwt.authorization test-user
 
 GET odin/api /me/permissions 200
