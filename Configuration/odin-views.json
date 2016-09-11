@@ -86,7 +86,23 @@
                     },
                     {
                         "path": ["/me", "/permissions"],
-                        "GET": "SELECT * FROM odin.permission"
+                        "GET": {
+                            "command": "SELECT
+                                    odin.permission.slug AS permission,
+                                    odin.permission.description
+                                FROM odin.identity
+                                JOIN odin.group_membership
+                                    ON odin.identity.id=odin.group_membership.identity_id
+                                JOIN odin.group_grant
+                                    ON odin.group_grant.group_slug=odin.group_membership.group_slug
+                                JOIN odin.permission
+                                    ON odin.permission.slug=odin.group_grant.permission_slug
+                                WHERE odin.identity.id=$1
+                                ORDER BY permission",
+                            "arguments": [
+                                ["request", "headers", "__user"]
+                            ]
+                        }
                     },
                     {
                         "return": "object",
