@@ -18,5 +18,11 @@ odin.user test-user
 odin.membership test-user public
 odin.jwt.authorization test-user
 
+# Check the right permissions are granted
 GET odin/api /me/permissions 200 {"columns": ["permission"],
     "rows": [["create-group"], ["test-perm"]]}
+
+# Set superuser and then check again
+odin.superuser test-user
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["create-group"], ["create-user"], ["not-granted"], ["test-perm"]]}

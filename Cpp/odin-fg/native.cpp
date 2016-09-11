@@ -39,6 +39,7 @@ namespace {
             stack.native["odin.membership"] = odin::lib::membership;
             stack.native["odin.permission"] = odin::lib::permission;
             stack.native["odin.sql.file"] = sql_file;
+            stack.native["odin.superuser"] = odin::lib::superuser;
             stack.native["odin.user"] = odin::lib::user;
         });
 

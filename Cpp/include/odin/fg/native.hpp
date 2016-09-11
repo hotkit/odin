@@ -19,7 +19,7 @@ namespace odin {
 
     namespace lib {
         const extern fg::frame::builtin assign, group, jwt, membership,
-            permission, user;
+            permission, superuser, user;
     }
 
 

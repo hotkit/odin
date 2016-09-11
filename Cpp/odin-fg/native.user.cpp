@@ -13,6 +13,20 @@
 #include <fost/insert>
 
 
+const fg::frame::builtin odin::lib::superuser =
+    [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
+        auto cnx = connect(stack);
+        fg::json row;
+        fostlib::insert(row, "reference", stack.lookup("odin.reference"));
+        fostlib::insert(row, "identity_id",
+            stack.resolve_string(stack.argument("username", pos, end)));
+        fostlib::insert(row, "superuser", true);
+        cnx.insert("odin.identity_superuser_ledger", row);
+        cnx.commit();
+        return fostlib::json();
+    };
+
+
 const fg::frame::builtin odin::lib::user =
     [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
         auto cnx = connect(stack);
