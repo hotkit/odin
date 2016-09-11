@@ -25,6 +25,7 @@ const fg::frame::builtin odin::lib::assign =
         while ( pos != end ) {
             fostlib::jcursor("permission_slug").replace(row,
                 stack.resolve_string(stack.argument("permission", pos, end)));
+            cnx.insert("odin.group_grant_ledger", row);
         }
         cnx.commit();
         return fostlib::json();
