@@ -87,19 +87,10 @@
                     {
                         "path": ["/me", "/permissions"],
                         "GET": {
-                            "command": "SELECT DISTINCT
-                                    odin.permission.slug AS permission,
-                                    odin.permission.description
-                                FROM odin.identity
-                                JOIN odin.group_membership ON
-                                    odin.identity.id=odin.group_membership.identity_id
-                                JOIN odin.group_grant ON
-                                    (odin.group_grant.group_slug=odin.group_membership.group_slug
-                                    OR odin.identity.is_superuser='t')
-                                JOIN odin.permission ON
-                                    (odin.permission.slug=odin.group_grant.permission_slug
-                                    OR odin.identity.is_superuser='t')
-                                WHERE odin.identity.id=$1
+                            "command": "SELECT
+                                    permission_slug AS permission, description
+                                FROM odin.user_permission
+                                WHERE identity_id=$1
                                 ORDER BY permission",
                             "arguments": [
                                 ["request", "headers", "__user"]

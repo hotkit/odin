@@ -238,6 +238,24 @@ CREATE TRIGGER odin_group_grant_ledger_insert_trigger
     BEFORE INSERT ON odin.group_grant_ledger
     FOR EACH ROW EXECUTE PROCEDURE odin.group_grant_ledger_insert();
 
+
+CREATE VIEW odin.user_permission AS
+    SELECT DISTINCT
+            odin.identity.id as identity_id,
+            odin.permission.slug AS permission_slug,
+            odin.permission.description
+        FROM odin.identity
+        JOIN odin.group_membership ON
+            (odin.identity.id=odin.group_membership.identity_id
+                 OR odin.identity.is_superuser='t')
+        JOIN odin.group_grant ON
+            (odin.group_grant.group_slug=odin.group_membership.group_slug
+                 OR odin.identity.is_superuser='t')
+        JOIN odin.permission ON
+            (odin.permission.slug=odin.group_grant.permission_slug
+                OR odin.identity.is_superuser='t');
+
+
 INSERT INTO odin.group_grant_ledger
     (reference, group_slug, permission_slug, allows) VALUES
     (current_setting('odin.reference'), 'admin-group', 'create-group', 't'),
