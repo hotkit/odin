@@ -1,0 +1,45 @@
+{
+    "webserver": {
+        "views/test/permission": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "fost.view.pathprefix",
+                    "configuration": {
+                        "": "fost.response.404",
+                        "create-group/": {
+                            "view": "odin.permission",
+                            "configuration": {
+                                "host": ["request", "headers", "__pgdsn", "host"],
+                                "user": ["request", "headers", "__pgdsn", "user"],
+                                "dbname": ["request", "headers", "__pgdsn", "dbname"],
+                                "permission": "create-group",
+                                "allowed": "odin/secure/sql",
+                                "forbidden": "fost.response.403"
+                            }
+                        },
+                        "not-granted/": {
+                            "view": "odin.permission",
+                            "configuration": {
+                                "host": ["request", "headers", "__pgdsn", "host"],
+                                "user": ["request", "headers", "__pgdsn", "user"],
+                                "dbname": ["request", "headers", "__pgdsn", "dbname"],
+                                "permission": "not-granted",
+                                "allowed": "odin/secure/sql",
+                                "forbidden": "fost.response.403"
+                            }
+                        }
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

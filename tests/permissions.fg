@@ -12,6 +12,7 @@ odin.assign public test-perm create-group
 # When not logged in get a 403 or 401
 GET odin/api / 401 {"odin": {"my": {"permissions": "./me/permissions"}}}
 GET odin/api /me/permissions 401
+GET test/permission /not-granted/ 401
 
 # Set up a user account
 odin.user test-user
@@ -22,7 +23,13 @@ odin.jwt.authorization test-user
 GET odin/api /me/permissions 200 {"columns": ["permission"],
     "rows": [["create-group"], ["test-perm"]]}
 
+# Check the web API is also able to check the permissions
+GET test/permission /create-group/ 200
+GET test/permission /not-granted/ 403
+
 # Set superuser and then check again
 odin.superuser test-user
 GET odin/api /me/permissions 200 {"columns": ["permission"],
     "rows": [["create-group"], ["create-user"], ["not-granted"], ["test-perm"]]}
+GET test/permission /create-group/ 200
+GET test/permission /not-granted/ 200

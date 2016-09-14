@@ -48,6 +48,7 @@ run ../../fostgres/Cpp/fostgres-test//fostgres-test :
         ../Cpp/odin-views//odin-views
         ../Schema/bootstrap.sql
         permissions.fg
+        permissions.json
     :
     :
         odin-test-permissions
