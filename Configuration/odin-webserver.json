@@ -11,15 +11,19 @@
 
         "views": {
             "root": {
-                "view": "fost.middleware.request",
+                "view": "fost.middleware.logging",
                 "configuration": {
-                    "headers": {
-                        "__pgdsn": {"dbname": "odin-test"}
-                    },
-                    "view": "fost.view.pathprefix",
+                    "view": "fost.middleware.request",
                     "configuration": {
-                        "": "redirect",
-                        "odin/": "odin"
+                        "headers": {
+                            "__pgdsn": {"dbname": "odin-test"}
+                        },
+                        "view": "fost.view.pathprefix",
+                        "configuration": {
+                            "": "redirect",
+                            "favicon.ico": "fost.response.404",
+                            "odin/": "odin"
+                        }
                     }
                 }
             },
