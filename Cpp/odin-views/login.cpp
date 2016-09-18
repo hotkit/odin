@@ -50,7 +50,7 @@ namespace {
                 }
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
                 odin::reference(cnx);
-                auto user = odin::credentials(cnx, username, password);
+                auto user = odin::credentials(cnx, username, password, req.remote_address());
                 cnx.commit();
                 if ( user.isnull() ) {
                     return execute(config["failure"], path, req, host);
