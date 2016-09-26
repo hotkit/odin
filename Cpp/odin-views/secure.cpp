@@ -12,6 +12,7 @@
 
 #include <fost/crypto>
 #include <fost/insert>
+#include <fost/log>
 
 
 namespace {
@@ -43,6 +44,11 @@ namespace {
                             fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]));
                         return execute(config["secure"], path, req, host);
                     }
+                } else {
+                    fostlib::log::warning(odin::c_odin)
+                        ("", "Invalid Authorization scheme")
+                        ("scheme", parts.first)
+                        ("data", parts.second);
                 }
             }
             return execute(config["unsecure"], path, req, host);
