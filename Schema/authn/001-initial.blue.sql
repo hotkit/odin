@@ -76,7 +76,7 @@ CREATE TABLE odin.login_attempt (
     username text NOT NULL,
     attempt timestamp with time zone NOT NULL DEFAULT now(),
 
-    source_address inet NULL,
+    source_address text NULL,
     annotation jsonb NOT NULL DEFAULT '{}'
 );
 
