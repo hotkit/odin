@@ -1,4 +1,5 @@
 import csv
+from odin.display import listing
 from odin.group import (addmembership, assignpermission, removemembership,
     setgroup)
 from odin.permission import setpermission
@@ -99,6 +100,7 @@ COMMANDS = {
         'full-name': setfullname,
         'group': setgroup,
         'include': include,
+        'list': listing,
         'membership': addmembership,
         'password': setpassword,
         'permission': setpermission,

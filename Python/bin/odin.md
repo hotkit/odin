@@ -120,6 +120,16 @@ In order to set a password the following is also needed:
 
     # grant INSERT on odin.credentials_password_ledger to uadmin;
 
+The full name (`full-name` command) requires:
+
+    # grant INSERT on odin.identity_full_name_ledger to uadmin;
+
+### Displaying information about users
+
+The `list` commmand provides several options for displaying information about users. These rely on the following SELECT permissions:
+
+* users -- `grant SELECT on odin.identity to uadmin;`
+
 ### Add and remove users to groups
 
 Covers the `membership` and `exclude` commands.
