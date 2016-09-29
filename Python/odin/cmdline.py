@@ -45,6 +45,9 @@ Comand is one of:
     include filename
         Find commands (one per line) in the specified file and run them
 
+    list [users|user-groups|user-permissions]
+        List information about the current configuration of the system.
+
     membership user group1 [group2 [group3 ...]]
         Add the user to one or more groups. Requires the `authz` module.
 

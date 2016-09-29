@@ -41,6 +41,18 @@ Set up a group and its description.
 
 Find commands (one per line) in the specified file and run them
 
+### Listing users
+
+    list [users|user-groups|user-permissions]
+
+List information about the current configuration of the system.
+
+* users -- List all users and their names
+* user-groups -- List the groups that users belong to with the group names
+* user-permissions -- List all permissions that users have
+
+Superusers are listed as members of all groups and as having all permissions whether or not they've been explicitly added to any groups.
+
 ### Add a user to one or more groups
 
     membership user group1 [group2 [group3 ...]]
@@ -130,6 +142,7 @@ The `list` commmand provides several options for displaying information about us
 
 * users -- `grant SELECT on odin.identity to uadmin;`
 * user-groups -- `grant SELECT on odin.identity, odin.group, odin.group_membership to uadmin;`
+* user-permissions -- `grant SELECT on odin.identity, odin.group_grant, odin.group_membership to uadmin;`
 
 ### Add and remove users to groups
 
