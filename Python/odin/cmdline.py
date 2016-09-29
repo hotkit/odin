@@ -1,7 +1,7 @@
 import csv
 from odin.group import addmembership, assignpermission, setgroup
 from odin.permission import setpermission
-from odin.user import createuser, setfullname, setsuperuser
+from odin.user import createuser, setfullname, setpassword, setsuperuser
 
 
 SHORTOPTS = '?d:h:U:'
@@ -41,6 +41,11 @@ Comand is one of:
 
     membership user group1 [group2 [group3 ...]]
         Add the user to one or more groups.
+
+    password name [password]
+        Set (or reset) the user's password. If the password is not provided
+        as part of the command then the tool will prompt the user to
+        enter one. Setting the password requires the module `authn`.
 
     permission name [description]
         Set up a permission and its description.
@@ -89,6 +94,7 @@ COMMANDS = {
         'group': setgroup,
         'include': include,
         'membership': addmembership,
+        'password': setpassword,
         'permission': setpermission,
         'sql': sql,
         'superuser': setsuperuser,

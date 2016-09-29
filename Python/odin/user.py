@@ -1,4 +1,5 @@
 import base64
+from getpass import getpass
 import hashlib
 import os
 from psycopg2.extras import Json
@@ -37,8 +38,16 @@ def setfullname(cnx, username, full_name):
     print(username, "full name set")
 
 
-def setpassword(cnx, username, password):
+def setpassword(cnx, username, password=None):
     cnx.assert_module('authn')
+    if not password:
+        p1 = getpass()
+        p2 = getpass()
+        while p1 != p2:
+            print("Passwords do not match")
+            p1 = getpass()
+            p2 = getpass()
+        password = p1
     salt = os.urandom(24)
     process = dict(name='pbkdf2-sha256', rounds=300000, length=32,
         salt=base64.b64encode(salt).decode('utf8'))
