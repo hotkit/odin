@@ -1,9 +1,9 @@
-# Odin #
+# Odin
 
 An authorisation and authentication plug in for Mengmom.
 
 
-## Requirements ##
+## Build requirements
 
 * A modern C++ compiler (at lesat C++14).
 * Postgres 9.5. You will need libpq's development package installed.
@@ -13,10 +13,13 @@ To do a build it's probably easiest to check out Mengmom and start there telling
 
     mengmom/compile mengmom odin
 
-See the Mengmom README for full details.
+
+## Modules
+
+Odin is split into [several modules](Schema/README.md) allowing you some flexibility in how to deploy it.
 
 
-## Modules ##
+## Configuration and administration
 
-Odin is split into several module allowing you some flexibility in how to deploy it.
+There is a [command line tool](Python/bin/odin.md) for administering and setting up Odin systems. The command line tool can be run with a range of permissions to enable to anything from setting up and configuring new Odin modules to user administration.
 
