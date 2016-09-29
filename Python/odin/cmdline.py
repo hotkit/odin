@@ -30,6 +30,9 @@ Comand is one of:
     full-name username "Full Name"
         Set the full name field. Requres module `opt/full-name`
 
+    help
+        Show this text
+
     group name [description]
         Set up a group and its description.
 
