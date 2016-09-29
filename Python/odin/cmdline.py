@@ -1,5 +1,6 @@
 import csv
-from odin.group import addmembership, assignpermission, setgroup
+from odin.group import (addmembership, assignpermission, removemembership,
+    setgroup)
 from odin.permission import setpermission
 from odin.user import createuser, setfullname, setpassword, setsuperuser
 
@@ -27,6 +28,10 @@ Comand is one of:
     assign group permission1 [permission2 [permission3 ...]]
         Assign one or more permissions to a group.
 
+    exclude username group1 [group2 [group3 ...]]
+        Remove the user from the specified groups. Requires the `authz`
+        module.
+
     full-name username "Full Name"
         Set the full name field. Requres module `opt/full-name`
 
@@ -40,7 +45,7 @@ Comand is one of:
         Find commands (one per line) in the specified file and run them
 
     membership user group1 [group2 [group3 ...]]
-        Add the user to one or more groups.
+        Add the user to one or more groups. Requires the `authz` module.
 
     password name [password]
         Set (or reset) the user's password. If the password is not provided
@@ -90,6 +95,7 @@ def sql(cnx, filename):
 
 COMMANDS = {
         'assign': assignpermission,
+        'exclude': removemembership,
         'full-name': setfullname,
         'group': setgroup,
         'include': include,

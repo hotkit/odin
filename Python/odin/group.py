@@ -25,6 +25,13 @@ def addmembership(cnx, user, *groups):
         print(user, "is a member of", group)
 
 
+def removemembership(cnx, user, *groups):
+    cnx.assert_module('authz')
+    for group in groups:
+        cnx.execute(SET_MEMBERSHIP, (cnx.reference, user, group, False))
+        print(user, "is no longer a member of", group)
+
+
 def assignpermission(cnx, group, *permissions):
     cnx.assert_module('authz')
     for permission in permissions:
