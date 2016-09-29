@@ -57,6 +57,5 @@ class Connection(object):
 
     def commit(self):
         self.pg.commit()
-        print("* Changes commited")
         self.new_reference()
 
