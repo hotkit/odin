@@ -3,16 +3,13 @@ from psycopg2.extras import Json
 
 SET_GROUP = '''INSERT INTO odin.group_ledger
     (reference, group_slug, description)
-    VALUES (%s, %s, %s)
-    RETURNING *'''
+    VALUES (%s, %s, %s)'''
 SET_MEMBERSHIP = '''INSERT INTO odin.group_membership_ledger
     (reference, identity_id, group_slug, member)
-    VALUES (%s, %s, %s, %s)
-    RETURNING *'''
+    VALUES (%s, %s, %s, %s)'''
 SET_PERMISSION = '''INSERT INTO odin.group_grant_ledger
     (reference, group_slug, permission_slug, allows)
-    VALUES (%s, %s, %s, %s)
-    RETURNING *'''
+    VALUES (%s, %s, %s, %s)'''
 
 
 def setgroup(cnx, group, description=''):

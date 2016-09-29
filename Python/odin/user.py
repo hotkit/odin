@@ -7,22 +7,17 @@ from psycopg2.extras import Json
 
 INSERT_USER = '''INSERT INTO odin.identity_ledger
         (reference, identity_id)
-    VALUES (%s, %s)
-    ON CONFLICT (reference, identity_id) DO NOTHING
-    RETURNING *'''
+    VALUES (%s, %s)'''
 
 SET_FULLNAME = '''INSERT INTO odin.identity_full_name_ledger
         (reference, identity_id, full_name)
-    VALUES (%s, %s, %s)
-    RETURNING *'''
+    VALUES (%s, %s, %s)'''
 SET_PASSWORD = '''INSERT INTO odin.credentials_password_ledger
         (reference, identity_id, password, process)
-    VALUES (%s, %s, %s, %s)
-    RETURNING *'''
+    VALUES (%s, %s, %s, %s)'''
 SET_SUPERUSER = '''INSERT INTO odin.identity_superuser_ledger
         (reference, identity_id, superuser, annotation)
-    VALUES (%s, %s, %s, %s)
-    RETURNING *'''
+    VALUES (%s, %s, %s, %s)'''
 
 
 def createuser(cnx, username, password=None):

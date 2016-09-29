@@ -52,6 +52,12 @@ class Connection(object):
         """ Execute the SQL command and return the data rows as tuples
         """
         self.cursor.execute(cmd, *args, **kwargs)
+
+
+    def select(self, cmd, *args, **kwargs):
+        """ Execute the SQL command and return the data rows as tuples
+        """
+        self.cursor.execute(cmd, *args, **kwargs)
         return self.cursor.fetchall()
 
 
