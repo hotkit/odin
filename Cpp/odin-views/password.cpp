@@ -64,7 +64,7 @@ namespace {
                     } else {
                         const auto hash = odin::set_password(new_password);
                         fostlib::json row;
-                        fostlib::insert(row, "reference", req.headers()["__reference"].value());
+                        fostlib::insert(row, "reference", req.headers()["__odin_reference"].value());
                         fostlib::insert(row, "identity_id", username);
                         fostlib::insert(row, "password", hash.first);
                         fostlib::insert(row, "process", hash.second);

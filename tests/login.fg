@@ -33,3 +33,7 @@ POST odin/api /me/password {"old-password": "password1234", "new-password": "pas
 POST odin/login / {"username": "test", "password": "password1234"} 401
 POST odin/login / {"username": "test", "password": "password1235"} 200
 
+# And do a second change and check that too
+POST odin/api /me/password {"old-password": "password1235", "new-password": "password1236"} 200
+POST odin/login / {"username": "test", "password": "password1235"} 401
+POST odin/login / {"username": "test", "password": "password1236"} 200
