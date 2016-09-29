@@ -129,6 +129,7 @@ The full name (`full-name` command) requires:
 The `list` commmand provides several options for displaying information about users. These rely on the following SELECT permissions:
 
 * users -- `grant SELECT on odin.identity to uadmin;`
+* user-groups -- `grant SELECT on odin.identity, odin.group, odin.group_membership to uadmin;`
 
 ### Add and remove users to groups
 
