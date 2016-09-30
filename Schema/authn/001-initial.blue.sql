@@ -72,6 +72,37 @@ CREATE TRIGGER odin_credentials_ledger_insert_trigger
     EXECUTE PROCEDURE odin.credentials_ledger_insert();
 
 
+CREATE TABLE odin.password_expiry_ledger (
+    reference text NOT NULL,
+    identity_id text NOT NULL,
+    CONSTRAINT password_expiry_ledger_identity_fkey
+        FOREIGN KEY (identity_id)
+        REFERENCES odin.identity (id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    CONSTRAINT odin_password_expiry_ledger_pk PRIMARY KEY (reference, identity_id),
+
+    changed timestamp with time zone NOT NULL DEFAULT now(),
+    pg_user text NOT NULL DEFAULT current_user,
+
+    -- The time we want this account's password to expire
+    expires timestamp with time zone NOT NULL,
+
+    annotation jsonb NOT NULL DEFAULT '{}'
+);
+CREATE FUNCTION odin.password_expiry_ledger_insert() RETURNS TRIGGER AS $body$
+    BEGIN
+        UPDATE odin.credentials SET
+                password__expires = NEW.expires
+            WHERE identity_id=NEW.identity_id;
+        RETURN NULL;
+    END;
+    $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
+CREATE TRIGGER odin_password_expiry_ledger_insert_trigger
+    AFTER INSERT ON odin.password_expiry_ledger
+    FOR EACH ROW
+    EXECUTE PROCEDURE odin.password_expiry_ledger_insert();
+
+
 CREATE TABLE odin.login_attempt (
     username text NOT NULL,
     attempt timestamp with time zone NOT NULL DEFAULT now(),

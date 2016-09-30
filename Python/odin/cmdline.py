@@ -3,7 +3,8 @@ from odin.display import listing
 from odin.group import (addmembership, assignpermission, removemembership,
     setgroup)
 from odin.permission import setpermission
-from odin.user import createuser, setfullname, setpassword, setsuperuser
+from odin.user import (createuser, expirepassword,setfullname, setpassword,
+    setsuperuser)
 
 
 SHORTOPTS = '?d:h:U:'
@@ -100,6 +101,7 @@ def sql(cnx, filename):
 COMMANDS = {
         'assign': assignpermission,
         'exclude': removemembership,
+        'expire': expirepassword,
         'full-name': setfullname,
         'group': setgroup,
         'include': include,
