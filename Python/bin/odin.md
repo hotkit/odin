@@ -23,6 +23,12 @@ Assign one or more permissions to a group.
 
 Remove the user from the specified groups. Requires the `authz` module.
 
+### Expire a user account
+
+    expire username
+
+Expire the identity for the user at this time.
+
 ### Set a user's full name
 
     full-name username "Full Name"

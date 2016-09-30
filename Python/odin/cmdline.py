@@ -3,7 +3,7 @@ from odin.display import listing
 from odin.group import (addmembership, assignpermission, removemembership,
     setgroup)
 from odin.permission import setpermission
-from odin.user import (createuser, expirepassword,setfullname, setpassword,
+from odin.user import (createuser, expireuser, setfullname, setpassword,
     setsuperuser)
 
 
@@ -33,6 +33,9 @@ Comand is one of:
     exclude username group1 [group2 [group3 ...]]
         Remove the user from the specified groups. Requires the `authz`
         module.
+
+    expire username
+        Expire the identity for the user at this time.
 
     full-name username "Full Name"
         Set the full name field. Requres module `opt/full-name`
@@ -101,7 +104,7 @@ def sql(cnx, filename):
 COMMANDS = {
         'assign': assignpermission,
         'exclude': removemembership,
-        'expire': expirepassword,
+        'expire': expireuser,
         'full-name': setfullname,
         'group': setgroup,
         'include': include,

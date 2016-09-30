@@ -15,7 +15,7 @@ SET_FULLNAME = '''INSERT INTO odin.identity_full_name_ledger
 SET_PASSWORD = '''INSERT INTO odin.credentials_password_ledger
         (reference, identity_id, password, process)
     VALUES (%s, %s, %s, %s)'''
-EXPIRE_PASSWORD = '''INSERT INTO odin.password_expiry_ledger
+EXPIRE_USER = '''INSERT INTO odin.identity_expiry_ledger
         (reference, identity_id, expires)
     VALUES (%s, %s, %s)'''
 SET_SUPERUSER = '''INSERT INTO odin.identity_superuser_ledger
@@ -28,6 +28,13 @@ def createuser(cnx, username, password=None):
     print(username, "set up")
     if password:
         setpassword(cnx, username, password)
+
+
+def expireuser(cnx, username):
+    cnx.assert_module('authn')
+    expires = cnx.select("SELECT now()")[0][0]
+    cnx.execute(EXPIRE_USER, (cnx.reference, username, expires))
+    print(username, "account expired at", expires)
 
 
 def setfullname(cnx, username, full_name):
@@ -53,13 +60,6 @@ def setpassword(cnx, username, password=None):
     cnx.execute(SET_PASSWORD, (cnx.reference, username,
         base64.b64encode(pwhash).decode('utf8'), Json(process)))
     print(username, "password set")
-
-
-def expirepassword(cnx, username):
-    cnx.assert_module('authn')
-    expires = cnx.select("SELECT now()")[0][0]
-    cnx.execute(EXPIRE_PASSWORD, (cnx.reference, username, expires))
-    print(username, "password expires at", expires)
 
 
 def setsuperuser(cnx, username, su=True, annotation=dict()):
