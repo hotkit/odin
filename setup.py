@@ -2,7 +2,7 @@
 from distutils.core import setup
 
 setup(name='odin',
-        version='0.1.2',
+        version='0.1.3',
         description='Odin security system',
         author='Kirt Saelensminde',
         author_email='kirit@proteus-tech.com',
