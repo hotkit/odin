@@ -25,9 +25,9 @@ Remove the user from the specified groups. Requires the `authz` module.
 
 ### Expire a user account
 
-    expire username
+    expire username [time-date|never]
 
-Expire the identity for the user at this time.
+Expire the identity for the user at this time. If no expiry time is set then the account is expired immediatly. Alternatively a time/date can be passed, or the word `never` to unset the expiry.
 
 ### Set a user's full name
 

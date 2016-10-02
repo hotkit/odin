@@ -8,7 +8,6 @@ from psycopg2.extras import Json
 INSERT_USER = '''INSERT INTO odin.identity_ledger
         (reference, identity_id)
     VALUES (%s, %s)'''
-
 SET_FULLNAME = '''INSERT INTO odin.identity_full_name_ledger
         (reference, identity_id, full_name)
     VALUES (%s, %s, %s)'''
@@ -18,6 +17,7 @@ SET_PASSWORD = '''INSERT INTO odin.credentials_password_ledger
 EXPIRE_USER = '''INSERT INTO odin.identity_expiry_ledger
         (reference, identity_id, expires)
     VALUES (%s, %s, %s)'''
+SELECT_EXPIRY = '''SELECT expires FROM odin.identity WHERE id=%s'''
 SET_SUPERUSER = '''INSERT INTO odin.identity_superuser_ledger
         (reference, identity_id, superuser, annotation)
     VALUES (%s, %s, %s, %s)'''
@@ -30,11 +30,19 @@ def createuser(cnx, username, password=None):
         setpassword(cnx, username, password)
 
 
-def expireuser(cnx, username):
+def expireuser(cnx, username, expire=None):
     cnx.assert_module('authn')
-    expires = cnx.select("SELECT now()")[0][0]
-    cnx.execute(EXPIRE_USER, (cnx.reference, username, expires))
-    print(username, "account expired at", expires)
+    if expire is None:
+        expires = cnx.select("SELECT now()")[0][0]
+        cnx.execute(EXPIRE_USER, (cnx.reference, username, expires))
+        print(username, "account expired at", expires)
+    elif expire == "never":
+        cnx.execute(EXPIRE_USER, (cnx.reference, username, None))
+        print(username, "account no longer expires")
+    else:
+        cnx.execute(EXPIRE_USER, (cnx.reference, username, expire))
+        expires = cnx.select(SELECT_EXPIRY, (username,))[0][0]
+        print(username, "account expires at", expires)
 
 
 def setfullname(cnx, username, full_name):

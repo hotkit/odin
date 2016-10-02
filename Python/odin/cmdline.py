@@ -34,7 +34,7 @@ Comand is one of:
         Remove the user from the specified groups. Requires the `authz`
         module.
 
-    expire username
+    expire username [time-date|never]
         Expire the identity for the user at this time.
 
     full-name username "Full Name"

@@ -60,7 +60,7 @@ CREATE TABLE odin.identity_expiry_ledger (
     pg_user text NOT NULL DEFAULT current_user,
 
     -- The time we want this account's password to expire
-    expires timestamp with time zone NOT NULL,
+    expires timestamp with time zone NULL,
 
     annotation jsonb NOT NULL DEFAULT '{}'
 );
