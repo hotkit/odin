@@ -26,6 +26,19 @@ run ../../fostgres/Cpp/fostgres-test//fostgres-test :
     ;
 
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
+        odin-test-password
+    :
+        ../Configuration/odin-views.json
+        ../Cpp/odin-fg//odin-fg
+        ../Cpp/odin-views//odin-views
+        ../Schema/bootstrap.sql
+        password.fg
+    :
+    :
+        odin-test-password
+    ;
+
+run ../../fostgres/Cpp/fostgres-test//fostgres-test :
         odin-test-registration-self
     :
         ../../fost-web/Configuration/log-show-all.json
