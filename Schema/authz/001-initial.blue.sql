@@ -247,13 +247,14 @@ CREATE VIEW odin.user_permission AS
         FROM odin.identity
         JOIN odin.group_membership ON
             (odin.identity.id=odin.group_membership.identity_id
-                 OR odin.identity.is_superuser='t')
+                 OR odin.identity.is_superuser)
         JOIN odin.group_grant ON
             (odin.group_grant.group_slug=odin.group_membership.group_slug
-                 OR odin.identity.is_superuser='t')
+                 OR odin.identity.is_superuser)
         JOIN odin.permission ON
             (odin.permission.slug=odin.group_grant.permission_slug
-                OR odin.identity.is_superuser='t');
+                OR odin.identity.is_superuser)
+        WHERE odin.identity.expires IS NULL OR odin.identity.expires > now();
 
 
 INSERT INTO odin.group_grant_ledger

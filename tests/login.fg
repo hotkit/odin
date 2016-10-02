@@ -17,3 +17,7 @@ POST odin/login / {"username": "test", "password": "password1234"} 200
 POST odin/login / {"username": "test", "password": "password12345"} 401
 POST odin/login / {"username": "tester", "password": "password1234"} 401
 
+# Expire the user and make sure they can't now log in
+odin.user.expire test
+POST odin/login / {"username": "test", "password": "password1234"} 401
+

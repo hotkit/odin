@@ -41,6 +41,7 @@ namespace {
             stack.native["odin.sql.file"] = sql_file;
             stack.native["odin.superuser"] = odin::lib::superuser;
             stack.native["odin.user"] = odin::lib::user;
+            stack.native["odin.user.expire"] = odin::lib::expire;
         });
 
 

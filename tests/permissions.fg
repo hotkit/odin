@@ -33,3 +33,9 @@ GET odin/api /me/permissions 200 {"columns": ["permission"],
     "rows": [["create-group"], ["create-user"], ["not-granted"], ["test-perm"]]}
 GET test/permission /create-group/ 200
 GET test/permission /not-granted/ 200
+
+# Expire the account and make sure the permissions go away
+odin.user.expire test-user
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+GET test/permission /create-group/ 403
+GET test/permission /not-granted/ 403

@@ -29,6 +29,8 @@ Remove the user from the specified groups. Requires the `authz` module.
 
 Expire the identity for the user at this time. If no expiry time is set then the account is expired immediatly. Alternatively a time/date can be passed, or the word `never` to unset the expiry.
 
+Expiring an account doesn't revoke any JWT that has already been issued, but does stop new ones from being issued. All permissions are immediatly revoked so the account loses the ability to perform any permissioned action.
+
 ### Set a user's full name
 
     full-name username "Full Name"

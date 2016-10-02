@@ -22,6 +22,7 @@ fostlib::json odin::credentials(
     const fostlib::json &annotation
 ) {
     static const fostlib::string sql("SELECT "
+            "odin.identity.expires < now() AS expired, "
             "odin.identity.tableoid AS identity__tableoid, "
             "odin.credentials.tableoid AS credentials__tableoid, "
             "odin.identity.*, odin.credentials.* "
@@ -67,8 +68,17 @@ fostlib::json odin::credentials(
         user["credentials"]["password"]["hash"]);
     const auto process = user["credentials"]["password"]["process"];
     if ( check_password(password, hash, process) ) {
-        cnx.insert("odin.login_success", attempt);
-        return user;
+        if ( not fostlib::coerce<bool>(user["expired"]) ) {
+            cnx.insert("odin.login_success", attempt);
+            return user;
+        } else {
+            fostlib::log::warning(c_odin)
+                ("", "Account expired")
+                ("username", username)
+                ("identity", user["identity"])
+                ("credentials", user["credentials"]);
+            return fostlib::json();
+        }
     } else {
         fostlib::log::warning(c_odin)
             ("", "Password mismatch")
