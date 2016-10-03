@@ -130,6 +130,8 @@ Example SQL below assumes a Postgres role named `uadmin` is to be used for runni
     # grant usage on schema odin to uadmin;
     # grant SELECT on odin.module to uadmin;
 
+These grants are dependant on the low level implementation of Odin and can change for any release in the future.
+
 ### Create users
 
 Covers the `user` command.
@@ -144,6 +146,13 @@ The full name (`full-name` command) requires:
 
     # grant INSERT on odin.identity_full_name_ledger to uadmin;
 
+### Expire user account
+
+    # grant INSERT on odin.identity_expiry_ledger to uadmin;
+    # grant SELECT on odin.identity to uadmin;
+
+The SELECT grant is only needed if the expiry is set to a particular time (so as to read the time the database recorded). If the `expire` command is only used without option, or with `never` then the SELECT is not needed.
+
 ### Displaying information about users
 
 The `list` commmand provides several options for displaying information about users. These rely on the following SELECT permissions:
@@ -152,7 +161,7 @@ The `list` commmand provides several options for displaying information about us
 * user-groups -- `grant SELECT on odin.identity, odin.group, odin.group_membership to uadmin;`
 * user-permissions -- `grant SELECT on odin.identity, odin.group_grant, odin.group_membership to uadmin;`
 
-### Add and remove users to groups
+### Add and remove groups
 
 Covers the `membership` and `exclude` commands.
 
