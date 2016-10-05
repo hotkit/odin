@@ -47,7 +47,7 @@ Adds a full name field to the identity.
 
 The schema is designed to provide tracking of changes for auditability. It is also designed to enforce as much as possible of the data storage rules.
 
-In general application code is expected to write entries into the `leger` tables whose triggers then make the requested change in the underlying data table.
+In general application code is expected to write entries into the `ledger` tables whose triggers then make the requested change in the underlying data table.
 
 
 # Notes on specific migrations #
