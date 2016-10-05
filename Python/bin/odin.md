@@ -61,6 +61,8 @@ List information about the current configuration of the system.
 
 Superusers are listed as members of all groups and as having all permissions whether or not they've been explicitly added to any groups.
 
+Expired user accounts are shown as belonging to the correct groups, but do not list any permissions.
+
 ### Add a user to one or more groups
 
     membership user group1 [group2 [group3 ...]]
