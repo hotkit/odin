@@ -19,15 +19,9 @@ def listing(cnx, command):
                 pu = name
             print("   ", group, description)
     elif command == 'user-permissions':
-        up = cnx.select("SELECT DISTINCT id, permission_slug, odin.permission.description \
-            FROM odin.identity \
-            JOIN odin.group_membership ON \
-                (odin.group_membership.identity_id=odin.identity.id OR odin.identity.is_superuser) \
-            JOIN odin.group_grant ON \
-                (odin.group_grant.group_slug=odin.group_membership.group_slug OR \
-                    odin.identity.is_superuser) \
-            JOIN odin.permission ON (odin.permission.slug = odin.group_grant.permission_slug) \
-            ORDER BY id, permission_slug; ")
+        up = cnx.select("SELECT identity_id, permission_slug, description \
+            FROM odin.user_permission \
+            ORDER BY identity_id, permission_slug; ")
         pu = None
         for (name, perm, description) in up:
             if pu != name:
