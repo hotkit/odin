@@ -6,7 +6,7 @@ def listing(cnx, command):
         for (name, su, full) in users:
             print(name, "SUPERUSER" if su else "-", full)
     elif command == 'user-groups':
-        ug = cnx.select("SELECT id, group_slug, odin.group.description \
+        ug = cnx.select("SELECT DISTINCT id, group_slug, odin.group.description \
             FROM odin.identity \
             JOIN odin.group_membership ON \
                 (odin.group_membership.identity_id=odin.identity.id OR odin.identity.is_superuser) \
