@@ -1,7 +1,8 @@
 import base64
 from datetime import datetime, timezone
+from getpass import getpass
 import os
-from psycopg2 import connect
+import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_SERIALIZABLE
 
 
@@ -16,7 +17,15 @@ class ModuleNotPresent(Exception):
 
 class Connection(object):
     def __init__(self, dsn):
-        self.pg = connect(dsn)
+        try:
+            self.pg = psycopg2.connect(dsn)
+        except psycopg2.OperationalError as e:
+            if "fe_sendauth" in str(e):
+                pwd = getpass()
+                dsn = dsn + " password='%s'" % pwd
+                self.pg = psycopg2.connect(dsn)
+            else:
+                raise e
         self.pg.set_session(isolation_level=ISOLATION_LEVEL_SERIALIZABLE)
         self.cursor = self.pg.cursor()
         self.load_modules()
