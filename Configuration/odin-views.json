@@ -31,6 +31,10 @@
                 }
             }
         },
+        "views/odin/logout": {
+            "view": "odin.logout",
+            "configuration": "fost.response.200"
+        },
         "views/odin/api": {
             "view": "odin.secure",
             "configuration": {
@@ -38,6 +42,7 @@
                     "view": "fost.view.pathprefix",
                     "configuration": {
                         "": "odin/secure/sql",
+                        "logout/": "odin/logout",
                         "me/password": "odin.password.me"
                     }
                 },
@@ -76,6 +81,7 @@
                                     'odin/handshake'::text AS \"@context\",
                                     array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
                                     './login/'::text AS odin__login,
+                                    './logout/'::text AS odin__logout,
                                     './me/permissions'::text AS odin__my__permissions,
                                     './me/password'::text AS odin__my__password,
                                     './user/:user-id/'::text AS odin__user,
@@ -138,6 +144,7 @@
                             'odin/handshake'::text AS \"@context\",
                             array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
                             './login/'::text AS odin__login,
+                            './logout/'::text AS odin__logout,
                             './me/permissions'::text AS odin__my__permissions,
                             './me/password'::text AS odin__my__password,
                             './user/:user-id/'::text AS odin__user"

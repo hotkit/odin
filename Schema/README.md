@@ -6,6 +6,7 @@ These schemas are intended to be run in numerical order with blue before green. 
 2. authn
 3. authz
 4. authz-pg
+5. opt/*
 
 So, run all `001.blue` scripts for the modules you need before you run any `001.green` ones. Then you can move on to `002` etc.
 
@@ -41,6 +42,10 @@ There are various optional modules under opts.
 ### full-name ###
 
 Adds a full name field to the identity.
+
+### logout ###
+
+Adds a log out count which is used to verify JWT. This allows an account to log out and revoke all JWTs, but means that the Odin database must be accessed in order to verify that a JWT is valid. This module requires the `authn` module to be loaded.
 
 
 # Schema rationale #

@@ -15,9 +15,9 @@ GET odin/api /me/permissions 401
 GET test/permission /not-granted/ 401
 
 # Set up a user account
-odin.user test-user
+odin.user test-user password1234
 odin.membership test-user public
-odin.jwt.authorization test-user
+odin.jwt.authorization test-user password1234
 
 # Check the right permissions are granted
 GET odin/api /me/permissions 200 {"columns": ["permission"],

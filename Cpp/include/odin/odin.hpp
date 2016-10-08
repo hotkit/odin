@@ -22,6 +22,9 @@ namespace odin {
     /// The secret used for JWT tokens
     extern const fostlib::setting<fostlib::string> c_jwt_secret;
 
+    /// The JWT claim for the log out count
+    extern const fostlib::setting<fostlib::string> c_jwt_logout_claim;
+
 
 }
 

@@ -88,3 +88,22 @@ fostlib::json odin::credentials(
     }
 }
 
+
+fostlib::jwt::mint odin::mint_jwt(const fostlib::json &user) {
+    static const fostlib::jcursor subject("identity", "id");
+    static const fostlib::jcursor full_name("identity", "full_name");
+    static const fostlib::jcursor logout_count("credentials", "logout_count");
+
+    fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
+    jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
+
+    if ( user.has_key(full_name) ) {
+        jwt.claim("name", user[full_name]);
+    }
+    if ( user.has_key(logout_count) ) {
+        jwt.claim(c_jwt_logout_claim.value(), user[logout_count]);
+    }
+
+    return jwt;
+}
+

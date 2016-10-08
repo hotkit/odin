@@ -7,34 +7,28 @@
 
 
 #include <odin/fg/native.hpp>
+#include <odin/credentials.hpp>
 #include <odin/odin.hpp>
 
 #include <fost/crypto>
 #include <fost/insert>
 
 
-namespace {
-
-
-    fg::json jwt(
-        fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end
-    ) {
+const fg::frame::builtin odin::lib::jwt =
+    [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
         auto username = stack.resolve_string(stack.argument("username", pos, end));
-        fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
-        jwt.subject(username);
+        auto password = stack.resolve_string(stack.argument("password", pos, end));
 
-        auto token = jwt.token();
+        auto cnx = connect(stack);
+        auto user = odin::credentials(cnx, username, password);
+
+        auto token = odin::mint_jwt(user).token();
         stack.symbols["odin.jwt"] = token;
 
         auto headers = stack.symbols["testserver.headers"];
-        fostlib::insert(headers, "Authorization", fg::json("Bearer " + token));
+        fostlib::jcursor("Authorization").set(headers, fg::json("Bearer " + token));
         stack.symbols["testserver.headers"] = headers;
 
         return fg::json(std::move(token));
-    }
+    };
 
-
-}
-
-
-const fg::frame::builtin odin::lib::jwt = ::jwt;

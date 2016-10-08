@@ -11,7 +11,6 @@
 #include <odin/odin.hpp>
 #include <odin/views.hpp>
 
-#include <fost/crypto>
 #include <fost/insert>
 #include <fostgres/sql.hpp>
 
@@ -20,9 +19,6 @@ namespace {
 
 
     const class login : public fostlib::urlhandler::view {
-        const static fostlib::jcursor subject;
-        const static fostlib::jcursor full_name;
-
     public:
         login()
         : view("odin.login") {
@@ -55,11 +51,8 @@ namespace {
                 if ( user.isnull() ) {
                     return execute(config["failure"], path, req, host);
                 } else {
-                    fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
-                    jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
+                    auto jwt(odin::mint_jwt(user));
                     auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
-                    if ( user.has_key(full_name) )
-                        jwt.claim("name", user[full_name]);
 
                     fostlib::mime::mime_headers headers;
                     headers.add("Expiress", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
@@ -74,10 +67,6 @@ namespace {
             }
         }
     } c_login;
-
-
-    const fostlib::jcursor login::subject("identity", "id");
-    const fostlib::jcursor login::full_name("identity", "full_name");
 
 
 }

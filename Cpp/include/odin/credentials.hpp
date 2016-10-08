@@ -9,6 +9,7 @@
 #pragma once
 
 
+#include <fost/crypto>
 #include <fost/internet>
 #include <fost/postgres>
 
@@ -26,6 +27,9 @@ namespace odin {
         const fostlib::string &password,
         const fostlib::nullable<fostlib::host> &source = fostlib::null,
         const fostlib::json &annotation = fostlib::json::object_t());
+
+    /// Mint a JWT for this user and set common fields on it
+    fostlib::jwt::mint mint_jwt(const fostlib::json &user);
 
 
 }

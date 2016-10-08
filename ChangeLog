@@ -1,3 +1,6 @@
+2016-10-08  Kirit Saelensminde  <kirit@felspar.com>
+ Added a new module that allows force logout and immediate revokation of JWT.
+
 2016-09-30  Kirit Saelensminde  <kirit@felspar.com>
  Better document the command line management tool.
 
