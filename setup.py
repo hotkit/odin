@@ -2,7 +2,7 @@
 from distutils.core import setup
 
 setup(name='odin',
-        version='0.1.5',
+        version='0.1.6',
         description='Odin security system',
         author='Kirt Saelensminde',
         author_email='kirit@proteus-tech.com',
@@ -16,5 +16,6 @@ setup(name='odin',
             ('share/odin/Schema/authz', ['Schema/authz/001-initial.blue.sql']),
             ('share/odin/Schema/core', ['Schema/core/001-initial.blue.sql']),
             ('share/odin/Schema/opts/full-name', ['Schema/opts/full-name/001-initial.blue.sql']),
+            ('share/odin/Schema/opts/logout', ['Schema/opts/logout/001-initial.blue.sql']),
         ],
      )
