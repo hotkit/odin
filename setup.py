@@ -10,6 +10,7 @@ setup(name='odin',
         scripts=['Python/bin/odin'],
         packages=['odin'],
         package_dir={'': 'Python'},
+        install_requires=['psycopg2'],
         data_files=[
             ('share/odin/Schema', ['Schema/bootstrap.sql']),
             ('share/odin/Schema/authn', ['Schema/authn/001-initial.blue.sql']),
