@@ -7,10 +7,11 @@ from odin.user import (createuser, expireuser, setfullname, setpassword,
     setsuperuser)
 
 
-SHORTOPTS = '?d:h:U:'
+SHORTOPTS = '?d:h:p:U:'
 PGOPTMAP = {
         '-d': 'dbname',
         '-h': 'host',
+        '-p': 'port',
         '-U': 'user',
     }
 
