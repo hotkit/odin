@@ -1,6 +1,8 @@
-INSERT INTO odin.migration VALUES('authz', '002-view-user_permission.blue.sql');
+INSERT INTO odin.migration VALUES('authz', '002-view-user_permission.blue.sql') ON CONFLICT DO NOTHING;
 
 DROP VIEW odin.user_permission;
+DROP VIEW IF EXISTS odin.identity_permission;
+
 CREATE MATERIALIZED VIEW odin.identity_permission AS
     SELECT DISTINCT
             odin.identity.id as identity_id,
