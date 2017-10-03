@@ -2,6 +2,7 @@
 odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
 
 # Set up test permissions and group
 odin.permission test-perm "Test permission"
