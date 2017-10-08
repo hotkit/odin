@@ -1,5 +1,5 @@
 /*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+    Copyright 2016-2017 Felspar Co Ltd. http://odin.felspar.com/
     Distributed under the Boost Software License, Version 1.0.
     See accompanying file LICENSE_1_0.txt or copy at
         http://www.boost.org/LICENSE_1_0.txt
@@ -80,10 +80,10 @@ namespace {
             // Now check which sub-view to enter
             if ( req.headers().exists("Authorization") ) {
                 auto parts = fostlib::partition(req.headers()["Authorization"].value(), " ");
-                if ( parts.first == "Bearer" && not parts.second.isnull() ) {
+                if ( parts.first == "Bearer" && parts.second ) {
                     auto jwt = fostlib::jwt::token::load(
                         odin::c_jwt_secret.value(), parts.second.value());
-                    if ( not jwt.isnull() && check_logout_claim(config, req, jwt.value()) ) {
+                    if ( jwt && check_logout_claim(config, req, jwt.value()) ) {
                         fostlib::log::debug(odin::c_odin)
                             ("", "JWT authenticated")
                             ("header", jwt.value().header)
