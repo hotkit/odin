@@ -29,6 +29,7 @@ namespace {
             const fostlib::json &config, fostlib::http::server::request &req,
             const fostlib::jwt::token &jwt
         ) const {
+            if ( not odin::c_jwt_logout_check.value() ) return true;
             const auto &&claim = odin::c_jwt_logout_claim.value();
             if ( jwt.payload.has_key(claim) ) {
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};

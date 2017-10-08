@@ -1,5 +1,5 @@
 /*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+    Copyright 2016-2017 Felspar Co Ltd. http://odin.felspar.com/
     Distributed under the Boost Software License, Version 1.0.
     See accompanying file LICENSE_1_0.txt or copy at
         http://www.boost.org/LICENSE_1_0.txt
@@ -18,4 +18,6 @@ const fostlib::setting<fostlib::string> odin::c_jwt_secret(
 
 const fostlib::setting<fostlib::string> odin::c_jwt_logout_claim(
     "odin/odin.cpp", "odin", "JWT logout claim", "http://odin.felspar.com/lo", true);
+const fostlib::setting<bool> odin::c_jwt_logout_check(
+    "odin/odin.cpp", "odin", "Perform JWT logout check", true, true);
 

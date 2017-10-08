@@ -19,3 +19,10 @@ odin.sql.file (module.path.join ../Schema/opts/logout/001-initial.blue.sql)
 odin.jwt.authorization test password1234
 POST odin/api /logout/ {} 200
 GET odin/api / 401
+
+# Now turn off the logout setting and the request will work again
+setting odin "Perform JWT logout check" false
+GET odin/api / 200
+# And setting it again causes a failure
+setting odin "Perform JWT logout check" true
+GET odin/api / 401
