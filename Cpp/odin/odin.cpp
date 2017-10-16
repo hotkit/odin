@@ -5,9 +5,11 @@
         http://www.boost.org/LICENSE_1_0.txt
 */
 
-
+#include <iostream>
 #include <odin/odin.hpp>
 #include <odin/nonce.hpp>
+
+#include <fostgres/sql.hpp>
 
 
 const fostlib::module odin::c_odin("odin");
@@ -21,3 +23,20 @@ const fostlib::setting<fostlib::string> odin::c_jwt_logout_claim(
 const fostlib::setting<bool> odin::c_jwt_logout_check(
     "odin/odin.cpp", "odin", "Perform JWT logout check", true, true);
 
+
+namespace {
+    void set_jwt_values_to_cnx_session(fostlib::pg::connection &cnx, const fostlib::http::server::request &req) {
+        if ( req.headers().exists("__user") ) {
+            const auto &user = req.headers()["__user"];
+            cnx.set_session("odin.jwt.subject", user.value());
+        }
+    }
+
+    struct init {
+        init() {
+            fostgres::register_cnx_callback(set_jwt_values_to_cnx_session);
+        }
+    };
+
+    const init i;
+}

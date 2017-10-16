@@ -1,0 +1,9 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.user test password1234
+
+# Login
+odin.jwt.authorization test password1234
+
+GET odin/api / 200 {"jwt": {"subject": "test"}}
