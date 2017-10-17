@@ -40,6 +40,19 @@ run ../../fostgres/Cpp/fostgres-test//fostgres-test :
     ;
 
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
+        odin-test-session
+    :
+        ../Configuration/odin-views.json
+        ../Cpp/odin-fg//odin-fg
+        ../Cpp/odin-views//odin-views
+        ../Schema/bootstrap.sql
+        session.fg
+    :
+    :
+        odin-test-session
+    ;
+
+run ../../fostgres/Cpp/fostgres-test//fostgres-test :
         odin-test-password
     :
         ../Configuration/odin-views.json
