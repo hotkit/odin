@@ -80,7 +80,7 @@
                             "command": "SELECT
                                     'odin/handshake'::text AS \"@context\",
                                     array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
-                                    current_setting('odin.jwt.subject') AS jwt__subject,
+                                    current_setting('odin.jwt.sub') AS jwt__subject,
                                     './login/'::text AS odin__login,
                                     './logout/'::text AS odin__logout,
                                     './me/permissions'::text AS odin__my__permissions,

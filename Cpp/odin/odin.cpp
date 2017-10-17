@@ -27,7 +27,7 @@ namespace {
     void set_jwt_values_to_cnx_session(fostlib::pg::connection &cnx, const fostlib::http::server::request &req) {
         if ( req.headers().exists("__user") ) {
             const auto &user = req.headers()["__user"];
-            cnx.set_session("odin.jwt.subject", user.value());
+            cnx.set_session("odin.jwt.sub", user.value());
         }
     }
 
