@@ -16,6 +16,8 @@ const fostlib::module odin::c_odin("odin");
 
 const fostlib::setting<fostlib::string> odin::c_jwt_secret(
     "odin/odin.cpp", "odin", "JWT secret", odin::nonce(), true);
+const fostlib::setting<bool> odin::c_jwt_trust(
+    "odin/odin.cpp", "odin", "Trust JWT", false, true);
 
 const fostlib::setting<fostlib::string> odin::c_jwt_logout_claim(
     "odin/odin.cpp", "odin", "JWT logout claim", "http://odin.felspar.com/lo", true);

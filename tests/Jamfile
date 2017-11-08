@@ -1,3 +1,16 @@
+run ../../fostgres/Cpp/fostgres-test//fostgres-test :
+        odin-test-db-bypass
+    :
+        ../../fost-web/Configuration/log-show-all.json
+        ../Configuration/odin-views.json
+        ../Cpp/odin-fg//odin-fg
+        ../Cpp/odin-views//odin-views
+        ../Schema/bootstrap.sql
+        db-bypass.fg
+    :
+    :
+        odin-test-db-bypass
+    ;
 
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
         odin-test-login

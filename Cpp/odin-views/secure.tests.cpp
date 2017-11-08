@@ -60,6 +60,7 @@ FSL_TEST_FUNCTION(check_unsecure_04_wrong_token) {
 }
 
 FSL_TEST_FUNCTION(check_secure) {
+    const fostlib::setting<bool> trust_jwt{"odin-views/secure.tests.cpp", odin::c_jwt_trust, true};
     fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
     jwt.subject("test-user");
     fostlib::http::server::request req("GET", "/");

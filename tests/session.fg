@@ -9,3 +9,5 @@ odin.jwt.authorization test password1234 {"test": "two"}
 # Make sure we get the subject correct
 GET odin/test/session / 200 {"jwt": {"sub": "test", "test": "two"}}
 
+#odin.jwt.authorization test password1234 {"weird\"key\"": "odd-value"}
+#GET odin/test/session / 200 {"jwt": {"sub": "test"}}
