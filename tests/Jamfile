@@ -42,10 +42,10 @@ run ../../fostgres/Cpp/fostgres-test//fostgres-test :
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
         odin-test-session
     :
-        ../Configuration/odin-views.json
         ../Cpp/odin-fg//odin-fg
         ../Cpp/odin-views//odin-views
         ../Schema/bootstrap.sql
+        ../tests/session-test-view.json
         session.fg
     :
     :

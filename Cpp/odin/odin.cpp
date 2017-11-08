@@ -29,6 +29,10 @@ namespace {
             const auto &user = req.headers()["__user"];
             cnx.set_session("odin.jwt.sub", user.value());
         }
+        if ( req.headers().exists("__jwt") ) {
+            for ( const auto &sv : req.headers()["__jwt"] )
+                cnx.set_session("odin.jwt." + sv.first, sv.second);
+        }
     }
 
     struct init {

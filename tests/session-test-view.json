@@ -1,0 +1,28 @@
+{
+    "webserver": {
+        "views/odin/test/session": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "fostgres.sql",
+                    "configuration": {
+                        "host": ["request", "headers", "__pgdsn", "host"],
+                        "user": ["request", "headers", "__pgdsn", "user"],
+                        "dbname": ["request", "headers", "__pgdsn", "dbname"],
+                        "sql": [
+                            {
+                                "return": "object",
+                                "path": [],
+                                "GET": "SELECT
+                                        current_setting('odin.jwt.sub') AS jwt__sub,
+                                        current_setting('odin.jwt.test') AS jwt__test"
+                            }
+                        ]
+                    }
+                },
+                "unsecure": "fost.response.403"
+            }
+        }
+    }
+}
+
