@@ -24,6 +24,9 @@ const fg::frame::builtin odin::lib::jwt =
 
         auto cnx = connect(stack);
         auto user = odin::credentials(cnx, username, password);
+        if ( user.isnull() )
+            throw fostlib::exceptions::not_implemented(__func__,
+                "The user does not appear in the database so no JWT can be minted");
 
         auto token = odin::mint_jwt(user, std::move(payload)).token();
         stack.symbols["odin.jwt"] = token;
