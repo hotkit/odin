@@ -1,16 +1,16 @@
-
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
-        odin-test-no-auth
+        odin-test-db-bypass
     :
+        ../../fost-web/Configuration/log-show-all.json
         ../Configuration/odin-views.json
+        ../Cpp/odin-fg//odin-fg
         ../Cpp/odin-views//odin-views
         ../Schema/bootstrap.sql
-        no-auth.fg
+        db-bypass.fg
     :
     :
-        odin-test-no-auth
+        odin-test-db-bypass
     ;
-
 
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
         odin-test-login
@@ -40,16 +40,15 @@ run ../../fostgres/Cpp/fostgres-test//fostgres-test :
     ;
 
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
-        odin-test-session
+        odin-test-no-auth
     :
         ../Configuration/odin-views.json
-        ../Cpp/odin-fg//odin-fg
         ../Cpp/odin-views//odin-views
         ../Schema/bootstrap.sql
-        session.fg
+        no-auth.fg
     :
     :
-        odin-test-session
+        odin-test-no-auth
     ;
 
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
@@ -63,6 +62,21 @@ run ../../fostgres/Cpp/fostgres-test//fostgres-test :
     :
     :
         odin-test-password
+    ;
+
+run ../../fostgres/Cpp/fostgres-test//fostgres-test :
+        odin-test-permissions
+    :
+        ../../fost-web/Configuration/log-show-all.json
+        ../Configuration/odin-views.json
+        ../Cpp/odin-fg//odin-fg
+        ../Cpp/odin-views//odin-views
+        ../Schema/bootstrap.sql
+        permissions.fg
+        permissions.json
+    :
+    :
+        odin-test-permissions
     ;
 
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
@@ -80,16 +94,14 @@ run ../../fostgres/Cpp/fostgres-test//fostgres-test :
     ;
 
 run ../../fostgres/Cpp/fostgres-test//fostgres-test :
-        odin-test-permissions
+        odin-test-session
     :
-        ../../fost-web/Configuration/log-show-all.json
-        ../Configuration/odin-views.json
         ../Cpp/odin-fg//odin-fg
         ../Cpp/odin-views//odin-views
         ../Schema/bootstrap.sql
-        permissions.fg
-        permissions.json
+        ../tests/session-test-view.json
+        session.fg
     :
     :
-        odin-test-permissions
+        odin-test-session
     ;

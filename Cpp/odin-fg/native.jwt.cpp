@@ -18,11 +18,17 @@ const fg::frame::builtin odin::lib::jwt =
     [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
         auto username = stack.resolve_string(stack.argument("username", pos, end));
         auto password = stack.resolve_string(stack.argument("password", pos, end));
+        fostlib::json payload;
+        if ( pos != end )
+            payload = stack.argument("payload", pos, end);
 
         auto cnx = connect(stack);
         auto user = odin::credentials(cnx, username, password);
+        if ( user.isnull() )
+            throw fostlib::exceptions::not_implemented(__func__,
+                "The user does not appear in the database so no JWT can be minted");
 
-        auto token = odin::mint_jwt(user).token();
+        auto token = odin::mint_jwt(user, std::move(payload)).token();
         stack.symbols["odin.jwt"] = token;
 
         auto headers = stack.symbols["testserver.headers"];

@@ -24,6 +24,8 @@ namespace odin {
     /// The secret used for JWT tokens. Always pick a new value for this as
     /// the default will change each time the mengmom is restarted.
     extern const fostlib::setting<fostlib::string> c_jwt_secret;
+    /// Set this to true to skip database check against user JWT.
+    extern const fostlib::setting<bool> c_jwt_trust;
 
     /// The JWT claim for the log out count.
     extern const fostlib::setting<fostlib::string> c_jwt_logout_claim;

@@ -2,6 +2,7 @@
 odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.user test password1234
+setting odin "Trust JWT" true
 
 # Check that logging in works
 POST odin/login / {"username": "test", "password": "password1234"} 200
@@ -17,6 +18,7 @@ GET odin/api / 200
 # Now load up the logout module, get a new token and check the log out works
 odin.sql.file (module.path.join ../Schema/opts/logout/001-initial.blue.sql)
 odin.jwt.authorization test password1234
+setting odin "Trust JWT" false
 POST odin/api /logout/ {} 200
 GET odin/api / 401
 
