@@ -1,0 +1,10 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.user test password1234
+
+# Use the login API to get our JWT and then check it works
+set odin.jwt (POST odin/login / {"username": "test", "password": "password1234"} 200)
+set-path testserver.headers (Authorization) (cat "Bearer " (lookup odin.jwt))
+GET odin/api / 200
