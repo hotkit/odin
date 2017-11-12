@@ -8,3 +8,11 @@ odin.user test password1234
 set odin.jwt (POST odin/login / {"username": "test", "password": "password1234"} 200)
 set-path testserver.headers (Authorization) (cat "Bearer " (lookup odin.jwt))
 GET odin/api / 200
+
+# Blank the header and it will fail again
+set-path testserver.headers (Authorization) ""
+GET odin/api / 401
+
+# Check that the default JWT contains the subject key
+set payload (odin.jwt.payload)
+contains (lookup payload) {"sub": "test"}
