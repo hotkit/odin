@@ -6,6 +6,7 @@ run ../../fostgres/Cpp/fostgres-test//fostgres-test :
         ../Cpp/odin-fg//odin-fg
         ../Cpp/odin-views//odin-views
         ../Schema/bootstrap.sql
+        authnz-test-view.json
         authnz.fg
     :
     :

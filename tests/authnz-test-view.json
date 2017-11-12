@@ -1,0 +1,18 @@
+{
+    "webserver": {
+        "views/odin/test/authnz": {
+            "view": "odin.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "failure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
