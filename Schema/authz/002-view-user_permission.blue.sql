@@ -33,7 +33,7 @@ CREATE OR REPLACE FUNCTION odin.identity_superuser_ledger_insert() RETURNS TRIGG
             VALUES (NEW.identity_id, NEW.superuser)
             ON CONFLICT (id) DO UPDATE SET
                 is_superuser = EXCLUDED.is_superuser;
-        REFRESH MATERIALIZED VIEW odin.identity_permission;
+        REFRESH MATERIALIZED VIEW CONCURRENTLY odin.identity_permission;
         RETURN NULL;
     END
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
@@ -44,7 +44,7 @@ CREATE OR REPLACE FUNCTION odin.group_ledger_insert() RETURNS TRIGGER AS $body$
             VALUES (NEW.group_slug, NEW.description)
             ON CONFLICT (slug) DO UPDATE SET
                 description = EXCLUDED.description;
-        REFRESH MATERIALIZED VIEW odin.identity_permission;
+        REFRESH MATERIALIZED VIEW CONCURRENTLY odin.identity_permission;
         RETURN NEW;
     END
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
@@ -59,7 +59,7 @@ CREATE OR REPLACE FUNCTION odin.group_membership_ledger_insert() RETURNS TRIGGER
             DELETE FROM odin.group_membership
                 WHERE identity_id=NEW.identity_id AND group_slug=NEW.group_slug;
         END if;
-        REFRESH MATERIALIZED VIEW odin.identity_permission;
+        REFRESH MATERIALIZED VIEW CONCURRENTLY odin.identity_permission;
         RETURN NEW;
     END
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
@@ -70,7 +70,7 @@ CREATE OR REPLACE FUNCTION odin.permission_ledger_insert() RETURNS TRIGGER AS $b
             VALUES (NEW.permission_slug, NEW.description)
             ON CONFLICT (slug) DO UPDATE SET
                 description = EXCLUDED.description;
-        REFRESH MATERIALIZED VIEW odin.identity_permission;
+        REFRESH MATERIALIZED VIEW CONCURRENTLY odin.identity_permission;
         RETURN NEW;
     END
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
@@ -85,7 +85,7 @@ CREATE OR REPLACE FUNCTION odin.group_grant_ledger_insert() RETURNS TRIGGER AS $
             DELETE FROM odin.group_grant
                 WHERE group_slug = NEW.group_slug AND permission_slug = NEW.permission_slug;
         END if;
-        REFRESH MATERIALIZED VIEW odin.identity_permission;
+        REFRESH MATERIALIZED VIEW CONCURRENTLY odin.identity_permission;
         RETURN NEW;
     END
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
