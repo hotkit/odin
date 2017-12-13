@@ -4,6 +4,7 @@
             "view": "odin.login",
             "configuration": {
                 "expires": {"hours": 72},
+                "permissions": ["p2", "p1", "p404"],
                 "failure": {
                     "view": "fost.response.401",
                     "configuration": {

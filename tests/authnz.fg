@@ -3,9 +3,15 @@ odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
 odin.user test password1234
+odin.permission p1
+odin.permission p2
+odin.permission p3
+odin.group g1
+odin.assign g1 p1 p3
+odin.membership test g1
 
 # Use the login API to get our JWT and then check it works
-set odin.jwt (POST odin/login / {"username": "test", "password": "password1234"} 200)
+set odin.jwt (POST odin/test/authnz / {"username": "test", "password": "password1234"} 200)
 set-path testserver.headers (Authorization) (cat "Bearer " (lookup odin.jwt))
 GET odin/api / 200
 
@@ -15,4 +21,5 @@ GET odin/api / 401
 
 # Check that the default JWT contains the subject key
 set payload (odin.jwt.payload)
-contains (lookup payload) {"sub": "test"}
+contains (lookup payload) {"sub": "test", "http://odin.felspar.com/p": ["p1"]}
+

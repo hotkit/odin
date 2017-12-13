@@ -24,6 +24,9 @@ const fostlib::setting<fostlib::string> odin::c_jwt_logout_claim(
 const fostlib::setting<bool> odin::c_jwt_logout_check(
     "odin/odin.cpp", "odin", "Perform JWT logout check", true, true);
 
+const fostlib::setting<fostlib::string> odin::c_jwt_permissions_claim(
+    "odin/odin.cpp", "odin", "JWT permissions claim", "http://odin.felspar.com/p", true);
+
 
 namespace {
     const fostgres::register_cnx_callback c_cb(
