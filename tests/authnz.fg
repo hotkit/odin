@@ -2,6 +2,7 @@
 odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+setting odin "Trust JWT" true
 odin.user test password1234
 odin.permission p1
 odin.permission p2
@@ -15,11 +16,24 @@ set odin.jwt (POST odin/test/authnz / {"username": "test", "password": "password
 set-path testserver.headers (Authorization) (cat "Bearer " (lookup odin.jwt))
 GET odin/api / 200
 
-# Blank the header and it will fail again
+# Blank the header and it will fail again, then set it back up properly
 set-path testserver.headers (Authorization) ""
 GET odin/api / 401
 
 # Check that the default JWT contains the subject key
 set payload (odin.jwt.payload)
 contains (lookup payload) {"sub": "test", "http://odin.felspar.com/p": ["p1"]}
+
+# Check that the database controls access to the APIs
+odin.jwt.authorization test password1234 # No permissions claim in JWT
+GET odin/test/p1 / 200
+GET odin/test/p2 / 403
+GET odin/test/p3 / 200
+
+# Add p2 explicitly into the payload. When this is checked we will have
+# access to the API even though we don't have the permission in the database
+odin.jwt.authorization test password1234 {"http://odin.felspar.com/p": ["p2"]}
+GET odin/test/p1 / 200
+GET odin/test/p2 / 200
+GET odin/test/p3 / 200
 

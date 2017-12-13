@@ -10,9 +10,6 @@
                         "create-group/": {
                             "view": "odin.permission",
                             "configuration": {
-                                "host": ["request", "headers", "__pgdsn", "host"],
-                                "user": ["request", "headers", "__pgdsn", "user"],
-                                "dbname": ["request", "headers", "__pgdsn", "dbname"],
                                 "permission": "create-group",
                                 "allowed": "odin/secure/sql",
                                 "forbidden": "fost.response.403"
@@ -21,9 +18,6 @@
                         "not-granted/": {
                             "view": "odin.permission",
                             "configuration": {
-                                "host": ["request", "headers", "__pgdsn", "host"],
-                                "user": ["request", "headers", "__pgdsn", "user"],
-                                "dbname": ["request", "headers", "__pgdsn", "dbname"],
                                 "permission": "not-granted",
                                 "allowed": "odin/secure/sql",
                                 "forbidden": "fost.response.403"
