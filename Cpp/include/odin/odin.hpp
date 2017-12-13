@@ -33,6 +33,9 @@ namespace odin {
     /// SQL `SELECT`, but means that revokation of JWTs won't be noticed.
     extern const fostlib::setting<bool> c_jwt_logout_check;
 
+    /// The JWT claim for embedded permissions
+    extern const fostlib::setting<fostlib::string> c_jwt_permissions_claim;
+
 
 }
 
