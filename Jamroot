@@ -37,6 +37,7 @@ alias odin :
         ../fostgres//fostgres
         Configuration
         Cpp/odin
+        Cpp/odin-fg
         Cpp/odin-views
         Schema
     ;
