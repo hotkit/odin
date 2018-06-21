@@ -1,0 +1,20 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.user test password1234
+
+# Mint a new JWT for out user
+odin.jwt.authorization test password1234
+GET odin/api / 200
+# Expiring the user (in the database) means we get a 401
+odin.user.expire test
+GET odin/api / 401
+# But if we use a view that doesn't look in the database, we get a 200
+
+# Globally turn on JWT trust setting to skip database check
+setting odin "Trust JWT" true
+GET odin/api / 200
+
+# Turn it off to see 401 again
+setting odin "Trust JWT" false
+GET odin/api / 401

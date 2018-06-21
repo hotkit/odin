@@ -22,7 +22,7 @@ fostlib::json odin::credentials(
     const fostlib::json &annotation
 ) {
     static const fostlib::string sql("SELECT "
-            "odin.identity.expires < now() AS expired, "
+            "odin.identity.expires <= now() AS expired, "
             "odin.identity.tableoid AS identity__tableoid, "
             "odin.credentials.tableoid AS credentials__tableoid, "
             "odin.identity.*, odin.credentials.* "
@@ -89,12 +89,12 @@ fostlib::json odin::credentials(
 }
 
 
-fostlib::jwt::mint odin::mint_jwt(const fostlib::json &user) {
+fostlib::jwt::mint odin::mint_jwt(const fostlib::json &user, fostlib::json payload) {
     static const fostlib::jcursor subject("identity", "id");
     static const fostlib::jcursor full_name("identity", "full_name");
     static const fostlib::jcursor logout_count("credentials", "logout_count");
 
-    fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
+    fostlib::jwt::mint jwt{fostlib::sha256, odin::c_jwt_secret.value(), std::move(payload)};
     jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
 
     if ( user.has_key(full_name) ) {

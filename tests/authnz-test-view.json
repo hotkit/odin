@@ -1,0 +1,82 @@
+{
+    "webserver": {
+        "views/odin/test/authnz": {
+            "view": "odin.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "permissions": ["p2", "p1", "p404"],
+                "failure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        },
+        "views/odin/test/p1": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "odin.permission",
+                    "configuration": {
+                        "permission": "p1",
+                        "allowed": "fost.response.200",
+                        "forbidden": "fost.response.403"
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        },
+        "views/odin/test/p2": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "odin.permission",
+                    "configuration": {
+                        "permission": "p2",
+                        "allowed": "fost.response.200",
+                        "forbidden": "fost.response.403"
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        },
+        "views/odin/test/p3": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "odin.permission",
+                    "configuration": {
+                        "permission": "p3",
+                        "allowed": "fost.response.200",
+                        "forbidden": "fost.response.403"
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

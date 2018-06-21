@@ -1,3 +1,10 @@
+2017-10-08  Kirit Saelensminde  <kirit@felspar.com>
+ Add a setting that allows the logout count and a/c expiry checks to be bypassed.
+
+2017-06-14  Nattapong Amornbunchornvej  <sprintf.null@gmail.com>
+ Add support for custom port DB connection.
+ Add psycopg2 as dependencies of the python package.
+
 2016-10-08  Kirit Saelensminde  <kirit@felspar.com>
  Added a new module that allows force logout and immediate revokation of JWT.
 

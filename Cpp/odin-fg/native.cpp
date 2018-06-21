@@ -36,6 +36,7 @@ namespace {
             stack.native["odin.assign"] = odin::lib::assign;
             stack.native["odin.group"] = odin::lib::group;
             stack.native["odin.jwt.authorization"] = odin::lib::jwt;
+            stack.native["odin.jwt.payload"] = odin::lib::jwt_payload;
             stack.native["odin.membership"] = odin::lib::membership;
             stack.native["odin.permission"] = odin::lib::permission;
             stack.native["odin.sql.file"] = sql_file;

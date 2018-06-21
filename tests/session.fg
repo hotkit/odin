@@ -1,0 +1,13 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.user test password1234
+
+# Login
+odin.jwt.authorization test password1234 {"test": "two"}
+
+# Make sure we get the subject correct
+GET odin/test/session / 200 {"jwt": {"sub": "test", "test": "two"}}
+
+#odin.jwt.authorization test password1234 {"weird\"key\"": "odd-value"}
+#GET odin/test/session / 200 {"jwt": {"sub": "test"}}
