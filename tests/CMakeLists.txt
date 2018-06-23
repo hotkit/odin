@@ -1,6 +1,5 @@
 add_custom_command(OUTPUT test-authnz
         COMMAND fostgres-test odin-test-authnz -o test-authnz
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -24,7 +23,6 @@ add_custom_command(OUTPUT test-authnz
 
 add_custom_command(OUTPUT test-db-bypass
         COMMAND fostgres-test odin-test-db-bypass -o test-db-bypass
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -45,7 +43,6 @@ add_custom_command(OUTPUT test-db-bypass
 
 add_custom_command(OUTPUT test-login
         COMMAND fostgres-test odin-test-login -o test-login
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -66,7 +63,6 @@ add_custom_command(OUTPUT test-login
 
 add_custom_command(OUTPUT test-logout
         COMMAND fostgres-test odin-test-logout -o test-logout
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -88,7 +84,6 @@ add_custom_command(OUTPUT test-logout
 
 add_custom_command(OUTPUT test-no-auth
         COMMAND fostgres-test odin-test-no-auth -o test-no-auth
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -107,7 +102,6 @@ add_custom_command(OUTPUT test-no-auth
 
 add_custom_command(OUTPUT test-password
         COMMAND fostgres-test odin-test-password -o test-password
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -128,7 +122,6 @@ add_custom_command(OUTPUT test-password
 
 add_custom_command(OUTPUT test-permissions
         COMMAND fostgres-test odin-test-permissions -o test-permissions
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -152,7 +145,6 @@ add_custom_command(OUTPUT test-permissions
 
 add_custom_command(OUTPUT test-registration-self
         COMMAND fostgres-test odin-test-registration-self -o test-registration-self
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -173,7 +165,6 @@ add_custom_command(OUTPUT test-registration-self
 
 add_custom_command(OUTPUT test-session
         COMMAND fostgres-test odin-test-session -o test-session
-            $<TARGET_SONAME_FILE:fostgres>
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
