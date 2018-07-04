@@ -18,7 +18,8 @@ fostlib::json odin::create_user(
     const fostlib::string &username
 ) {
     fg::json user_values;
-    fostlib::insert(user_values, "reference", odin::reference(cnx));
+    // fostlib::insert(user_values, "reference", odin::reference(cnx));
+    fostlib::insert(user_values, "reference", odin::reference());
     fostlib::insert(user_values, "identity_id", username);
     cnx.insert("odin.identity_ledger", user_values);
     cnx.commit();
@@ -31,10 +32,11 @@ fostlib::json odin::create_user(
     const fostlib::string &password
 ) {
     fg::json user_values;
-    fostlib::insert(user_values, "reference", odin::reference(cnx));
+    // fostlib::insert(user_values, "reference", odin::reference(cnx));
+    fostlib::insert(user_values, "reference", odin::reference());
     fostlib::insert(user_values, "identity_id", username);
     cnx.insert("odin.identity_ledger", user_values);
-    
+
     auto hashed = odin::set_password(password);
     fostlib::insert(user_values, "password", hashed.first);
     fostlib::insert(user_values, "process", hashed.second);
