@@ -19,7 +19,13 @@ namespace odin {
     /// Create the given user
     fostlib::json create_user(
         fostlib::pg::connection &cnx,
+        const fostlib::string &username
+    );
+
+    fostlib::json create_user(
+        fostlib::pg::connection &cnx,
         const fostlib::string &username,
         const fostlib::string &password
     );
+
 }
