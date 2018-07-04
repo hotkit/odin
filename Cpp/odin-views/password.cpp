@@ -53,7 +53,6 @@ namespace {
                 const auto old_password = fostlib::coerce<fostlib::string>(body["old-password"]);
                 const auto new_password = fostlib::coerce<fostlib::string>(body["new-password"]);
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
-                odin::reference(cnx);
                 auto user = odin::credentials(cnx, username, old_password, req.remote_address());
                 cnx.commit();
                 if ( user.isnull() ) {
