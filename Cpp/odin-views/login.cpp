@@ -48,8 +48,7 @@ namespace {
                     throw fostlib::exceptions::not_implemented("odin.login",
                         "Must pass both a username and password");
                 }
-                fostlib::pg::connection cnx{fostgres::connection(config, req)};
-                odin::reference(cnx);
+                fostlib::pg::connection cnx{fostgres::connection(config, req)};                
                 auto user = odin::credentials(cnx, username, password, req.remote_address());
                 cnx.commit();
                 if ( user.isnull() ) {
