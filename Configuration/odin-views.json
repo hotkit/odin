@@ -5,7 +5,8 @@
             "configuration": {
                 "": "odin/static",
                 "api/": "odin/api",
-                "api/login/": "odin/login"
+                "api/login/": "odin/login",
+                "api/register/": "odin/register"
             }
         },
         "views/odin/static": {
@@ -16,6 +17,23 @@
         },
         "views/odin/login": {
             "view": "odin.login",
+            "configuration": {
+                "host": ["request", "headers", "__pgdsn", "host"],
+                "user": ["request", "headers", "__pgdsn", "user"],
+                "dbname": ["request", "headers", "__pgdsn", "dbname"],
+                "expires": {"hours": 72},
+                "failure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        },
+        "views/odin/register": {
+            "view": "odin.register",
             "configuration": {
                 "host": ["request", "headers", "__pgdsn", "host"],
                 "user": ["request", "headers", "__pgdsn", "user"],
