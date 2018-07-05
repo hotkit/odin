@@ -5,6 +5,8 @@
     See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
+#include <fostgres/sql.hpp>
+
 #include <odin/fg/native.hpp>
 #include <odin/nonce.hpp>
 #include <odin/user.hpp>
@@ -39,3 +41,17 @@ void odin::set_password(
     fostlib::insert(user_values, "process", hashed.second);
     cnx.insert("odin.credentials_password_ledger", user_values);
 }
+
+
+bool odin::does_user_exist(fostlib::pg::connection &cnx, f5::u8view username) {
+    static const fostlib::string sql("SELECT * FROM odin.identity WHERE id=$1");
+    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{username});
+    auto &rs = data.second;
+    auto row = rs.begin();
+    if ( row == rs.end() ) {
+        // User not found
+        return false;
+    }
+    return true;
+}
+

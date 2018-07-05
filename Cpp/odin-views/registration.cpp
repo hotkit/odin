@@ -4,8 +4,6 @@
     See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
-
-#include <odin/credentials.hpp>
 #include <odin/nonce.hpp>
 #include <odin/odin.hpp>
 #include <odin/user.hpp>
@@ -44,10 +42,16 @@ namespace {
                 const auto username = fostlib::coerce<f5::u8view>(body["username"]);
                 const auto password = fostlib::coerce<f5::u8view>(body["password"]);
                 if ( username.empty() || password.empty() ) {
-                    throw fostlib::exceptions::not_implemented("odin.login",
+                    throw fostlib::exceptions::not_implemented("odin.register",
                         "Must pass both a username and password");
                 }
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
+
+                if (odin::does_user_exist(cnx, username)) {
+                    throw fostlib::exceptions::not_implemented("odin.register",
+                        "User already exists");
+                }
+
                 const auto ref = odin::reference();
                 odin::create_user(cnx, ref, username);
                 odin::set_password(cnx, ref, username, password);

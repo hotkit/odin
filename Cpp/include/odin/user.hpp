@@ -23,5 +23,6 @@ namespace odin {
     /// This does not commit the new password
     void set_password(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view username, f5::u8view password);
 
-
+    /// Check user does already exists in the database
+    bool does_user_exist(fostlib::pg::connection &cnx, f5::u8view username);
 }
