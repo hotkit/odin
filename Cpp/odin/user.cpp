@@ -29,8 +29,8 @@ void odin::create_user(
 
 void odin::set_password(
     fostlib::pg::connection &cnx,
-    f5::u8view reference, 
-    f5::u8view username, 
+    f5::u8view reference,
+    f5::u8view username,
     f5::u8view password
 ) {
     fg::json user_values;
@@ -47,11 +47,6 @@ bool odin::does_user_exist(fostlib::pg::connection &cnx, f5::u8view username) {
     static const fostlib::string sql("SELECT * FROM odin.identity WHERE id=$1");
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{username});
     auto &rs = data.second;
-    auto row = rs.begin();
-    if ( row == rs.end() ) {
-        // User not found
-        return false;
-    }
-    return true;
+    return rs.begin() != rs.end();
 }
 

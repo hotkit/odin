@@ -12,7 +12,7 @@ POST odin/login / {"username": "self_register_user", "password": "password1234"}
 
 # Register with the existing username should return error
 POST odin/register / {"username": "existing_user", "password": "existing_pwd"} 201
-POST odin/register / {"username": "existing_user", "password": "new_pwd"} 500
+POST odin/register / {"username": "existing_user", "password": "new_pwd"} 501
 
 # But for managed registration we must be logged in
 odin.user test-user pw1234
