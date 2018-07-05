@@ -1,8 +1,8 @@
-/*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2018 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 #include <odin/fg/native.hpp>
@@ -13,36 +13,29 @@
 #include <fost/insert>
 
 
-fostlib::json odin::create_user(
+void odin::create_user(
     fostlib::pg::connection &cnx,
-    const fostlib::string &username
+    f5::u8view reference,
+    f5::u8view username
 ) {
     fg::json user_values;
-    // odin::reference(cnx) does not work
-    // fostlib::insert(user_values, "reference", odin::reference(cnx));
-    fostlib::insert(user_values, "reference", odin::reference());
+    fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", username);
     cnx.insert("odin.identity_ledger", user_values);
-    cnx.commit();
-    return fostlib::json();
 }
 
-fostlib::json odin::create_user(
+
+void odin::set_password(
     fostlib::pg::connection &cnx,
-    const fostlib::string &username,
-    const fostlib::string &password
+    f5::u8view reference, 
+    f5::u8view username, 
+    f5::u8view password
 ) {
     fg::json user_values;
-    // odin::reference(cnx) does not work
-    // fostlib::insert(user_values, "reference", odin::reference(cnx));
-    fostlib::insert(user_values, "reference", odin::reference());
+    fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", username);
-    cnx.insert("odin.identity_ledger", user_values);
-
-    auto hashed = odin::set_password(password);
+    auto hashed = odin::hash_password(password);
     fostlib::insert(user_values, "password", hashed.first);
     fostlib::insert(user_values, "process", hashed.second);
     cnx.insert("odin.credentials_password_ledger", user_values);
-    cnx.commit();
-    return fostlib::json();
 }

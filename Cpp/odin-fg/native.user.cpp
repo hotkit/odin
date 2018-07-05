@@ -33,11 +33,14 @@ const fg::frame::builtin odin::lib::user =
     [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
         auto cnx = connect(stack);
         auto username = stack.resolve_string(stack.argument("username", pos, end));
+        auto ref = odin::reference();
+        odin::create_user(cnx, ref, username);
         if ( pos != end ) {
             auto password = stack.resolve_string(stack.argument("password", pos, end));
-            return odin::create_user(cnx, username, password);
+            odin::set_password(cnx, ref, username, password);
         }
-        return odin::create_user(cnx, username);
+        cnx.commit();
+        return fostlib::json();
     };
 
 

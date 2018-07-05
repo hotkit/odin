@@ -61,7 +61,7 @@ namespace {
                     if ( new_password.length() < 8u ) {
                         return respond("New password is too short");
                     } else {
-                        const auto hash = odin::set_password(new_password);
+                        const auto hash = odin::hash_password(new_password);
                         fostlib::json row;
                         fostlib::insert(row, "reference", req.headers()["__odin_reference"].value());
                         fostlib::insert(row, "identity_id", username);

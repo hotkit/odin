@@ -1,8 +1,8 @@
-/*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2018 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
@@ -30,8 +30,8 @@ bool odin::check_password(
 }
 
 
-std::pair<fostlib::string, fostlib::json> odin::set_password(
-    const fostlib::string &password
+std::pair<fostlib::string, fostlib::json> odin::hash_password(
+    f5::u8view password
 ) {
     auto salt = fostlib::crypto_bytes<24>();
     fostlib::json process;
@@ -43,8 +43,7 @@ std::pair<fostlib::string, fostlib::json> odin::set_password(
     auto hashed = fostlib::string(
         fostlib::coerce<fostlib::base64_string>(
             fostlib::pbkdf2_hmac_sha256(
-                fostlib::coerce<fostlib::utf8_string>(password),
-                salt, 300000, 32)).underlying().underlying());
+                password, salt, 300000, 32)).underlying().underlying());
     return std::make_pair(hashed, process);
 }
 

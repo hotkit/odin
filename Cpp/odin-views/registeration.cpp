@@ -19,12 +19,12 @@
 namespace {
 
 
-    const fostlib::module c_odin_register(odin::c_odin, "register.cpp");
+    const fostlib::module c_odin_register(odin::c_odin, "registeration.cpp");
 
 
-    const class register : public fostlib::urlhandler::view {
+    const class registration : public fostlib::urlhandler::view {
     public:
-        register()
+        registration()
         : view("odin.register") {
         }
 
