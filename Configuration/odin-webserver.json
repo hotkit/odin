@@ -3,7 +3,7 @@
         "JWT secret": "TL/ITHZAnskZLbRCVBfrEBsQspjWkm4zysWWjnIF4zUfHhPUkBp3fiu97Wl90KrB"
     },
     "webserver": {
-        "Load": ["fostgres", "odin-views"],
+        "Load": ["libfostgres.so", "libodin-views.so"],
 
         "hosts": {
             "": "root"
