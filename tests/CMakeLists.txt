@@ -186,6 +186,26 @@ add_custom_command(OUTPUT test-session
             session-test-view.json
     )
 
+add_custom_command(OUTPUT test-forgotten-password
+        COMMAND fostgres-test odin-test-forgotten-password -o test-forgotten-password
+            $<TARGET_SONAME_FILE:odin-fg>
+            $<TARGET_SONAME_FILE:odin-views>
+            ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+            ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/forgotten-password.fg
+        MAIN_DEPENDENCY forgotten-password.fg
+        DEPENDS
+            fostgres-test
+            fostgres
+            odin-fg
+            odin-views
+            ../Schema/bootstrap.sql
+            ../Schema/core/001-initial.blue.sql
+            ../Schema/authn/001-initial.blue.sql
+            ../Configuration/odin-views.json
+            registration-self.fg
+    )
+
 
 ## Because of the way cmake works we need this stuff at the end to
 ## actually make the above commands run when things change.
@@ -199,6 +219,7 @@ add_custom_target(odin-tests DEPENDS
         test-permissions
         test-registration-self
         test-session
+        test-forgotten-password
     )
 add_dependencies(stress odin-tests)
 
