@@ -60,6 +60,7 @@
                             "": "odin/unsecure/sql",
                             "me/": "fost.response.403",
                             "me/password": "odin.password.me",
+                            "forgotten-password/": "odin/forgotten-password",
                             "user/": {
                                 "view": "odin.user.unsecure",
                                 "configuration": "odin/unsecure/sql"
@@ -165,6 +166,9 @@
                     }
                 ]
             }
+        },
+        "views/odin/forgotten-password": {
+            "view": "fost.response.200"
         }
     }
 }
