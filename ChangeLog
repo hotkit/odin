@@ -1,3 +1,6 @@
+2018-07-06  Kirit Saelensminde  <kirit@felspar.com>
+ Deprecate setting a password when a user is created. It should be done separately
+
 2017-10-08  Kirit Saelensminde  <kirit@felspar.com>
  Add a setting that allows the logout count and a/c expiry checks to be bypassed.
 
