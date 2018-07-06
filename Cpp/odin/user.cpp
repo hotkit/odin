@@ -33,12 +33,23 @@ void odin::set_password(
     f5::u8view username,
     f5::u8view password
 ) {
+    auto hashed = odin::hash_password(password);
+    save_hash(cnx, reference, username, hashed.first, hashed.second);
+}
+
+
+void odin::save_hash(
+    fostlib::pg::connection &cnx,
+    f5::u8view reference,
+    f5::u8view username,
+    f5::u8view hash,
+    fostlib::json process
+) {
     fg::json user_values;
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", username);
-    auto hashed = odin::hash_password(password);
-    fostlib::insert(user_values, "password", hashed.first);
-    fostlib::insert(user_values, "process", hashed.second);
+    fostlib::insert(user_values, "password", hash);
+    fostlib::insert(user_values, "process", process);
     cnx.insert("odin.credentials_password_ledger", user_values);
 }
 
