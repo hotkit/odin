@@ -3,6 +3,7 @@ add_library(odin-views
         logout.cpp
         password.cpp
         permission.cpp
+        registration.cpp
         secure.cpp
         user.cpp
     )
