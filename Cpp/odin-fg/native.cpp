@@ -8,9 +8,13 @@
 
 #include <odin/fg/native.hpp>
 #include <odin/nonce.hpp>
+#include <odin/odin.hpp>
 #include <odin/pwhashproc.hpp>
 
 #include <fost/insert>
+
+
+const fostlib::module odin::c_odin_fg(odin::c_odin, "fg");
 
 
 namespace {

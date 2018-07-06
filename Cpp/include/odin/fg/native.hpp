@@ -13,6 +13,9 @@
 namespace odin {
 
 
+    const extern fostlib::module c_odin_fg;
+
+
     /// Connect and set hte reference option on the connection
     fostlib::pg::connection connect(fg::frame &);
 
