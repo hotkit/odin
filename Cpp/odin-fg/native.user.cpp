@@ -13,6 +13,7 @@
 
 #include <fost/datetime>
 #include <fost/insert>
+#include <fost/log>
 
 
 const fg::frame::builtin odin::lib::superuser =
@@ -36,6 +37,7 @@ const fg::frame::builtin odin::lib::user =
         auto ref = odin::reference();
         odin::create_user(cnx, ref, username);
         if ( pos != end ) {
+            fostlib::log::warning(c_odin_fg, "Setting password is deprecated");
             auto password = stack.resolve_string(stack.argument("password", pos, end));
             odin::set_password(cnx, ref, username, password);
         }
