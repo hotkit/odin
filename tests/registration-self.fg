@@ -6,8 +6,13 @@ odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 # For self registration we must be not logged in
 GET odin /api/ 401 {"odin": {"user": "./user/:user-id/"}}
 
-# TODO: Add self-registration tests here
 
+POST odin/register / {"username": "self_register_user", "password": "password1234"} 201
+POST odin/login / {"username": "self_register_user", "password": "password1234"} 200
+
+# Register with a username works the first time, but then returns an error
+POST odin/register / {"username": "some-user", "password": "existing_pwd"} 201
+POST odin/register / {"username": "some-user", "password": "new_pwd"} 501
 
 # But for managed registration we must be logged in
 odin.user test-user pw1234

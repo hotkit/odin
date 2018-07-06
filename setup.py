@@ -2,7 +2,7 @@
 from distutils.core import setup
 
 setup(name='odin',
-        version='0.1.6.1',
+        version='0.1.6.2',
         description='Odin security system',
         author='Kirt Saelensminde',
         author_email='kirit@proteus-tech.com',
@@ -10,7 +10,7 @@ setup(name='odin',
         scripts=['Python/bin/odin'],
         packages=['odin'],
         package_dir={'': 'Python'},
-        install_requires=['psycopg2'],
+        install_requires=['psycopg2-binary'],
         data_files=[
             ('share/odin/Schema', ['Schema/bootstrap.sql']),
             ('share/odin/Schema/authn', ['Schema/authn/001-initial.blue.sql']),

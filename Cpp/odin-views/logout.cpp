@@ -1,5 +1,5 @@
 /*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+    Copyright 2016-2017 Felspar Co Ltd. http://odin.felspar.com/
     Distributed under the Boost Software License, Version 1.0.
     See accompanying file LICENSE_1_0.txt or copy at
         http://www.boost.org/LICENSE_1_0.txt
@@ -31,8 +31,9 @@ namespace {
             const fostlib::host &host
         ) const {
             if ( req.method() == "POST" ) {
-                auto logout_claim = req.headers()["__jwt"].subvalue(odin::c_jwt_logout_claim.value());
-                if ( not logout_claim.isnull() ) {
+                auto logout_claim =
+                    req.headers()["__jwt"].subvalue(odin::c_jwt_logout_claim.value());
+                if ( logout_claim ) {
                     fostlib::pg::connection cnx{fostgres::connection(config, req)};
                     fostlib::json row;
                     fostlib::insert(row, "identity_id", req.headers()["__user"].value());

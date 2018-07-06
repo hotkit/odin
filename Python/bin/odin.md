@@ -27,15 +27,15 @@ Remove the user from the specified groups. Requires the `authz` module.
 
     expire username [time-date|never]
 
-Expire the identity for the user at this time. If no expiry time is set then the account is expired immediatly. Alternatively a time/date can be passed, or the word `never` to unset the expiry.
+Expire the identity for the user at this time. If no expiry time is set then the account is expired immediately. Alternatively a time/date can be passed, or the word `never` to unset the expiry.
 
-Expiring an account doesn't revoke any JWT that has already been issued, but does stop new ones from being issued. All permissions are immediatly revoked so the account loses the ability to perform any permissioned action.
+Expiring an account doesn't revoke any JWT that has already been issued, but does stop new ones from being issued. All permissions are immediately revoked so the account loses the ability to perform any permissioned action.
 
 ### Set a user's full name
 
     full-name username "Full Name"
 
-Set the full name field. Requres module `opt/full-name`
+Set the full name field. Requires module `opt/full-name`
 
 ### Create a group
 
@@ -91,14 +91,18 @@ Load the filename and present the SQL in it to the database for execution. This 
 
     user username [password]
 
-Ensure the requested user is in the system. Setting the password requires the module `authn`. If the password is left out here then no password will be set. To create a user and prompt for a password use the `password` command:
+Ensure the requested user is in the system.
 
-    $ odin user example-user
-    example-user set up
-    $ odin password example-user
-    Password:
-    Password:
-    example-user password set
+Setting the password requires the module `authn`, but setting the password through this command is now deprecated. To create a user and prompt for a password use the `password` command:
+
+```bash
+$ odin user example-user
+example-user set up
+$ odin password example-user
+Password:
+Password:
+example-user password set
+```
 
 ### Grant or revoke super user privileges
 
