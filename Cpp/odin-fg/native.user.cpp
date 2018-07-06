@@ -54,6 +54,7 @@ const fg::frame::builtin odin::lib::hash =
         auto hash = stack.resolve_string(stack.argument("hash", pos, end));
         auto process = stack.resolve(stack.argument("process", pos, end));
         odin::save_hash(cnx, ref, username, hash, process);
+        cnx.commit();
         return fostlib::json();
     };
 
