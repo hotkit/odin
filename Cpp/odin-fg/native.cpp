@@ -1,8 +1,8 @@
-/*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2016-2018 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
@@ -39,6 +39,7 @@ namespace {
             stack.symbols["odin.reference"] = odin::reference();
             stack.native["odin.assign"] = odin::lib::assign;
             stack.native["odin.group"] = odin::lib::group;
+            stack.native["odin.hash"] = odin::lib::hash;
             stack.native["odin.jwt.authorization"] = odin::lib::jwt;
             stack.native["odin.jwt.payload"] = odin::lib::jwt_payload;
             stack.native["odin.membership"] = odin::lib::membership;
