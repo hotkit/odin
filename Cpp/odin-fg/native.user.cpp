@@ -1,8 +1,8 @@
-/*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2016-2018 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
@@ -13,6 +13,7 @@
 
 #include <fost/datetime>
 #include <fost/insert>
+#include <fost/log>
 
 
 const fg::frame::builtin odin::lib::superuser =
@@ -36,9 +37,23 @@ const fg::frame::builtin odin::lib::user =
         auto ref = odin::reference();
         odin::create_user(cnx, ref, username);
         if ( pos != end ) {
+            fostlib::log::warning(c_odin_fg, "Setting password is deprecated");
             auto password = stack.resolve_string(stack.argument("password", pos, end));
             odin::set_password(cnx, ref, username, password);
         }
+        cnx.commit();
+        return fostlib::json();
+    };
+
+
+const fg::frame::builtin odin::lib::hash =
+    [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
+        auto cnx = connect(stack);
+        auto ref = odin::reference();
+        auto username = stack.resolve_string(stack.argument("username", pos, end));
+        auto hash = stack.resolve_string(stack.argument("hash", pos, end));
+        auto process = stack.resolve(stack.argument("process", pos, end));
+        odin::save_hash(cnx, ref, username, hash, process);
         cnx.commit();
         return fostlib::json();
     };

@@ -27,6 +27,8 @@ def createuser(cnx, username, password=None):
     cnx.execute(INSERT_USER, (cnx.reference, username))
     print(username, "set up")
     if password:
+        print("WARNING: Using createuser (Python) or user (Odin script) to set a password is deprecated")
+        print("Instead use a separate call to setpassword (Python) or password (Odin script).")
         setpassword(cnx, username, password)
 
 

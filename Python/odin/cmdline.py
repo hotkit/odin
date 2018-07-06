@@ -72,6 +72,9 @@ Comand is one of:
         Ensure the requested user is in the system. Setting the password
         requires the module `authn`.
 
+        WARNING: Setting the password in this way is deprecated. Use the
+        'password' command instead.
+
     superuser username [True|False]
         Sets the superuser bit (defaults to True). Requires the `authz`
         module.
