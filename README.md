@@ -9,9 +9,7 @@ An authorisation and authentication plug in for Mengmom.
 * Postgres 9.5. You will need libpq's development package installed.
 * The Mengmom web server with the fostgres plug in.
 
-To do a build it's probably easiest to check out Mengmom and start there telling it you want to build odin:
-
-    mengmom/compile mengmom odin
+To do a build it's probably easiest to check out Mengmom and start there.
 
 
 ## Modules
