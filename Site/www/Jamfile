@@ -1,7 +1,0 @@
-
-install static :
-        [ glob-tree *.*  ]
-    :
-        <location>$(PREFIX)/Static/odin
-        <install-source-root>$(TOP)/Site/www
-    ;

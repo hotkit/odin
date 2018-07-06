@@ -1,8 +1,0 @@
-
-css site : site.less ;
-
-install static :
-        site
-    :
-        <location>$(PREFIX)/Static/odin
-    ;
