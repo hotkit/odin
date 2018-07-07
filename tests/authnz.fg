@@ -2,6 +2,7 @@
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+# odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
 setting odin "Trust JWT" true
 odin.user test password1234
 odin.permission p1
