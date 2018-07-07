@@ -1,3 +1,4 @@
+INSERT INTO odin.module VALUES('opts/logout') ON CONFLICT (name) DO NOTHING;
 INSERT INTO odin.migration VALUES('opts/logout', '001-initial.blue.sql');
 
 

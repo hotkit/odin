@@ -1,3 +1,4 @@
+INSERT INTO odin.module VALUES('authz') ON CONFLICT (name) DO NOTHING;
 INSERT INTO odin.migration VALUES('authz', '001-initial.blue.sql');
 
 
