@@ -17,7 +17,7 @@ setup(name='odin',
             ('share/odin/Schema/authz', [
                 'Schema/authz/001-initial.blue.sql',
                 'Schema/authz/002-view-user_permission.blue.sql']),
-            ('share/odin/Schema/core', ['Schema/core/001-initial.blue.sql']),
+            ('share/odin/Schema/core', ['Schema/core/000-initial.blue.sql']),
             ('share/odin/Schema/opts/full-name', ['Schema/opts/full-name/001-initial.blue.sql']),
             ('share/odin/Schema/opts/logout', ['Schema/opts/logout/001-initial.blue.sql']),
         ],
