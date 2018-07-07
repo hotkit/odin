@@ -3,7 +3,8 @@ enable-modules authn authz opts/full-name opts/logout
 migrate
 
 # Create the initial super user account
-user root password123
+user root
+password root password123
 full-name root "System admin"
 superuser root
 
