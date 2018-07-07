@@ -1,5 +1,5 @@
 import csv
-from odin.connection import sql
+from odin.connection import execute_sql_file
 from odin.display import listing
 from odin.group import (addmembership, assignpermission, removemembership,
     setgroup)
@@ -118,7 +118,7 @@ COMMANDS = {
         'migrate': migrate,
         'password': setpassword,
         'permission': setpermission,
-        'sql': sql,
+        'sql': execute_sql_file,
         'superuser': setsuperuser,
         'user': createuser,
     }

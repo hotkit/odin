@@ -89,7 +89,7 @@ class Connection(object):
         self.new_reference()
 
 
-def sql(cnx, filename):
+def execute_sql_file(cnx, filename):
     with open(filename) as f:
         cmds = f.read()
         cnx.cursor.execute(cmds)

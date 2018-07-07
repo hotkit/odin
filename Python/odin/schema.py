@@ -1,5 +1,4 @@
-from odin.cmdline import sql
-from odin.connection import OdinSchemaNotPresent
+from odin.connection import execute_sql_file, OdinSchemaNotPresent
 import os.path
 
 
@@ -34,7 +33,7 @@ def enablemodules(cnx, *modules):
         cnx.pg.rollback()
         print("Odin not loaded for this database. Bootstrapping...")
         bootstrapfile = os.path.join(find_schema_path(), 'bootstrap.sql')
-        sql(cnx, bootstrapfile)
+        execute_sql_file(cnx, bootstrapfile)
         got = cnx.load_modules()
     for mod in want.difference(got):
         cnx.execute(ADD_MODULE, (mod,))
@@ -67,5 +66,5 @@ def migrate(cnx):
     scripts.sort(key=lambda m: m[1])
     for (mod, migration) in scripts:
         if (mod, migration) not in migrations:
-            sql(cnx, os.path.join(root, mod, migration))
+            execute_sql_file(cnx, os.path.join(root, mod, migration))
 
