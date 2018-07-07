@@ -61,3 +61,17 @@ bool odin::does_user_exist(fostlib::pg::connection &cnx, f5::u8view username) {
     return rs.begin() != rs.end();
 }
 
+
+void odin::set_full_name(
+    fostlib::pg::connection &cnx,
+    f5::u8view reference,
+    f5::u8view username,
+    f5::u8view full_name
+) {
+    fg::json user_values;
+    fostlib::insert(user_values, "reference", reference);
+    fostlib::insert(user_values, "identity_id", username);
+    fostlib::insert(user_values, "full_name", full_name);
+    cnx.insert("odin.identity_full_name_ledger", user_values);
+}
+

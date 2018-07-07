@@ -70,6 +70,15 @@ namespace {
                 odin::set_password(cnx, ref, username, password);
             }
 
+            if ( body.has_key("full_name") ) {
+                const auto full_name = fostlib::coerce<f5::u8view>(body["full_name"]);
+                if ( full_name.empty() ){
+                    throw fostlib::exceptions::not_implemented("odin.register",
+                        "Full name cannot be empty");
+                }
+                odin::set_full_name(cnx, ref, username, full_name);
+            }
+
             cnx.commit();
             fostlib::mime::mime_headers headers;
             boost::shared_ptr<fostlib::mime> response(
