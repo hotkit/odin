@@ -8,11 +8,17 @@ Individual migration files can be easily run using the Python `odin` command.
 
 # Enabling modules and migrating the schema
 
-Modules should be enabled using the `odin enable-module` command:
+Modules should be enabled using the `odin enable-modules` command:
 
-    odin enable-module mod1 [mod2 [mod3 ...]]
+    odin enable-modules mod1 [mod2 [mod3 ...]]
 
 Enabling a module does not run its migrations and the core module is always enabled whether or not it is listed.
+
+Whenever fetching a new version of Odin its migrations need to be run. This is done using the `odin migrate` command.
+
+    odin migrate
+
+It will report any migration scripts that it executes.
 
 
 # The Modules
@@ -52,6 +58,3 @@ The schema is designed to provide tracking of changes for auditability. It is al
 In general application code is expected to write entries into the `ledger` tables whose triggers then make the requested change in the underlying data table.
 
 
-# Notes on specific migrations #
-
-Some migrations will have choices depending on how you want to manage certain features. For example, if you want to use the identity field for the log in name or the user's password.
