@@ -13,7 +13,7 @@ add_custom_command(OUTPUT test-authnz
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authz/001-initial.blue.sql
             ../Configuration/odin-views.json
@@ -35,7 +35,7 @@ add_custom_command(OUTPUT test-db-bypass
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Configuration/odin-views.json
             db-bypass.fg
@@ -55,7 +55,7 @@ add_custom_command(OUTPUT test-login
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Configuration/odin-views.json
             login.fg
@@ -75,7 +75,7 @@ add_custom_command(OUTPUT test-logout
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/opts/logout/001-initial.blue.sql
             ../Configuration/odin-views.json
@@ -114,7 +114,7 @@ add_custom_command(OUTPUT test-password
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Configuration/odin-views.json
             password.fg
@@ -135,7 +135,7 @@ add_custom_command(OUTPUT test-permissions
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authz/001-initial.blue.sql
             ../Configuration/odin-views.json
@@ -157,7 +157,7 @@ add_custom_command(OUTPUT test-registration-self
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Configuration/odin-views.json
             registration-self.fg
@@ -178,7 +178,7 @@ add_custom_command(OUTPUT test-session
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authz/001-initial.blue.sql
             ../Configuration/odin-views.json
@@ -200,7 +200,7 @@ add_custom_command(OUTPUT test-forgotten-password
             odin-fg
             odin-views
             ../Schema/bootstrap.sql
-            ../Schema/core/001-initial.blue.sql
+            ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Configuration/odin-views.json
             registration-self.fg
