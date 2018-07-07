@@ -1,5 +1,4 @@
-INSERT INTO odin.module VALUES('opt.logout');
-INSERT INTO odin.migration VALUES('opt.logout', '001-initial.blue.sql');
+INSERT INTO odin.migration VALUES('opts/logout', '001-initial.blue.sql');
 
 
 ALTER TABLE odin.credentials ADD COLUMN

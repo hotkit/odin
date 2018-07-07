@@ -1,4 +1,3 @@
-INSERT INTO odin.module VALUES('authn');
 INSERT INTO odin.migration VALUES('authn', '001-initial.blue.sql');
 
 

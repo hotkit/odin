@@ -30,11 +30,6 @@ def enablemodules(cnx, *modules):
     want = set(modules)
     try:
         got = cnx.load_modules()
-        ## As a stop-gap measure we're going to run some SQL here intended
-        ## to change the old Odin migration mechanism to the new one. We
-        ## need to do this if we're bootstrapping a new one. The SQL needs
-        ## to be idempotent as it will be run many times against the same
-        ## system
     except OdinSchemaNotPresent:
         cnx.pg.rollback()
         print("Odin not loaded for this database. Bootstrapping...")
@@ -47,5 +42,30 @@ def enablemodules(cnx, *modules):
 
 
 def migrate(cnx):
-    pass
+    ## As a stop-gap measure we're going to run some SQL here intended
+    ## to change the old Odin migration mechanism to the new one. We
+    ## need to do this if we're bootstrapping a new one. The SQL needs
+    ## to be idempotent as it will be run many times against the same
+    ## system
+    cnx.execute("UPDATE odin.module "
+            "SET name='opts/full-name' "
+            "WHERE name='opt.full-name'")
+    cnx.execute("UPDATE odin.module "
+        "SET name='opts/logout' "
+        "WHERE name='opt.logout'")
+    cnx.execute("UPDATE odin.migration "
+            "SET migration='000-initial.blue.sql' "
+            "WHERE module_name='core' AND migration='001-initial.blue.sql'")
+    ## Find and execute all migration scripts that haven't already been run
+    root = find_schema_path()
+    scripts = []
+    migrations = set(cnx.select("SELECT module_name, migration FROM odin.migration"))
+    for dirname, subdirs, files in os.walk(root):
+        relpath = os.path.relpath(dirname, root)
+        if relpath != '.' and relpath in cnx.load_modules():
+            scripts += [(relpath, f) for f in files if f.endswith('.sql')]
+    scripts.sort(key=lambda m: m[1])
+    for (mod, migration) in scripts:
+        if (mod, migration) not in migrations:
+            sql(cnx, os.path.join(root, mod, migration))
 

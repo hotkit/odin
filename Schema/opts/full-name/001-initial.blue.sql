@@ -1,5 +1,4 @@
-INSERT INTO odin.module VALUES('opt.full-name');
-INSERT INTO odin.migration VALUES('opt.full-name', '001-initial.blue.sql');
+INSERT INTO odin.migration VALUES('opts/full-name', '001-initial.blue.sql');
 
 
 ALTER TABLE odin.identity  ADD COLUMN
