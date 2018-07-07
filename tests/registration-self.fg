@@ -11,7 +11,7 @@ POST odin/login / {"username": "self_register_user", "password": "password1234"}
 
 # Password is optional when register.
 POST odin/register / {"username": "no_pwd"} 201
-GET odin/api /user/no_pwd 200 {"username": "no_pwd"}
+GET odin/secure/sql /user/no_pwd 200 {"user": {"id": "no_pwd", "expires": null}}
 
 # Register with a username works the first time, but then returns an error
 POST odin/register / {"username": "some-user", "password": "existing_pwd"} 201
@@ -28,7 +28,8 @@ GET odin /api/ 200 {"odin": {"user": "./user/:user-id/"}, "user": {"id": "test-u
 PUT odin /api/user/test-user {"password": "1234"} 200
 
 
-# Enable the full-name module, then user can register with full-name along with username and password
-odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
-POST odin/register / {"username": "user88", "password": "pwd88", "full-name": "John Doe"} 201
-GET odin/api /user/user88 200 {"username": "user88", "full-name": "John Doe"}
+## Enable the full-name module, then user can register with full-name along with username and password
+## odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+## POST odin/register / {"username": "user88", "password": "pwd88", "full-name": "John Doe"} 201
+## GET odin/api /user/user88 200 {"username": "user88", "full-name": "John Doe"}
+
