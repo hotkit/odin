@@ -10,6 +10,8 @@ The tool can be used to administer the configuration of the Odin authentication 
     ...
 
 
+The `enable-module` and `migrate` commands are used for managing the Odin installation. These are covered in the [database schema documentation](../../Schema/README.md).
+
 
 ### Assign permissions to a group
 
@@ -35,7 +37,7 @@ Expiring an account doesn't revoke any JWT that has already been issued, but doe
 
     full-name username "Full Name"
 
-Set the full name field. Requires module `opt/full-name`
+Set the full name field. Requires module `opts/full-name`
 
 ### Create a group
 

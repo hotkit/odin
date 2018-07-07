@@ -2,7 +2,7 @@
 from getopt import gnu_getopt
 from odin.cmdline import (command, HELPTEXT, SHORTOPTS, makedsn,
     UnknownCommand)
-from odin.connection import Connection
+from odin.connection import Connection, OdinSchemaNotPresent
 from psycopg2 import ProgrammingError
 import sys
 
@@ -22,11 +22,16 @@ if __name__ == "__main__":
             cnx = Connection(dsn)
             command(cnx, *(args[1:]))
             cnx.commit()
-        except UnknownCommand:
-            print("Unknown command. Type 'odin help' for help")
+        except UnknownCommand as e:
+            print("Unknown command '{}'. Type 'odin help' for help".format(e))
             exit(1)
         except ProgrammingError as e:
-            print("** Postgres error")
+            print("** Postgres error", e.pgcode)
+            print()
             print(e)
             exit(2)
+        except OdinSchemaNotPresent:
+            print("This database does not have the Odin schemas installed")
+            print("Use `odin enable-module core` to bootstrap it")
+            exit(3)
 

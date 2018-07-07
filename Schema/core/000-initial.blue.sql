@@ -1,4 +1,3 @@
-INSERT INTO odin.module VALUES ('core');
 INSERT INTO odin.migration VALUES('core', '001-initial.blue.sql');
 
 

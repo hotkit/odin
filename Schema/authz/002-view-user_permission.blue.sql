@@ -19,6 +19,7 @@ CREATE MATERIALIZED VIEW odin.identity_permission AS
             (odin.permission.slug=odin.group_grant.permission_slug
                 OR odin.identity.is_superuser);
 CREATE INDEX identity_permission_identity_id_idx ON odin.identity_permission (identity_id);
+CREATE UNIQUE INDEX ON odin.identity_permission (identity_id, permission_slug);
 
 CREATE VIEW odin.user_permission AS
     SELECT identity_id, permission_slug, description
