@@ -79,6 +79,15 @@ namespace {
                 odin::set_full_name(cnx, ref, username, full_name);
             }
 
+            if ( body.has_key("email") ) {
+                const auto email = fostlib::coerce<f5::u8view>(body["email"]);
+                if ( email.empty() ){
+                    throw fostlib::exceptions::not_implemented("odin.register",
+                        "Full name cannot be empty");
+                }
+                odin::set_email(cnx, ref, username, email);
+            }
+
             cnx.commit();
             fostlib::mime::mime_headers headers;
             boost::shared_ptr<fostlib::mime> response(
