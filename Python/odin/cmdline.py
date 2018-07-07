@@ -44,7 +44,7 @@ Command is one of:
         Expire the identity for the user at this time.
 
     full-name username "Full Name"
-        Set the full name field. Requires module `opt/full-name`
+        Set the full name field. Requires module `opts/full-name`
 
     help
         Show this text

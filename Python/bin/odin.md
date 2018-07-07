@@ -37,7 +37,7 @@ Expiring an account doesn't revoke any JWT that has already been issued, but doe
 
     full-name username "Full Name"
 
-Set the full name field. Requires module `opt/full-name`
+Set the full name field. Requires module `opts/full-name`
 
 ### Create a group
 
