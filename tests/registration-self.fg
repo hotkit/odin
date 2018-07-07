@@ -22,3 +22,6 @@ GET odin /api/ 200 {"odin": {"user": "./user/:user-id/"}, "user": {"id": "test-u
 # Put the user
 PUT odin /api/user/test-user {"password": "1234"} 200
 
+# Enable the full-name module, then user can register with full-name along with username and password
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+POST odin/register / {"username": "user88", "password": "pwd88", "full-name": "John Doe"} 201
