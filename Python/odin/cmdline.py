@@ -23,10 +23,10 @@ opts are one or more of:
 
     -?                      Print this text
     -h hostname             Postgres host
-    -d database             Database  name
-    -U username             Database username
+    -d database             Database name
+    -U username             Database username (role)
 
-Comand is one of:
+Command is one of:
 
     assign group permission1 [permission2 [permission3 ...]]
         Assign one or more permissions to a group.
@@ -39,7 +39,7 @@ Comand is one of:
         Expire the identity for the user at this time.
 
     full-name username "Full Name"
-        Set the full name field. Requres module `opt/full-name`
+        Set the full name field. Requires module `opt/full-name`
 
     help
         Show this text
