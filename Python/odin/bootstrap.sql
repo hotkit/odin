@@ -15,3 +15,7 @@ CREATE TABLE odin.migration (
     migration text NOT NULL,
     CONSTRAINT migration_pk PRIMARY KEY (module_name, migration)
 );
+
+
+-- Always enable this module
+INSERT INTO odin.module VALUES ('core');
