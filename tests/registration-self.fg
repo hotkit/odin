@@ -28,7 +28,13 @@ GET odin /api/ 200 {"odin": {"user": "./user/:user-id/"}, "user": {"id": "test-u
 PUT odin /api/user/test-user {"password": "1234"} 200
 
 
-## Enable the full-name module, then user can register with full-name along with username and password
+## Enable opts/full-name module, then user can register with full-name along with username and password
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 POST odin/register / {"username": "user88", "password": "pwd88", "full_name": "John Doe"} 201
 GET odin/secure/sql /user/user88 200 {"user": {"id": "user88", "expires": null, "full_name": "John Doe"}}
+
+
+## Enable opts/email module, then user can register with email
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+POST odin/register / {"username": "user89", "password": "pwd88", "email": "admin@example.com"} 201
+GET odin/secure/sql /user/user89 200 {"user": {"id": "user89", "expires": null, "full_name": null, "email": "admin@example.com"}}

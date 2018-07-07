@@ -159,6 +159,8 @@ add_custom_command(OUTPUT test-registration-self
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/email/001-initial.blue.sql
             ../Configuration/odin-views.json
             registration-self.fg
     )
