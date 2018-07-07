@@ -8,6 +8,7 @@ add_library(odin-views
         user.cpp
     )
 target_link_libraries(odin-views fost-urlhandler odin)
+set_target_properties(odin-views PROPERTIES DEBUG_POSTFIX "-d")
 install(TARGETS odin-views LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 
 add_library(odin-views-smoke STATIC EXCLUDE_FROM_ALL

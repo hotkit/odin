@@ -7,4 +7,5 @@ add_library(odin
     )
 target_include_directories(odin PUBLIC ../include)
 target_link_libraries(odin fost-crypto fost-inet fost-postgres fostgres)
+set_target_properties(odin PROPERTIES DEBUG_POSTFIX "-d")
 install(TARGETS odin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
