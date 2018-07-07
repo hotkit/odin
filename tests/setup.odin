@@ -1,9 +1,6 @@
-sql ../Schema/core/001-initial.blue.sql
-sql ../Schema/authn/001-initial.blue.sql
-sql ../Schema/authz/001-initial.blue.sql
-#sql ../Schema/authz/002-view-user_permission.blue.sql
-sql ../Schema/opts/full-name/001-initial.blue.sql
-sql ../Schema/opts/logout/001-initial.blue.sql
+# Enable the modules we want and migrate them all
+enable-modules authn authz opts/full-name opts/logout
+migrate
 
 # Create the initial super user account
 user root password123

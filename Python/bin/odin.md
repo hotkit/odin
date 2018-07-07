@@ -10,6 +10,8 @@ The tool can be used to administer the configuration of the Odin authentication 
     ...
 
 
+The `enable-module` and `migrate` commands are used for managing the Odin installation. These are covered in the [database schema documentation](../../Schema/README.md).
+
 
 ### Assign permissions to a group
 
