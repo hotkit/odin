@@ -75,8 +75,13 @@ namespace {
             }
 
             if ( body.has_key("email") ) {
-                const auto email = fostlib::coerce<fostlib::email_address>(body["email"]);
-                odin::set_email(cnx, ref, username.value(), email);
+                try {
+                    const auto email = fostlib::coerce<fostlib::email_address>(body["email"]);
+                    odin::set_email(cnx, ref, username.value(), email);
+                } catch ( fostlib::exceptions::exception &e ) {
+                    throw fostlib::exceptions::not_implemented("odin.register",
+                        "Invalid e-mail address");
+                }
             }
 
             cnx.commit();

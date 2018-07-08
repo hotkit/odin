@@ -40,5 +40,5 @@ POST odin/register / {"username": "user89", "password": "pwd88", "email": "admin
 GET odin/secure/sql /user/user89 200 {"user": {"id": "user89", "expires": null, "full_name": null, "email": "admin@example.com"}}
 
 ## Should throw exception when user input invalid email
-POST odin/register / {"username": "user91", "password": "pwd88", "email": "invalid_email"} 400
-POST odin/register / {"username": "user91", "password": "pwd88", "email": ""} 400
+POST odin/register / {"username": "user91", "password": "pwd88", "email": "invalid_email"} 501
+POST odin/register / {"username": "user91", "password": "pwd88", "email": ""} 501
