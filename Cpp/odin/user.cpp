@@ -80,11 +80,11 @@ void odin::set_email(
     fostlib::pg::connection &cnx,
     f5::u8view reference,
     f5::u8view username,
-    f5::u8view email
+    fostlib::email_address email
 ) {
     fg::json user_values;
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", username);
-    fostlib::insert(user_values, "email", email);
+    fostlib::insert(user_values, "email", email.email());
     cnx.insert("odin.identity_email_ledger", user_values);
 }

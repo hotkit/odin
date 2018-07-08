@@ -75,12 +75,8 @@ namespace {
             }
 
             if ( body.has_key("email") ) {
-                const auto email = fostlib::coerce<f5::u8view>(body["email"]);
-                if ( email.empty() ){
-                    throw fostlib::exceptions::not_implemented("odin.register",
-                        "Full name cannot be empty");
-                }
-                odin::set_email(cnx, ref, username, email);
+                const auto email = fostlib::coerce<fostlib::email_address>(body["email"]);
+                odin::set_email(cnx, ref, username.value(), email);
             }
 
             cnx.commit();

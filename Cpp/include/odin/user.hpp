@@ -9,6 +9,7 @@
 #pragma once
 
 
+#include <fost/mailbox>
 #include <fost/postgres>
 
 
@@ -37,7 +38,7 @@ namespace odin {
 
     /// Save email of the given user to database, this does not commit the transaction
     void set_email(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view username,
-        f5::u8view email);
+        fostlib::email_address email);
 
 
 }

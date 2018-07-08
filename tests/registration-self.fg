@@ -38,3 +38,7 @@ GET odin/secure/sql /user/user88 200 {"user": {"id": "user88", "expires": null, 
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 POST odin/register / {"username": "user89", "password": "pwd88", "email": "admin@example.com"} 201
 GET odin/secure/sql /user/user89 200 {"user": {"id": "user89", "expires": null, "full_name": null, "email": "admin@example.com"}}
+
+## Should throw exception when user input invalid email
+POST odin/register / {"username": "user91", "password": "pwd88", "email": "invalid_email"} 400
+POST odin/register / {"username": "user91", "password": "pwd88", "email": ""} 400
