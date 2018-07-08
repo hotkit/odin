@@ -77,7 +77,7 @@ add_custom_command(OUTPUT test-logout
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
-            ../Schema/opts/logout/001-initial.blue.sql
+            ../Schema/opts/logout/002-initial.blue.sql
             ../Configuration/odin-views.json
             logout.fg
     )
