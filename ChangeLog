@@ -1,5 +1,6 @@
 2018-07-08  Tle Ekkul  <e.aryuth@gmail.com>
  Added self registration API with full-name
+ Added self registration API with e-mail address
 
 2018-07-07  Kirit Saelensminde  <kirit@felspar.com>
  Change the way that Odin migrations are run.
