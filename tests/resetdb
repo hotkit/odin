@@ -6,6 +6,5 @@ set -ex
 
 dropdb -h $1 odin-test || echo "OK, odin-test database hasn't been created before"
 createdb -h $1 odin-test
-psql -h $1 odin-test < ../Schema/bootstrap.sql
 
 odin -h $1 -d odin-test include setup.odin

@@ -38,6 +38,7 @@ def enablemodules(cnx, *modules):
     for mod in want.difference(got):
         cnx.execute(ADD_MODULE, (mod,))
         print(mod, "enabled")
+    cnx._modules = set()
 
 
 def migrate(cnx):
