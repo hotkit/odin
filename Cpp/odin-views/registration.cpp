@@ -39,27 +39,22 @@ namespace {
             auto body_str = fostlib::coerce<fostlib::string>(
                 fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
+            const auto username = fostlib::coerce<fostlib::nullable<f5::u8view>>(body["username"]);
 
-            if ( !body.has_key("username") ) {
+            if ( not username || username.value().empty() ) {
                 throw fostlib::exceptions::not_implemented("odin.register",
                     "Must pass username field");
             }
 
-            const auto username = fostlib::coerce<f5::u8view>(body["username"]);
-            if ( username.empty() ) {
-                throw fostlib::exceptions::not_implemented("odin.register",
-                    "Must pass username");
-            }
-
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
 
-            if (odin::does_user_exist(cnx, username)) {
+            if (odin::does_user_exist(cnx, username.value())) {
                 throw fostlib::exceptions::not_implemented("odin.register",
                     "User already exists");
             }
 
             const auto ref = odin::reference();
-            odin::create_user(cnx, ref, username);
+            odin::create_user(cnx, ref, username.value());
 
             if ( body.has_key("password") ) {
                 const auto password = fostlib::coerce<f5::u8view>(body["password"]);
@@ -67,7 +62,7 @@ namespace {
                     throw fostlib::exceptions::not_implemented("odin.register",
                         "Password cannot be empty");
                 }
-                odin::set_password(cnx, ref, username, password);
+                odin::set_password(cnx, ref, username.value(), password);
             }
 
             if ( body.has_key("full_name") ) {
@@ -76,7 +71,7 @@ namespace {
                     throw fostlib::exceptions::not_implemented("odin.register",
                         "Full name cannot be empty");
                 }
-                odin::set_full_name(cnx, ref, username, full_name);
+                odin::set_full_name(cnx, ref, username.value(), full_name);
             }
 
             if ( body.has_key("email") ) {
