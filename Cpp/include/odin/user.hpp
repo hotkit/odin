@@ -13,7 +13,7 @@
 
 
 namespace odin {
-    
+
 
     /// Create the given user, this does not commit the new user
     void create_user(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view username);
@@ -30,4 +30,8 @@ namespace odin {
 
     /// Check user does already exists in the database
     bool does_user_exist(fostlib::pg::connection &cnx, f5::u8view username);
+
+    /// Save full name of the given user to database, this does not commit the transaction
+    void set_full_name(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view username,
+        f5::u8view full_name);
 }

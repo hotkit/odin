@@ -31,41 +31,55 @@ namespace {
             fostlib::http::server::request &req,
             const fostlib::host &host
         ) const {
-            if ( req.method() == "POST" ) {
-                auto body_str = fostlib::coerce<fostlib::string>(
-                    fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
-                fostlib::json body = fostlib::json::parse(body_str);
-                // Should retrieve confirm_password as well?
-                if ( !body.has_key("username") || !body.has_key("password") ) {
-                    throw fostlib::exceptions::not_implemented("odin.register",
-                        "Must pass both username and password fields");
-                }
-                const auto username = fostlib::coerce<f5::u8view>(body["username"]);
-                const auto password = fostlib::coerce<f5::u8view>(body["password"]);
-                if ( username.empty() || password.empty() ) {
-                    throw fostlib::exceptions::not_implemented("odin.register",
-                        "Must pass both a username and password");
-                }
-                fostlib::pg::connection cnx{fostgres::connection(config, req)};
-
-                if (odin::does_user_exist(cnx, username)) {
-                    throw fostlib::exceptions::not_implemented("odin.register",
-                        "User already exists");
-                }
-
-                const auto ref = odin::reference();
-                odin::create_user(cnx, ref, username);
-                odin::set_password(cnx, ref, username, password);
-                cnx.commit();
-                fostlib::mime::mime_headers headers;
-                boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(fostlib::json::unparse(fostlib::json{}, true),
-                        headers, "application/json"));
-                return std::make_pair(response, 201);
-            } else {
+            if ( req.method() != "POST" ) {
                 throw fostlib::exceptions::not_implemented(__func__,
                     "Registration requires POST. This should be a 405");
             }
+
+            auto body_str = fostlib::coerce<fostlib::string>(
+                fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
+            fostlib::json body = fostlib::json::parse(body_str);
+            const auto username = fostlib::coerce<fostlib::nullable<f5::u8view>>(body["username"]);
+
+            if ( not username || username.value().empty() ) {
+                throw fostlib::exceptions::not_implemented("odin.register",
+                    "Must pass username field");
+            }
+
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
+
+            if (odin::does_user_exist(cnx, username.value())) {
+                throw fostlib::exceptions::not_implemented("odin.register",
+                    "User already exists");
+            }
+
+            const auto ref = odin::reference();
+            odin::create_user(cnx, ref, username.value());
+
+            if ( body.has_key("password") ) {
+                const auto password = fostlib::coerce<f5::u8view>(body["password"]);
+                if ( password.empty() ){
+                    throw fostlib::exceptions::not_implemented("odin.register",
+                        "Password cannot be empty");
+                }
+                odin::set_password(cnx, ref, username.value(), password);
+            }
+
+            if ( body.has_key("full_name") ) {
+                const auto full_name = fostlib::coerce<f5::u8view>(body["full_name"]);
+                if ( full_name.empty() ){
+                    throw fostlib::exceptions::not_implemented("odin.register",
+                        "Full name cannot be empty");
+                }
+                odin::set_full_name(cnx, ref, username.value(), full_name);
+            }
+
+            cnx.commit();
+            fostlib::mime::mime_headers headers;
+            boost::shared_ptr<fostlib::mime> response(
+                new fostlib::text_body(fostlib::json::unparse(fostlib::json{}, true),
+                    headers, "application/json"));
+            return std::make_pair(response, 201);
         }
     } c_registration;
 
