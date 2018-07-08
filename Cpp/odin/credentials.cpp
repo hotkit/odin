@@ -1,8 +1,8 @@
-/*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2016-2018 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
@@ -98,7 +98,10 @@ fostlib::jwt::mint odin::mint_jwt(const fostlib::json &user, fostlib::json paylo
     jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
 
     if ( user.has_key(full_name) ) {
-        jwt.claim("name", user[full_name]);
+        auto fn = fostlib::coerce<fostlib::nullable<f5::u8view>>(user[full_name]);
+        if ( fn && not fn.value().empty() ) {
+            jwt.claim("name", user[full_name]);
+        }
     }
     if ( user.has_key(logout_count) ) {
         jwt.claim(c_jwt_logout_claim.value(), user[logout_count]);
