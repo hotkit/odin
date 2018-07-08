@@ -3,7 +3,7 @@ INSERT INTO odin.migration VALUES('opts/email', '001-initial.blue.sql');
 
 
 ALTER TABLE odin.identity  ADD COLUMN
-    email text NULL;
+    email text NULL UNIQUE;
 
 CREATE TABLE odin.identity_email_ledger (
     reference text NOT NULL,

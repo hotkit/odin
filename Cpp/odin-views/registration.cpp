@@ -87,6 +87,13 @@ namespace {
                         ("e-mail", body["email"]);
                     throw fostlib::exceptions::not_implemented("odin.register",
                         "Invalid e-mail address");
+                } catch ( std::exception &e ) {
+                    fostlib::log::error(c_odin_registration)
+                        ("", "Email already exists")
+                        ("username", username.value())
+                        ("e-mail", body["email"]);
+                    throw fostlib::exceptions::not_implemented("odin.register",
+                        "E-mail already exists");
                 }
             }
 

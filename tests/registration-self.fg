@@ -48,3 +48,6 @@ GET odin/secure/sql /user/user89 200 {"user": {"id": "user89", "expires": null, 
 ## Should throw exception when user input invalid email
 POST odin/register / {"username": "user91", "password": "password1234", "email": "invalid_email"} 501
 POST odin/register / {"username": "user91", "password": "password1234", "email": ""} 501
+
+## Should throw exception when user input existing email
+POST odin/register / {"username": "user90", "password": "password1234", "email": "admin@example.com"} 501
