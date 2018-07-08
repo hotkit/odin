@@ -10,8 +10,10 @@
 #include <odin/user.hpp>
 #include <odin/views.hpp>
 
+#include <fost/exception/parse_error.hpp>
 #include <fost/insert>
 #include <fost/log>
+#include <fost/mailbox>
 #include <fostgres/sql.hpp>
 
 
@@ -78,7 +80,11 @@ namespace {
                 try {
                     const auto email = fostlib::coerce<fostlib::email_address>(body["email"]);
                     odin::set_email(cnx, ref, username.value(), email);
-                } catch ( fostlib::exceptions::exception &e ) {
+                } catch ( fostlib::exceptions::parse_error &e ) {
+                    fostlib::log::debug(c_odin_registration)
+                        ("", "Email parsing error")
+                        ("username", username.value())
+                        ("e-mail", body["email"]);
                     throw fostlib::exceptions::not_implemented("odin.register",
                         "Invalid e-mail address");
                 }
