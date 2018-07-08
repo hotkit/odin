@@ -81,7 +81,7 @@ namespace {
                     const auto email = fostlib::coerce<fostlib::email_address>(body["email"]);
                     odin::set_email(cnx, ref, username.value(), email);
                 } catch ( fostlib::exceptions::parse_error &e ) {
-                    fostlib::log::debug(c_odin_registration)
+                    fostlib::log::error(c_odin_registration)
                         ("", "Email parsing error")
                         ("username", username.value())
                         ("e-mail", body["email"]);
