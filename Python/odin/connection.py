@@ -90,8 +90,12 @@ class Connection(object):
 
 
 def execute_sql_file(cnx, filename):
-    with open(filename) as f:
-        cmds = f.read()
-        cnx.cursor.execute(cmds)
-    cnx.load_modules()
-    print("Executed", filename)
+    try:
+        with open(filename) as f:
+            cmds = f.read()
+            cnx.cursor.execute(cmds)
+        cnx.load_modules()
+        print("Executed", filename)
+    except Exception:
+        print("Error whilst running", filename)
+        raise
