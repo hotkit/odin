@@ -14,9 +14,14 @@ POST odin/register / {"username": "no_pwd"} 201
 GET odin/secure/sql /user/no_pwd 200 {"user": {"id": "no_pwd", "expires": null}}
 
 # Register with a username works the first time, but then returns an error
-POST odin/register / {"username": "some-user", "password": "existing_pwd"} 201
-POST odin/register / {"username": "some-user", "password": "new_pwd"} 501
+POST odin/register / {"username": "some-user", "password": "password1234"} 201
+POST odin/register / {"username": "some-user", "password": "password5678"} 501
 
+# Password should longer than 8 characters
+POST odin/register / {"username": "some-user", "password": "pwd"} 501
+
+# Password cannot be empty
+POST odin/register / {"username": "some-user", "password": ""} 501
 
 # But for managed registration we must be logged in
 odin.user test-user pw1234
@@ -30,15 +35,16 @@ PUT odin /api/user/test-user {"password": "1234"} 200
 
 ## Enable opts/full-name module, then user can register with full-name along with username and password
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
-POST odin/register / {"username": "user88", "password": "pwd88", "full_name": "John Doe"} 201
+POST odin/register / {"username": "user88", "password": "password1234", "full_name": "John Doe"} 201
 GET odin/secure/sql /user/user88 200 {"user": {"id": "user88", "expires": null, "full_name": "John Doe"}}
 
 
 ## Enable opts/email module, then user can register with email
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
-POST odin/register / {"username": "user89", "password": "pwd88", "email": "admin@example.com"} 201
+POST odin/register / {"username": "user89", "password": "password1234", "email": "admin@example.com"} 201
 GET odin/secure/sql /user/user89 200 {"user": {"id": "user89", "expires": null, "full_name": null, "email": "admin@example.com"}}
 
+
 ## Should throw exception when user input invalid email
-POST odin/register / {"username": "user91", "password": "pwd88", "email": "invalid_email"} 501
-POST odin/register / {"username": "user91", "password": "pwd88", "email": ""} 501
+POST odin/register / {"username": "user91", "password": "password1234", "email": "invalid_email"} 501
+POST odin/register / {"username": "user91", "password": "password1234", "email": ""} 501

@@ -60,9 +60,9 @@ namespace {
 
             if ( body.has_key("password") ) {
                 const auto password = fostlib::coerce<f5::u8view>(body["password"]);
-                if ( password.empty() ){
+                if ( password.empty() || password.bytes() < 8u ){
                     throw fostlib::exceptions::not_implemented("odin.register",
-                        "Password cannot be empty");
+                        "Invalid password");
                 }
                 odin::set_password(cnx, ref, username.value(), password);
             }
