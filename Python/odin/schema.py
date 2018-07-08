@@ -56,6 +56,9 @@ def migrate(cnx):
     cnx.execute("UPDATE odin.migration "
             "SET migration='000-initial.blue.sql' "
             "WHERE module_name='core' AND migration='001-initial.blue.sql'")
+    cnx.execute("UPDATE odin.migration "
+            "SET migration='002-initial.blue.sql' "
+            "WHERE module_name='opts/logout' AND migration='001-initial.blue.sql'")
     ## Find and execute all migration scripts that haven't already been run
     root = find_schema_path()
     scripts = []
