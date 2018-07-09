@@ -168,7 +168,24 @@
             }
         },
         "views/odin/forgotten-password": {
-            "view": "fost.response.200"
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [{
+                    "return": "object",
+                    "path": [],
+                    "POST": {
+                        "table": "odin.request_reset_password_ledger",
+                        "columns": {
+                            "email": {"key": true},
+                            "reference": {
+                                "key": true,
+                                "source": ["request", "headers", "__odin_reference"]
+                            }
+                        },
+                        "returning": ["'200' as status"]
+                    }
+                }]
+            }
         }
     }
 }
