@@ -9,6 +9,7 @@
 #include <odin/credentials.hpp>
 #include <odin/nonce.hpp>
 #include <odin/pwhashproc.hpp>
+#include <odin/user.hpp>
 #include <odin/views.hpp>
 
 #include <fost/insert>
@@ -61,13 +62,8 @@ namespace {
                     if ( new_password.length() < 8u ) {
                         return respond("New password is too short");
                     } else {
-                        const auto hash = odin::hash_password(new_password);
-                        fostlib::json row;
-                        fostlib::insert(row, "reference", req.headers()["__odin_reference"].value());
-                        fostlib::insert(row, "identity_id", username);
-                        fostlib::insert(row, "password", hash.first);
-                        fostlib::insert(row, "process", hash.second);
-                        cnx.insert("odin.credentials_password_ledger", row);
+                        odin::set_password(cnx,
+                            req.headers()["__odin_reference"].value(), username, new_password);
                         cnx.commit();
                         return respond("", 200);
                     }
