@@ -73,7 +73,7 @@ namespace {
                     }
                 }
             } else {
-                return respond("No user is logged in");
+                return respond("No user is logged in", 401);
             }
         }
     } c_password_me;
