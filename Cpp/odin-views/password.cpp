@@ -31,6 +31,27 @@ namespace {
         return std::make_pair(response, code);
     }
 
+    std::pair<boost::shared_ptr<fostlib::mime>, int> change_password(
+        fostlib::pg::connection &cnx,
+        fostlib::host remote_address,
+        f5::u8view reference,
+        f5::u8view username,
+        f5::u8view old_password,
+        f5::u8view new_password
+    ) {
+        if ( new_password.bytes() < 8u ) {
+            return respond("New password is too short");
+        }
+        auto user = odin::credentials(cnx, username, old_password, remote_address);
+        cnx.commit();
+        if ( user.isnull() ) {
+            return respond("Wrong password");
+        }
+        odin::set_password(cnx, reference, username, new_password);
+        cnx.commit();
+        return respond("", 200);
+    }
+
 
     const class password_me : public fostlib::urlhandler::view {
     public:
@@ -51,23 +72,12 @@ namespace {
                 if ( !body.has_key("new-password") || !body.has_key("old-password") ) {
                     return respond("Must supply both old and new password");
                 }
-                const auto old_password = fostlib::coerce<fostlib::string>(body["old-password"]);
-                const auto new_password = fostlib::coerce<fostlib::string>(body["new-password"]);
+                const auto old_password = fostlib::coerce<f5::u8view>(body["old-password"]);
+                const auto new_password = fostlib::coerce<f5::u8view>(body["new-password"]);
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
-                auto user = odin::credentials(cnx, username, old_password, req.remote_address());
-                cnx.commit();
-                if ( user.isnull() ) {
-                    return respond("Wrong password");
-                } else {
-                    if ( new_password.length() < 8u ) {
-                        return respond("New password is too short");
-                    } else {
-                        odin::set_password(cnx,
-                            req.headers()["__odin_reference"].value(), username, new_password);
-                        cnx.commit();
-                        return respond("", 200);
-                    }
-                }
+                const auto reference = req.headers()["__odin_reference"].value();
+                const auto remote_address = req.remote_address();
+                return change_password(cnx, remote_address, reference, username, old_password, new_password);
             } else {
                 return respond("No user is logged in");
             }
