@@ -1,5 +1,5 @@
 # Enable the modules we want and migrate them all
-enable-modules authn authz opts/full-name opts/logout opts/email
+enable-modules authn authz opts/full-name opts/logout opts/email opts/forgotten-password
 migrate
 
 # Create the initial super user account
