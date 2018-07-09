@@ -52,7 +52,15 @@
                 "unsecure": {
                     "view": "fost.view.pathprefix",
                     "configuration": {
-                        "": "odin/unsecure/sql",
+                        "": {
+                            "view": "fost.response.401",
+                            "configuration": {
+                                "schemes": {
+                                    "Bearer": {}
+                                },
+                                "view": "odin/unsecure/sql"
+                            }
+                        },
                         "me/": "fost.response.403",
                         "me/password": "odin.password.me",
                         "forgotten-password/": "odin/forgotten-password",
@@ -127,44 +135,38 @@
             }
         },
         "views/odin/unsecure/sql": {
-            "view": "fost.response.401",
+            "view": "fostgres.sql",
             "configuration": {
-                "schemes": {
-                    "Bearer": {}
-                },
-                "view": "fostgres.sql",
-                "configuration": {
-                    "sql": [
-                        {
-                            "return": "object",
-                            "path": [],
-                            "GET": "SELECT
-                                'odin/handshake'::text AS \"@context\",
-                                array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
-                                './login/'::text AS odin__login,
-                                './logout/'::text AS odin__logout,
-                                './me/permissions'::text AS odin__my__permissions,
-                                './me/password'::text AS odin__my__password,
-                                './user/:user-id/'::text AS odin__user"
-                        },
-                        {
-                            "return": "object",
-                            "path": ["/user", 1],
-                            "PUT": {
-                                "table": "odin.identity_ledger",
-                                "columns": {
-                                    "reference": {
-                                        "key": true,
-                                        "source": ["request", "headers", "__odin_reference"]
-                                    },
-                                    "identity_id": {
-                                        "source": 1
-                                    }
+                "sql": [
+                    {
+                        "return": "object",
+                        "path": [],
+                        "GET": "SELECT
+                            'odin/handshake'::text AS \"@context\",
+                            array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
+                            './login/'::text AS odin__login,
+                            './logout/'::text AS odin__logout,
+                            './me/permissions'::text AS odin__my__permissions,
+                            './me/password'::text AS odin__my__password,
+                            './user/:user-id/'::text AS odin__user"
+                    },
+                    {
+                        "return": "object",
+                        "path": ["/user", 1],
+                        "PUT": {
+                            "table": "odin.identity_ledger",
+                            "columns": {
+                                "reference": {
+                                    "key": true,
+                                    "source": ["request", "headers", "__odin_reference"]
+                                },
+                                "identity_id": {
+                                    "source": 1
                                 }
                             }
                         }
-                    ]
-                }
+                    }
+                ]
             }
         },
         "views/odin/forgotten-password": {
