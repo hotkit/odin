@@ -1,12 +1,8 @@
 from odin.connection import execute_sql_file, OdinSchemaNotPresent
-import os.path
+import os
 
 
 MYDIR = os.path.dirname(os.path.abspath(__file__))
-SCHEMA_FILES_PATH = [
-        '/usr/share/odin/Schema',
-        os.path.join(MYDIR, '../../Schema'),
-    ]
 
 ADD_MODULE = '''INSERT INTO odin.module VALUES (%s)'''
 
@@ -15,14 +11,27 @@ class SchemaFilesNotFound(Exception):
     pass
 
 
+def get_schema_files_path():
+    DEFAULT_SCHEMA_FILES_PATH = (
+        '/usr/share/odin/Schema',
+        os.path.join(MYDIR, '../../Schema'),
+    )
+    odin_schema_files_path = DEFAULT_SCHEMA_FILES_PATH
+    env_odin_schema_path = os.getenv('ODIN_SCHEMA_PATH')
+    if env_odin_schema_path:
+        odin_schema_files_path = [env_odin_schema_path]
+    return odin_schema_files_path
+
+
 def find_schema_path():
     """Searches the locations in the `SCHEMA_FILES_PATH` to
     try to find where the schema SQL files are located.
     """
-    for path in SCHEMA_FILES_PATH:
+    schema_files_path = get_schema_files_path()
+    for path in schema_files_path:
         if os.path.exists(os.path.join(path, 'bootstrap.sql')):
             return path
-    raise SchemaFilesNotFound('Searched ' + ':'.join(SCHEMA_FILES_PATH))
+    raise SchemaFilesNotFound('Searched ' + ':'.join(schema_files_path))
 
 
 def enablemodules(cnx, *modules):

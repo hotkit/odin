@@ -1,5 +1,5 @@
 INSERT INTO odin.module VALUES('opts/logout') ON CONFLICT (name) DO NOTHING;
-INSERT INTO odin.migration VALUES('opts/logout', '001-initial.blue.sql');
+INSERT INTO odin.migration VALUES('opts/logout', '002-initial.blue.sql');
 
 
 ALTER TABLE odin.credentials ADD COLUMN
