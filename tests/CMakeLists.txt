@@ -203,7 +203,7 @@ add_custom_command(OUTPUT test-forgotten-password
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
-            ../Schema/authn/001-initial.blue.sql
+            ../Schema/opts/forgotten-password/001-initial.blue.sql
             ../Configuration/odin-views.json
             registration-self.fg
     )
