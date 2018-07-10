@@ -89,7 +89,7 @@ fostlib::json odin::credentials(
 }
 
 
-fostlib::jwt::mint odin::mint_jwt(const fostlib::json &user, fostlib::json payload) {
+fostlib::jwt::mint odin::mint_login_jwt(const fostlib::json &user, fostlib::json payload) {
     static const fostlib::jcursor subject("identity", "id");
     static const fostlib::jcursor full_name("identity", "full_name");
     static const fostlib::jcursor logout_count("credentials", "logout_count");
@@ -110,3 +110,8 @@ fostlib::jwt::mint odin::mint_jwt(const fostlib::json &user, fostlib::json paylo
     return jwt;
 }
 
+// fostlib::jwt::mint odin::mint(const fostlib::setting<fostlib::string> secret, fostlib::string subject) {
+//     fostlib::jwt::mint jwt{fostlib::sha256, secret.value(), std::move(payload)};
+//     jwt.subject(fostlib::coerce<fostlib::string>(subject));
+//     return jwt;
+// }

@@ -48,13 +48,13 @@ namespace {
                     throw fostlib::exceptions::not_implemented("odin.login",
                         "Must pass both a username and password");
                 }
-                fostlib::pg::connection cnx{fostgres::connection(config, req)};                
+                fostlib::pg::connection cnx{fostgres::connection(config, req)};
                 auto user = odin::credentials(cnx, username, password, req.remote_address());
                 cnx.commit();
                 if ( user.isnull() ) {
                     return execute(config["failure"], path, req, host);
                 } else {
-                    auto jwt(odin::mint_jwt(user));
+                    auto jwt(odin::mint_login_jwt(user));
                     auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
 
                     if ( config.has_key("permissions") && config["permissions"].isarray() ) {

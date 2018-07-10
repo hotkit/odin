@@ -28,7 +28,7 @@ const fg::frame::builtin odin::lib::jwt =
             throw fostlib::exceptions::not_implemented(__func__,
                 "The user does not appear in the database so no JWT can be minted");
 
-        auto token = odin::mint_jwt(user, std::move(payload)).token();
+        auto token = odin::mint_login_jwt(user, std::move(payload)).token();
         stack.symbols["odin.jwt"] = token;
 
         auto headers = stack.symbols["testserver.headers"];
@@ -50,4 +50,23 @@ const fg::frame::builtin odin::lib::jwt_payload =
             return jwt.value().payload;
         }
     };
+
+
+// const fg::frame::builtin odin::lib::jwt =
+//     [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
+//         auto username = stack.resolve_string(stack.argument("username", pos, end));
+//         auto cnx = connect(stack);
+//         if ( !odin::does_user_exist(cnx, username) )
+//             throw fostlib::exceptions::not_implemented(__func__,
+//                 "The user does not appear in the database so no JWT can be minted");
+
+//         auto token = odin::mint_jwt(user, std::move(payload)).token();
+//         stack.symbols["odin.jwt"] = token;
+
+//         auto headers = stack.symbols["testserver.headers"];
+//         fostlib::jcursor("Authorization").set(headers, fg::json("Bearer " + token));
+//         stack.symbols["testserver.headers"] = headers;
+
+//         return fg::json(std::move(token));
+//     };
 

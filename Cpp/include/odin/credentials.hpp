@@ -29,7 +29,7 @@ namespace odin {
         const fostlib::json &annotation = fostlib::json::object_t());
 
     /// Mint a JWT for this user and set common fields on it
-    fostlib::jwt::mint mint_jwt(const fostlib::json &user, fostlib::json payload = fostlib::json{});
+    fostlib::jwt::mint mint_login_jwt(const fostlib::json &user, fostlib::json payload = fostlib::json{});
 
 
 }
