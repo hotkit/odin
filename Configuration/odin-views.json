@@ -63,11 +63,7 @@
                         },
                         "me/": "fost.response.403",
                         "me/password": "odin.password.me",
-                        "forgotten-password/": "odin/forgotten-password",
-                        "user/": {
-                            "view": "odin.user.unsecure",
-                            "configuration": "odin/unsecure/sql"
-                        }
+                        "forgotten-password/": "odin/forgotten-password"
                     }
                 }
             }
