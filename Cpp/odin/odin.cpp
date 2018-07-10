@@ -16,6 +16,7 @@ const fostlib::module odin::c_odin("odin");
 
 const fostlib::setting<fostlib::string> odin::c_jwt_secret(
     "odin/odin.cpp", "odin", "JWT secret", odin::nonce(), true);
+
 const fostlib::setting<bool> odin::c_jwt_trust(
     "odin/odin.cpp", "odin", "Trust JWT", false, true);
 
@@ -27,6 +28,8 @@ const fostlib::setting<bool> odin::c_jwt_logout_check(
 const fostlib::setting<fostlib::string> odin::c_jwt_permissions_claim(
     "odin/odin.cpp", "odin", "JWT permissions claim", "http://odin.felspar.com/p", true);
 
+const fostlib::setting<fostlib::string> odin::c_jwt_reset_forgotten_password_secret(
+    "odin/odin.cpp", "odin", "JWT reset forgotten password secret", odin::nonce(), true);
 
 namespace {
     const fostgres::register_cnx_callback c_cb(
