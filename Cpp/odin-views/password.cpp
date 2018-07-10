@@ -8,6 +8,7 @@
 
 #include <odin/credentials.hpp>
 #include <odin/nonce.hpp>
+#include <odin/odin.hpp>
 #include <odin/pwhashproc.hpp>
 #include <odin/user.hpp>
 #include <odin/views.hpp>
@@ -47,7 +48,6 @@ namespace {
             fostlib::json body = fostlib::json::parse(body_str);
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto reference = req.headers()["__odin_reference"].value();
-            const auto remote_address = req.remote_address();
             if ( req.headers().exists("__user") ) {
                 const auto username = req.headers()["__user"].value();
                 if ( !body.has_key("new-password") || !body.has_key("old-password") ) {
@@ -55,7 +55,7 @@ namespace {
                 }
                 const auto old_password = fostlib::coerce<f5::u8view>(body["old-password"]);
                 const auto new_password = fostlib::coerce<f5::u8view>(body["new-password"]);
-                auto user = odin::credentials(cnx, username, old_password, remote_address);
+                auto user = odin::credentials(cnx, username, old_password, req.remote_address());
                 cnx.commit();
                 if ( user.isnull() ) return respond("Wrong password");
                 if ( new_password.bytes() < 8u ) return respond("New password is too short");
@@ -68,10 +68,10 @@ namespace {
     } c_password_me;
 
 
-    const class reset_password : public fostlib::urlhandler::view {
+    const class forgotten_password_reset : public fostlib::urlhandler::view {
     public:
-        reset_password()
-        : view("odin.password.reset") {
+        forgotten_password_reset()
+        : view("odin.password.reset-forgotten") {
         }
 
         std::pair<boost::shared_ptr<fostlib::mime>, int> operator () (
@@ -79,17 +79,36 @@ namespace {
             fostlib::http::server::request &req,
             const fostlib::host &host
         ) const {
+            if ( req.method() != "POST" ) {
+                throw fostlib::exceptions::not_implemented(__func__,
+                    "Forgotten password reset requires POST. This should be a 405");
+            }
             auto body_str = fostlib::coerce<fostlib::string>(
                 fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            const auto reference = req.headers()["__odin_reference"].value();
-            const auto remote_address = req.remote_address();
-            // TODO:
-            // parse & validate JWT
-            // Fetch user
-            // if user exists then set new password
-            // logout user
+            const auto reference = odin::reference();
+            if ( !body.has_key("reset-password-token") || !body.has_key("new-password") ) {
+                return respond("Must supply both reset token and new password");
+            }
+            const auto reset_token = fostlib::coerce<fostlib::string>(body["reset-password-token"]);
+            const auto new_password = fostlib::coerce<f5::u8view>(body["new-password"]);
+            auto parts = fostlib::partition(reset_token, " ");
+            // if ( parts.first == "Bearer" && parts.second ) {
+            //     auto jwt = fostlib::jwt::token::load(
+            //         odin::c_jwt_reset_forgotten_password_secret.value(), parts.second.value());
+            //     fostlib::log::debug(odin::c_odin)
+            //         ("", "JWT authenticated")
+            //         ("header", jwt.value().header)
+            //         ("payload", jwt.value().payload);
+            //     auto username = fostlib::coerce<f5::u8view>(jwt.value().payload["sub"]);
+            // }
+            return respond("Invalid reset-password-token", 400);
+            // parse & validate JWT -> username
+            // if( odin::does_user_exists(username) ){
+                //odin::set_password(args)
+            // logout user ()
+            //}
         }
     } c_reset_password;
 
