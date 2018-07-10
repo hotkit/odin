@@ -1,3 +1,3 @@
-install(FILES
+install(PROGRAMS
         odin
     DESTINATION bin)
