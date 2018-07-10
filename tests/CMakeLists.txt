@@ -194,6 +194,7 @@ add_custom_command(OUTPUT test-forgotten-password
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/forgotten-password-test-view.json
             ${CMAKE_CURRENT_SOURCE_DIR}/forgotten-password.fg
         MAIN_DEPENDENCY forgotten-password.fg
         DEPENDS
@@ -203,9 +204,10 @@ add_custom_command(OUTPUT test-forgotten-password
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
-            ../Schema/authn/001-initial.blue.sql
+            ../Schema/opts/forgotten-password/001-initial.blue.sql
             ../Configuration/odin-views.json
-            registration-self.fg
+            forgotten-password-test-view.json
+            forgotten-password.fg
     )
 
 

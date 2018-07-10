@@ -63,7 +63,7 @@ namespace {
                 cnx.commit();
                 return respond("", 200);
             }
-            return respond("No user is logged in");
+            return respond("No user is logged in", 401);
         }
     } c_password_me;
 
