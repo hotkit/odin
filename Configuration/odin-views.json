@@ -50,22 +50,20 @@
                     }
                 },
                 "unsecure": {
-                    "view": "fost.response.401",
+                    "view": "fost.view.pathprefix",
                     "configuration": {
-                        "schemes": {
-                            "Bearer": {}
-                        },
-                        "view": "fost.view.pathprefix",
-                        "configuration": {
-                            "": "odin/unsecure/sql",
-                            "me/": "fost.response.403",
-                            "me/password": "odin.password.me",
-                            "forgotten-password/": "odin/forgotten-password",
-                            "user/": {
-                                "view": "odin.user.unsecure",
-                                "configuration": "odin/unsecure/sql"
+                        "": {
+                            "view": "fost.response.401",
+                            "configuration": {
+                                "schemes": {
+                                    "Bearer": {}
+                                },
+                                "view": "odin/unsecure/sql"
                             }
-                        }
+                        },
+                        "me/": "fost.response.403",
+                        "me/password": "odin.password.me",
+                        "forgotten-password/": "odin/forgotten-password"
                     }
                 }
             }
@@ -168,7 +166,24 @@
             }
         },
         "views/odin/forgotten-password": {
-            "view": "fost.response.200"
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [{
+                    "return": "object",
+                    "path": [],
+                    "POST": {
+                        "table": "odin.request_reset_password_ledger",
+                        "columns": {
+                            "email": {"key": true},
+                            "reference": {
+                                "key": true,
+                                "source": ["request", "headers", "__odin_reference"]
+                            }
+                        },
+                        "returning": ["'200' as status"]
+                    }
+                }]
+            }
         }
     }
 }
