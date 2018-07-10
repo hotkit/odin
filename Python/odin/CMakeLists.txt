@@ -5,5 +5,6 @@ install(FILES
         display.py
         group.py
         permission.py
+        schema.py
         user.py
     DESTINATION lib/python3/dist-packages/odin/)
