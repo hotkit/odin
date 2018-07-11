@@ -89,24 +89,19 @@ namespace {
                 fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            const auto reference = odin::reference();
             if ( !body.has_key("reset-password-token") || !body.has_key("new-password") ) {
                 return respond("Must supply both reset token and new password");
             }
             const auto reset_token = fostlib::coerce<fostlib::string>(body["reset-password-token"]);
-            const auto new_password = fostlib::coerce<f5::u8view>(body["new-password"]);
-            auto parts = fostlib::partition(reset_token, " ");
-            if ( parts.first == "Bearer" && parts.second ) {
-                auto jwt = fostlib::jwt::token::load(
-                    odin::c_jwt_reset_forgotten_password_secret.value(), parts.second.value());
-                fostlib::log::debug(c_odin_reset_forgotten_password)
-                    ("", "JWT authenticated")
-                    ("header", jwt.value().header)
-                    ("payload", jwt.value().payload);
-                auto username = fostlib::coerce<f5::u8view>(jwt.value().payload["sub"]);
-                if( odin::does_user_exist(cnx, username) ){
-                    // odin::set_password(args);
-                }
+            auto jwt = fostlib::jwt::token::load(
+                odin::c_jwt_reset_forgotten_password_secret.value(), reset_token);
+            auto username = fostlib::coerce<f5::u8view>(jwt.value().payload["sub"]);
+            if( odin::does_user_exist(cnx, username) ){
+                const auto reference = odin::reference();
+                const auto new_password = fostlib::coerce<f5::u8view>(body["new-password"]);
+                odin::set_password(cnx, reference, username, new_password);
+                cnx.commit();
+                return respond("Success", 200);
             }
             throw fostlib::exceptions::not_implemented(__func__, "Invalid reset-password-token.");
         }
