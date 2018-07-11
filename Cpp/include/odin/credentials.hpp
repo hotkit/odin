@@ -28,8 +28,11 @@ namespace odin {
         const fostlib::nullable<fostlib::host> &source = fostlib::null,
         const fostlib::json &annotation = fostlib::json::object_t());
 
-    /// Mint a JWT for this user and set common fields on it
-    fostlib::jwt::mint mint_jwt(const fostlib::json &user, fostlib::json payload = fostlib::json{});
+    /// Mint Login JWT for this user and set common fields on it
+    fostlib::jwt::mint mint_login_jwt(const fostlib::json &user, fostlib::json payload = fostlib::json{});
+
+    /// Mint Reset Password JWT for this user and set common fields on it
+    fostlib::jwt::mint mint_reset_password_jwt(const f5::u8view username);
 
 
 }

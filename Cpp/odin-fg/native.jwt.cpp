@@ -9,12 +9,14 @@
 #include <odin/fg/native.hpp>
 #include <odin/credentials.hpp>
 #include <odin/odin.hpp>
+#include <odin/user.hpp>
 
 #include <fost/crypto>
+#include <fost/log>
 #include <fost/insert>
 
 
-const fg::frame::builtin odin::lib::jwt =
+const fg::frame::builtin odin::lib::mint_login_jwt =
     [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
         auto username = stack.resolve_string(stack.argument("username", pos, end));
         auto password = stack.resolve_string(stack.argument("password", pos, end));
@@ -28,7 +30,7 @@ const fg::frame::builtin odin::lib::jwt =
             throw fostlib::exceptions::not_implemented(__func__,
                 "The user does not appear in the database so no JWT can be minted");
 
-        auto token = odin::mint_jwt(user, std::move(payload)).token();
+        auto token = odin::mint_login_jwt(user, std::move(payload)).token();
         stack.symbols["odin.jwt"] = token;
 
         auto headers = stack.symbols["testserver.headers"];
@@ -49,5 +51,17 @@ const fg::frame::builtin odin::lib::jwt_payload =
         } else {
             return jwt.value().payload;
         }
+    };
+
+
+const fg::frame::builtin odin::lib::mint_reset_password_jwt =
+    [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
+        auto username = stack.resolve_string(stack.argument("username", pos, end));
+        auto cnx = connect(stack);
+        if ( !odin::does_user_exist(cnx, username) )
+            throw fostlib::exceptions::not_implemented(__func__,
+                "The user does not appear in the database so no JWT can be minted");
+        auto token = odin::mint_reset_password_jwt(username).token();
+        return fg::json(std::move(token));
     };
 

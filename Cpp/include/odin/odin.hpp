@@ -10,7 +10,7 @@
 
 
 #include <fost/core>
-
+#include <fost/postgres>
 
 namespace odin {
 
@@ -24,6 +24,7 @@ namespace odin {
     /// The secret used for JWT tokens. Always pick a new value for this as
     /// the default will change each time the mengmom is restarted.
     extern const fostlib::setting<fostlib::string> c_jwt_secret;
+
     /// Set this to true to skip database check against user JWT.
     extern const fostlib::setting<bool> c_jwt_trust;
 
@@ -36,6 +37,11 @@ namespace odin {
     /// The JWT claim for embedded permissions
     extern const fostlib::setting<fostlib::string> c_jwt_permissions_claim;
 
+    /// The secret used for JWT forgotten password reset tokens. Always pick a new value for this as
+    /// the default will change each time the mengmom is restarted.
+    extern const fostlib::setting<fostlib::string> c_jwt_reset_forgotten_password_secret;
 
+    /// Check module is enabled in the database, does not commit the transaction
+    bool is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name);
 }
 

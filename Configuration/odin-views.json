@@ -6,7 +6,8 @@
                 "": "odin/static",
                 "api/": "odin/api",
                 "api/login/": "odin/login",
-                "api/register/": "odin/register"
+                "api/register/": "odin/register",
+                "api/reset-forgotten-password/": "odin.password.reset-forgotten"
             }
         },
         "views/odin/static": {

@@ -40,7 +40,8 @@ namespace {
             stack.native["odin.assign"] = odin::lib::assign;
             stack.native["odin.group"] = odin::lib::group;
             stack.native["odin.hash"] = odin::lib::hash;
-            stack.native["odin.jwt.authorization"] = odin::lib::jwt;
+            stack.native["odin.jwt.authorization"] = odin::lib::mint_login_jwt;
+            stack.native["odin.jwt.mint.password-reset"] = odin::lib::mint_reset_password_jwt;
             stack.native["odin.jwt.payload"] = odin::lib::jwt_payload;
             stack.native["odin.membership"] = odin::lib::membership;
             stack.native["odin.permission"] = odin::lib::permission;
