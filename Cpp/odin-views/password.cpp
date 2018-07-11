@@ -62,6 +62,9 @@ namespace {
                 if ( user.isnull() ) return respond("Wrong password");
                 if ( new_password.bytes() < 8u ) return respond("New password is too short");
                 odin::set_password(cnx, reference, username, new_password);
+                if ( odin::does_module_enabled(cnx, "opts/logout") )
+                    odin::logout_user(cnx, reference, req.headers()["__remote_addr"].value(),
+                        username);
                 cnx.commit();
                 return respond("", 200);
             }
@@ -100,6 +103,9 @@ namespace {
                 const auto reference = odin::reference();
                 const auto new_password = fostlib::coerce<f5::u8view>(body["new-password"]);
                 odin::set_password(cnx, reference, username, new_password);
+                if ( odin::does_module_enabled(cnx, "opts/logout") )
+                    odin::logout_user(cnx, reference, req.headers()["__remote_addr"].value(),
+                        username);
                 cnx.commit();
                 return respond("Success", 200);
             }
