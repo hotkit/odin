@@ -14,11 +14,11 @@ odin.membership test g1
 
 # Use the login API to get our JWT and then check it works
 set odin.jwt (POST odin/test/authnz / {"username": "test", "password": "password1234"} 200)
-set-path testserver.headers (Authorization) (cat "Bearer " (lookup odin.jwt))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup odin.jwt))
 GET odin/api / 200
 
 # Blank the header and it will fail again, then set it back up properly
-set-path testserver.headers (Authorization) ""
+set-path testserver.headers ["Authorization"] ""
 GET odin/api / 401
 
 # Check that the default JWT contains the subject key
