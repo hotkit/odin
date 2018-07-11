@@ -26,6 +26,19 @@ void odin::create_user(
     cnx.insert("odin.identity_ledger", user_values);
 }
 
+void odin::logout_user(
+    fostlib::pg::connection &cnx,
+    f5::u8view reference,
+    f5::u8view source_address,
+    f5::u8view identity_id
+) {
+    fostlib::json row;
+    fostlib::insert(row, "identity_id", identity_id);
+    fostlib::insert(row, "reference", reference);
+    fostlib::insert(row, "source_address", source_address);
+    cnx.insert("odin.logout_ledger", row);
+}
+
 
 void odin::set_password(
     fostlib::pg::connection &cnx,

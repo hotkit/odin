@@ -19,6 +19,10 @@ namespace odin {
     /// Create the given user, this does not commit the new user
     void create_user(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view username);
 
+    /// Logout the given user, this does not commit the transaction
+    void logout_user(fostlib::pg::connection &cnx, f5::u8view reference,
+        f5::u8view source_address, f5::u8view identity_id);
+
     /// Hash the current password with the default procedures,
     /// Save password to the Database for the given user.
     /// This does not commit the new password
