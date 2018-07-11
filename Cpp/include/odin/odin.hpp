@@ -42,6 +42,6 @@ namespace odin {
     extern const fostlib::setting<fostlib::string> c_jwt_reset_forgotten_password_secret;
 
     /// Check module is enabled in the database, does not commit the transaction
-    bool does_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name);
+    bool is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name);
 }
 

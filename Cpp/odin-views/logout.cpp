@@ -35,7 +35,7 @@ namespace {
                 auto logout_claim =
                     req.headers()["__jwt"].subvalue(odin::c_jwt_logout_claim.value());
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
-                if ( odin::does_module_enabled(cnx, "opts/logout") && logout_claim ) {
+                if ( logout_claim ) {
                     odin::logout_user(cnx,
                         req.headers()["__odin_reference"].value(),
                         req.headers()["__remote_addr"].value(),

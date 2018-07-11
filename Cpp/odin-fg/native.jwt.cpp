@@ -62,7 +62,6 @@ const fg::frame::builtin odin::lib::mint_reset_password_jwt =
             throw fostlib::exceptions::not_implemented(__func__,
                 "The user does not appear in the database so no JWT can be minted");
         auto token = odin::mint_reset_password_jwt(username).token();
-        fostlib::log::warning(c_odin_fg, fg::json(std::move(token)));
         return fg::json(std::move(token));
     };
 

@@ -33,7 +33,7 @@ const fostlib::setting<fostlib::string> odin::c_jwt_reset_forgotten_password_sec
     "odin/odin.cpp", "odin", "JWT reset forgotten password secret", odin::nonce(), true);
 
 
-bool odin::does_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name){
+bool odin::is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name){
     static const fostlib::string sql("SELECT * FROM odin.module WHERE name=$1");
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{module_name});
     auto &rs = data.second;
