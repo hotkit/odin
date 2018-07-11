@@ -14,11 +14,13 @@
 #include <odin/views.hpp>
 
 #include <fost/insert>
+#include <fost/log>
 #include <fostgres/sql.hpp>
 
 
 namespace {
 
+    const fostlib::module c_odin_reset_forgotten_password(odin::c_odin, "password.cpp");
 
     std::pair<boost::shared_ptr<fostlib::mime>, int> respond(
         fostlib::string message, int code=403
@@ -94,24 +96,21 @@ namespace {
             const auto reset_token = fostlib::coerce<fostlib::string>(body["reset-password-token"]);
             const auto new_password = fostlib::coerce<f5::u8view>(body["new-password"]);
             auto parts = fostlib::partition(reset_token, " ");
-            // if ( parts.first == "Bearer" && parts.second ) {
-            //     auto jwt = fostlib::jwt::token::load(
-            //         odin::c_jwt_reset_forgotten_password_secret.value(), parts.second.value());
-            //     fostlib::log::debug(odin::c_odin)
-            //         ("", "JWT authenticated")
-            //         ("header", jwt.value().header)
-            //         ("payload", jwt.value().payload);
-            //     auto username = fostlib::coerce<f5::u8view>(jwt.value().payload["sub"]);
-            // }
-            return respond("Invalid reset-password-token", 400);
-            // parse & validate JWT -> username
-            // if( odin::does_user_exists(username) ){
-                //odin::set_password(args)
-            // logout user ()
-            //}
+            if ( parts.first == "Bearer" && parts.second ) {
+                auto jwt = fostlib::jwt::token::load(
+                    odin::c_jwt_reset_forgotten_password_secret.value(), parts.second.value());
+                fostlib::log::debug(c_odin_reset_forgotten_password)
+                    ("", "JWT authenticated")
+                    ("header", jwt.value().header)
+                    ("payload", jwt.value().payload);
+                auto username = fostlib::coerce<f5::u8view>(jwt.value().payload["sub"]);
+                if( odin::does_user_exist(cnx, username) ){
+                    // odin::set_password(args);
+                }
+            }
+            throw fostlib::exceptions::not_implemented(__func__, "Invalid reset-password-token.");
         }
     } c_reset_password;
 
 
 }
-

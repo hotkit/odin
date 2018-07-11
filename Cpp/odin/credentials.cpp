@@ -110,8 +110,9 @@ fostlib::jwt::mint odin::mint_login_jwt(const fostlib::json &user, fostlib::json
     return jwt;
 }
 
-// fostlib::jwt::mint odin::mint(const fostlib::setting<fostlib::string> secret, fostlib::string subject) {
-//     fostlib::jwt::mint jwt{fostlib::sha256, secret.value(), std::move(payload)};
-//     jwt.subject(fostlib::coerce<fostlib::string>(subject));
-//     return jwt;
-// }
+
+fostlib::jwt::mint odin::mint_reset_password_jwt(const f5::u8view username) {
+    fostlib::jwt::mint jwt{fostlib::sha256, odin::c_jwt_reset_forgotten_password_secret.value()};
+    jwt.subject(username);
+    return jwt;
+}
