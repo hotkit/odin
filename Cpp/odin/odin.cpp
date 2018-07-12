@@ -32,6 +32,12 @@ const fostlib::setting<fostlib::string> odin::c_jwt_permissions_claim(
 const fostlib::setting<fostlib::string> odin::c_jwt_reset_forgotten_password_secret(
     "odin/odin.cpp", "odin", "JWT reset forgotten password secret", odin::nonce(), true);
 
+const fostlib::setting<fostlib::string> odin::c_facebook_app_id(
+    "odin/odin.cpp", "odin", "Facebook AppID", "", true);
+
+const fostlib::setting<fostlib::string> odin::c_facebook_secret(
+    "odin/odin.cpp", "odin", "Facebook Secret", "", true);
+
 
 bool odin::is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name){
     static const fostlib::string sql("SELECT * FROM odin.module WHERE name=$1");

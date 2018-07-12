@@ -1,7 +1,9 @@
 {
     "odin": {
         "JWT secret": "TL/ITHZAnskZLbRCVBfrEBsQspjWkm4zysWWjnIF4zUfHhPUkBp3fiu97Wl90KrB",
-        "JWT reset forgotten password secret": "by0ix07Sm@C7QXu&^a#szU@BJT6AZKiMOjdFhH^!0jwjjM24GKM*eHlhMUcY8d2o"
+        "JWT reset forgotten password secret": "by0ix07Sm@C7QXu&^a#szU@BJT6AZKiMOjdFhH^!0jwjjM24GKM*eHlhMUcY8d2o",
+        "Facebook AppID": "236787949808058",
+        "Facebook Secret": "187641461146f8cb8c0cac5936925864"
     },
     "webserver": {
         "Load": ["fostgres", "odin-views"],
