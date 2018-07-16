@@ -1,4 +1,5 @@
 add_library(odin-views
+        facebook.cpp
         login.cpp
         logout.cpp
         password.cpp
