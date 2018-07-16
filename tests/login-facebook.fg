@@ -1,0 +1,8 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+
+
+# Check that facebook stub work
+# Get app token
+GET odin/stub/facebook/oauth / 200 {"access_token": "204629570383193|rHiSsK5FpCcEtCz53AuTE-F_QuU", "token_type": "bearer"}
