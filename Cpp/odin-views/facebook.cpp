@@ -46,7 +46,7 @@ namespace {
                     "Must pass access_token field");
             const auto access_token = fostlib::coerce<fostlib::string>(body["access_token"]);
             auto facebook_app_token = odin::facebook::get_app_token();
-            if ( !odin::facebook::does_user_authenticated(facebook_app_token, access_token) )
+            if ( !odin::facebook::is_user_authenticated(facebook_app_token, access_token) )
                 throw fostlib::exceptions::not_implemented("odin.facebook.login",
                     "User not authenticated");
 

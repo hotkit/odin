@@ -31,7 +31,7 @@ fostlib::string odin::facebook::get_app_token() {
 }
 
 
-bool odin::facebook::does_user_authenticated(f5::u8view app_token, f5::u8view user_token) {
+bool odin::facebook::is_user_authenticated(f5::u8view app_token, f5::u8view user_token) {
     fostlib::url fb_url(fostlib::coerce<fostlib::string>("https://graph.facebook.com/debug_token"));
     fostlib::url::query_string qs{};
     qs.append("input_token", user_token);
