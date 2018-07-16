@@ -60,7 +60,6 @@ fostlib::json odin::facebook::get_user_detail(f5::u8view user_token) {
 
 fostlib::json odin::facebook::credentials(fostlib::pg::connection &cnx, const f5::u8view &user_id) {
     static const fostlib::string sql("SELECT "
-            "odin.identity.expires <= now() AS expired, "
             "odin.identity.tableoid AS identity__tableoid, "
             "odin.facebook_credentials.tableoid AS facebook_credentials__tableoid, "
             "odin.identity.*, odin.facebook_credentials.* "
@@ -93,8 +92,6 @@ fostlib::json odin::facebook::credentials(fostlib::pg::connection &cnx, const f5
         for ( const auto &p : parts ) pos /= p;
         fostlib::insert(user, pos, record[index]);
     }
-
-    fostlib::log::error(c_odin)("odin::facebook::credentials", user);
     return user;
 }
 
@@ -106,6 +103,5 @@ void odin::facebook::set_facebook_credential(
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", identity_id);
     fostlib::insert(user_values, "facebook_user_id", facebook_user_id);
-    fostlib::log::error(c_odin)("set_facebook_credential", facebook_user_id);
     cnx.insert("odin.facebook_credentials_ledger", user_values);
 }

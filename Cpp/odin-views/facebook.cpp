@@ -5,6 +5,7 @@
     See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
+#include <odin/credentials.hpp>
 #include <odin/facebook.hpp>
 #include <odin/odin.hpp>
 #include <odin/nonce.hpp>
@@ -50,26 +51,37 @@ namespace {
                     "User not authenticated");
 
             auto user_detail = odin::facebook::get_user_detail(access_token);
+            const auto facebook_user_id = fostlib::coerce<f5::u8view>(user_detail["id"]);
+            const auto facebook_user_name = fostlib::coerce<f5::u8view>(user_detail["name"]);
+            const auto facebook_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
 
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto reference = odin::reference();
-            const auto facebook_user_id = fostlib::coerce<f5::u8view>(user_detail["id"]);
 
             auto facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
-
             auto identity_id = reference;
             if ( facebook_user.isnull() ) {
                 odin::create_user(cnx, reference, identity_id);
+                odin::set_full_name(cnx, reference, identity_id, facebook_user_name);
+                odin::set_email(cnx, reference, identity_id, facebook_user_email);
             } else {
-                identity_id = fostlib::coerce<fostlib::string>(facebook_user["identity"]["id"]);
+                const fostlib::jcursor id("identity", "id");
+                identity_id = fostlib::coerce<fostlib::string>(facebook_user[id]);
             }
             odin::facebook::set_facebook_credential(cnx, reference, identity_id, facebook_user_id);
-
             cnx.commit();
+
+            facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
+            fostlib::log::warning(c_odin_facebook)("facebook_user", facebook_user)("config", config);
+
+            auto jwt(odin::mint_login_jwt(facebook_user));
+            auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
+            jwt.claim("facebook_user_id", facebook_user["facebook_credentials"]["facebook_user_id"]);
             fostlib::mime::mime_headers headers;
+            headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
             boost::shared_ptr<fostlib::mime> response(
-                new fostlib::text_body(fostlib::json::unparse(user_detail, true),
-                    headers, L"application/json"));
+                    new fostlib::text_body(fostlib::utf8_string(jwt.token()),
+                        headers, L"application/jwt"));
             return std::make_pair(response, 200);
         }
     } c_facebook;

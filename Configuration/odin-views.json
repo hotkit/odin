@@ -5,7 +5,7 @@
             "configuration": {
                 "": "odin/static",
                 "api/": "odin/api",
-                "api/facebook/login/": "odin.facebook.login",
+                "api/facebook/login/": "odin/facebook/login",
                 "api/login/": "odin/login",
                 "api/register/": "odin/register",
                 "api/reset-forgotten-password/": "odin.password.reset-forgotten"
@@ -19,6 +19,20 @@
         },
         "views/odin/login": {
             "view": "odin.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "failure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        },
+        "views/odin/facebook/login": {
+            "view": "odin.facebook.login",
             "configuration": {
                 "expires": {"hours": 72},
                 "failure": {
