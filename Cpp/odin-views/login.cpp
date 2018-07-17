@@ -80,7 +80,7 @@ namespace {
                     }
 
                     fostlib::mime::mime_headers headers;
-                    headers.add("Expiress", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
+                    headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
                     boost::shared_ptr<fostlib::mime> response(
                             new fostlib::text_body(fostlib::utf8_string(jwt.token()),
                                 headers, L"application/jwt"));

@@ -1,5 +1,6 @@
 add_library(odin
         credentials.cpp
+        facebook.cpp
         nonce.cpp
         odin.cpp
         pwhashproc.cpp

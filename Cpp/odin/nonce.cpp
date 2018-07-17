@@ -15,10 +15,24 @@
 
 
 fostlib::string odin::nonce() {
+    const auto base64url = [](auto &&v) {
+        fostlib::utf8_string b64u;
+        for ( const auto c : v ) {
+            if ( c == '+' )
+                b64u += '-';
+            else if ( c == '/' )
+                b64u += '_';
+            else if ( c == '=' )
+                return b64u;
+            else
+                b64u += c;
+        }
+        return b64u;
+    };
     const auto bytes = fostlib::crypto_bytes<24>();
     const auto b64 = fostlib::coerce<fostlib::base64_string>(
         std::vector<unsigned char>(bytes.begin(), bytes.end()));
-    return b64.underlying().underlying().c_str();
+    return base64url(b64).underlying().c_str();
 }
 
 
