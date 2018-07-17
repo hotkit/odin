@@ -38,6 +38,9 @@ const fostlib::setting<fostlib::string> odin::c_facebook_app_id(
 const fostlib::setting<fostlib::string> odin::c_facebook_secret(
     "odin/odin.cpp", "odin", "Facebook Secret", "", true);
 
+const fostlib::setting<fostlib::string> odin::c_facebook_endpoint(
+    "odin/odin.cpp", "odin", "Facebook API Endpoint", "https://graph.facebook.com", true);
+
 
 bool odin::is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name){
     static const fostlib::string sql("SELECT * FROM odin.module WHERE name=$1");

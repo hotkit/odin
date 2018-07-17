@@ -37,7 +37,8 @@ namespace {
         ) const {
             if ( req.method() != "POST" )
                 throw fostlib::exceptions::not_implemented(__func__,
-                    "Registration requires POST. This should be a 405");
+                    "Facebook login requires POST. This should be a 405");
+
             auto body_str = fostlib::coerce<fostlib::string>(
                 fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
@@ -45,19 +46,27 @@ namespace {
                 throw fostlib::exceptions::not_implemented("odin.facebook.login",
                     "Must pass access_token field");
             const auto access_token = fostlib::coerce<fostlib::string>(body["access_token"]);
-            auto facebook_app_token = odin::facebook::get_app_token();
-            if ( !odin::facebook::is_user_authenticated(facebook_app_token, access_token) )
+            fostlib::json user_detail;
+            if ( fostlib::coerce<fostlib::string>(config["facebook-mock"]) == "OK" ) {
+                // Use access token as facebook ID
+                fostlib::insert(user_detail, "id", access_token);
+                fostlib::insert(user_detail, "name", "Test User");
+                fostlib::insert(user_detail, "email", access_token + "@mail.com");
+            } else if ( fostlib::coerce<fostlib::string>(config["facebook-mock"]) == "ERROR" ) {
+
+            } else {
+                user_detail = odin::facebook::get_user_detail(access_token);
+            }
+
+            if ( user_detail.isnull() )
                 throw fostlib::exceptions::not_implemented("odin.facebook.login",
                     "User not authenticated");
-
-            auto user_detail = odin::facebook::get_user_detail(access_token);
             const auto facebook_user_id = fostlib::coerce<f5::u8view>(user_detail["id"]);
             const auto facebook_user_name = fostlib::coerce<f5::u8view>(user_detail["name"]);
             const auto facebook_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
 
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto reference = odin::reference();
-
             auto facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
             auto identity_id = reference;
             if ( facebook_user.isnull() ) {
@@ -68,11 +77,10 @@ namespace {
                 const fostlib::jcursor id("identity", "id");
                 identity_id = fostlib::coerce<fostlib::string>(facebook_user[id]);
             }
-            odin::facebook::set_facebook_credential(cnx, reference, identity_id, facebook_user_id);
+            odin::facebook::set_facebook_credentials(cnx, reference, identity_id, facebook_user_id);
             cnx.commit();
 
             facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
-            fostlib::log::warning(c_odin_facebook)("facebook_user", facebook_user)("config", config);
 
             auto jwt(odin::mint_login_jwt(facebook_user));
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);

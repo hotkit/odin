@@ -47,6 +47,9 @@ namespace odin {
     /// Facebook Secret
     extern const fostlib::setting<fostlib::string> c_facebook_secret;
 
+    /// Facebook API Endpoint
+    extern const fostlib::setting<fostlib::string> c_facebook_endpoint;
+
     /// Check module is enabled in the database, does not commit the transaction
     bool is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name);
 }

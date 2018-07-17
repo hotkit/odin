@@ -35,15 +35,7 @@
         "views/odin/facebook/login": {
             "view": "odin.facebook.login",
             "configuration": {
-                "expires": {"hours": 72},
-                "failure": {
-                    "view": "fost.response.401",
-                    "configuration": {
-                        "schemes": {
-                            "Bearer": {}
-                        }
-                    }
-                }
+                "expires": {"hours": 72}
             }
         },
         "views/odin/google/login": {
