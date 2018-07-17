@@ -1,3 +1,7 @@
+2018-07-17  Tle Ekkul  <e.aryuth@gmail.com>
+ * Added login with Facebook module
+
+
 2018-07-11  Tle Ekkul  <e.aryuth@gmail.com>
  * Added reset forgotten password API view
 
