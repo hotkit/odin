@@ -109,7 +109,7 @@ namespace odin {
         }
 
 
-        void set_facebook_credential(
+        void set_facebook_credentials(
             fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view identity_id, f5::u8view facebook_user_id
         ) {
             fg::json user_values;

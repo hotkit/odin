@@ -77,7 +77,7 @@ namespace {
                 const fostlib::jcursor id("identity", "id");
                 identity_id = fostlib::coerce<fostlib::string>(facebook_user[id]);
             }
-            odin::facebook::set_facebook_credential(cnx, reference, identity_id, facebook_user_id);
+            odin::facebook::set_facebook_credentials(cnx, reference, identity_id, facebook_user_id);
             cnx.commit();
 
             facebook_user = odin::facebook::credentials(cnx, facebook_user_id);

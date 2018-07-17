@@ -32,7 +32,7 @@ namespace odin {
         fostlib::json credentials(fostlib::pg::connection &cnx, const f5::u8view &facebook_user_id);
 
         /// Save facebook credential of the given user to database, this does not commit the transaction
-        void set_facebook_credential(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view identity_id, f5::u8view facebook_user_id);
+        void set_facebook_credentials(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view identity_id, f5::u8view facebook_user_id);
 
     }
 
