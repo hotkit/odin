@@ -1,0 +1,16 @@
+{
+    "webserver": {
+        "views/odin/stub/google/oauth": {
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [
+                    {
+                        "return": "object",
+                        "path": [],
+                        "GET": "SELECT '204629570383193|rHiSsK5FpCcEtCz53AuTE-F_QuU' AS access_token, 'bearer' AS token_type"
+                    }
+                ]
+            }
+        }
+    }
+}

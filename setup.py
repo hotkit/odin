@@ -22,6 +22,7 @@ setup(name='odin',
             ('share/odin/Schema/opts/email', ['Schema/opts/email/001-initial.blue.sql']),
             ('share/odin/Schema/opts/forgotten-password', ['Schema/opts/forgotten-password/001-initial.blue.sql']),
             ('share/odin/Schema/opts/facebook', ['Schema/opts/facebook/001-initial.blue.sql']),
+            ('share/odin/Schema/opts/google', ['Schema/opts/google/001-initial.blue.sql']),
             ('share/odin/Schema/opts/logout', ['Schema/opts/logout/002-initial.blue.sql']),
         ],
      )
