@@ -216,7 +216,7 @@ add_custom_command(OUTPUT test-login-facebook
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/login-facebook-stub.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/login-facebook-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-facebook.fg
         MAIN_DEPENDENCY login-facebook.fg
         DEPENDS
@@ -227,9 +227,11 @@ add_custom_command(OUTPUT test-login-facebook
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
+            ../Schema/opts/email/001-initial.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/facebook/001-initial.blue.sql
             ../Configuration/odin-views.json
-            login-facebook-stub.json
+            login-facebook-test.json
             login-facebook.fg
     )
 
