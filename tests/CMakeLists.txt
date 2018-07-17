@@ -228,8 +228,8 @@ add_custom_command(OUTPUT test-login-facebook
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/opts/email/001-initial.blue.sql
-            ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/facebook/001-initial.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
             login-facebook-test.json
             login-facebook.fg
