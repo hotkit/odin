@@ -47,13 +47,13 @@ namespace {
                     "Must pass access_token field");
             const auto access_token = fostlib::coerce<fostlib::string>(body["access_token"]);
             fostlib::json user_detail;
-            if ( fostlib::coerce<fostlib::string>(config["facebook-mock"]) == "OK" ) {
-                // Use access token as facebook ID
-                fostlib::insert(user_detail, "id", access_token);
-                fostlib::insert(user_detail, "name", "Test User");
-                fostlib::insert(user_detail, "email", access_token + "@mail.com");
-            } else if ( fostlib::coerce<fostlib::string>(config["facebook-mock"]) == "ERROR" ) {
-
+            if ( config.has_key("facebook-mock") ) {
+                if ( fostlib::coerce<fostlib::string>(config["facebook-mock"]) == "OK") {
+                    // Use access token as facebook ID
+                    fostlib::insert(user_detail, "id", access_token);
+                    fostlib::insert(user_detail, "name", "Test User");
+                    fostlib::insert(user_detail, "email", access_token + "@mail.com");
+                }
             } else {
                 user_detail = odin::facebook::get_user_detail(access_token);
             }
@@ -62,17 +62,20 @@ namespace {
                 throw fostlib::exceptions::not_implemented("odin.facebook.login",
                     "User not authenticated");
             const auto facebook_user_id = fostlib::coerce<f5::u8view>(user_detail["id"]);
-            const auto facebook_user_name = fostlib::coerce<f5::u8view>(user_detail["name"]);
-            const auto facebook_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
-
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto reference = odin::reference();
             auto facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
             auto identity_id = reference;
             if ( facebook_user.isnull() ) {
                 odin::create_user(cnx, reference, identity_id);
-                odin::set_full_name(cnx, reference, identity_id, facebook_user_name);
-                odin::set_email(cnx, reference, identity_id, facebook_user_email);
+                if ( user_detail.has_key("name") ) {
+                    const auto facebook_user_name = fostlib::coerce<f5::u8view>(user_detail["name"]);
+                    odin::set_full_name(cnx, reference, identity_id, facebook_user_name);
+                }
+                if ( user_detail.has_key("email") ) {
+                    const auto facebook_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
+                    odin::set_email(cnx, reference, identity_id, facebook_user_email);
+                }
             } else {
                 const fostlib::jcursor id("identity", "id");
                 identity_id = fostlib::coerce<fostlib::string>(facebook_user[id]);
