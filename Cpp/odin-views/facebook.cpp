@@ -37,7 +37,7 @@ namespace {
         ) const {
             if ( req.method() != "POST" )
                 throw fostlib::exceptions::not_implemented(__func__,
-                    "Registration requires POST. This should be a 405");
+                    "Facebook login requires POST. This should be a 405");
             auto body_str = fostlib::coerce<fostlib::string>(
                 fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);

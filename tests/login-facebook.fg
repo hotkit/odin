@@ -6,3 +6,5 @@ odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 # Check that facebook stub work
 # Get app token
 GET odin/stub/facebook/oauth / 200 {"access_token": "204629570383193|rHiSsK5FpCcEtCz53AuTE-F_QuU", "token_type": "bearer"}
+GET odin/facebook/login / 501
+# POST odin/facebook/login / {"access_token": "EAAC6HAjabVkBAOQL4hhZCY4qK4MkPc63bOyrENAjYbOHKteDvlNRKZAXSvaUsEOZCgn7odZBJbMxeQNKQ2so66rPZAzrUEWFvtg9yuLESZABhroiI9jSEXvnAHPJ6DjKy3JLnnaPcjADEg9sH2zlDyoWPHQXm7eFdSE6hZCZCGbZCic8tGWYwc1JeAgn0TPOOdhYs7I4cEiqKoAZDZD"} 501

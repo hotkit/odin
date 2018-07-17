@@ -17,8 +17,10 @@
 
 
 fostlib::string odin::facebook::get_app_token() {
-    fostlib::url fb_url(fostlib::coerce<fostlib::string>("https://graph.facebook.com/oauth/access_token"));
+    fostlib::url base_url(odin::c_facebook_endpoint.value());
+    fostlib::url::filepath_string api{"/oauth/access_token"};
     fostlib::url::query_string qs{};
+    fostlib::url fb_url(base_url, api);
     qs.append("client_id", odin::c_facebook_app_id.value());
     qs.append("client_secret", odin::c_facebook_secret.value());
     qs.append("grant_type", "client_credentials");
@@ -32,7 +34,9 @@ fostlib::string odin::facebook::get_app_token() {
 
 
 bool odin::facebook::is_user_authenticated(f5::u8view app_token, f5::u8view user_token) {
-    fostlib::url fb_url(fostlib::coerce<fostlib::string>("https://graph.facebook.com/debug_token"));
+    fostlib::url base_url(odin::c_facebook_endpoint.value());
+    fostlib::url::filepath_string api{"/debug_token"};
+    fostlib::url fb_url(base_url, api);
     fostlib::url::query_string qs{};
     qs.append("input_token", user_token);
     qs.append("access_token", app_token);
@@ -46,7 +50,9 @@ bool odin::facebook::is_user_authenticated(f5::u8view app_token, f5::u8view user
 
 
 fostlib::json odin::facebook::get_user_detail(f5::u8view user_token) {
-    fostlib::url fb_url(fostlib::coerce<fostlib::string>("https://graph.facebook.com/me"));
+    fostlib::url base_url(odin::c_facebook_endpoint.value());
+    fostlib::url::filepath_string api{"/me"};
+    fostlib::url fb_url(base_url, api);
     fostlib::url::query_string qs{};
     qs.append("access_token", user_token);
     qs.append("fields", "id,name,email");
