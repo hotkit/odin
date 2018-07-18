@@ -57,7 +57,6 @@ namespace {
             } else {
                 user_detail = odin::facebook::get_user_detail(access_token);
             }
-
             if ( user_detail.isnull() )
                 throw fostlib::exceptions::not_implemented("odin.facebook.login",
                     "User not authenticated");

@@ -4,7 +4,8 @@
         "JWT reset forgotten password secret": "by0ix07Sm@C7QXu&^a#szU@BJT6AZKiMOjdFhH^!0jwjjM24GKM*eHlhMUcY8d2o",
         "Facebook AppID": "204629570383193",
         "Facebook Secret": "ba672f36b2a11e2eb11b906d9ad550c2",
-        "Facebook API Endpoint": "https://graph.facebook.com"
+        "Facebook API Endpoint": "https://graph.facebook.com",
+        "Google AUD": "1008719970978-hb24n2dstb40o45d4feuo2ukqmcc6381.apps.googleusercontent.com"
     },
     "webserver": {
         "Load": ["fostgres", "odin-views"],

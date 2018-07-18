@@ -18,9 +18,9 @@
 
 bool odin::google::is_user_authenticated(f5::u8view user_token) {
     auto user_detail = odin::google::get_user_detail(user_token);
-    if ( user_detail.isNull() )
-        return FALSE;
-    return TRUE;
+    if ( user_detail.isnull() )
+        return true;
+    return false;
 }
 
 
@@ -34,7 +34,11 @@ fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
     if ( response->status() == 400 )
         return fostlib::json();
     auto response_data = fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
-    return fostlib::json::parse(response_data);
+    fostlib::json body = fostlib::json::parse(response_data);
+    auto aud = fostlib::coerce<fostlib::string>(body["aud"]);
+    if ( aud != odin::c_google_aud.value())
+        return fostlib::json();
+    return body;
 }
 
 
@@ -76,7 +80,7 @@ fostlib::json odin::google::credentials(fostlib::pg::connection &cnx, const f5::
 }
 
 
-void odin::google::set_google_credential(
+void odin::google::set_google_credentials(
     fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view identity_id, f5::u8view google_user_id
 ) {
     fg::json user_values;

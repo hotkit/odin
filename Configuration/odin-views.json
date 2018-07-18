@@ -35,21 +35,15 @@
         "views/odin/facebook/login": {
             "view": "odin.facebook.login",
             "configuration": {
-                "expires": {"hours": 72}
+                "expires": {"hours": 72},
+                "facebook-mock": "test"
             }
         },
         "views/odin/google/login": {
             "view": "odin.google.login",
             "configuration": {
                 "expires": {"hours": 72},
-                "failure": {
-                    "view": "fost.response.401",
-                    "configuration": {
-                        "schemes": {
-                            "Bearer": {}
-                        }
-                    }
-                }
+                "google-mock": "test"
             }
         },
         "views/odin/register": {

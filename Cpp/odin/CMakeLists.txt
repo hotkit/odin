@@ -1,11 +1,11 @@
 add_library(odin
         credentials.cpp
+        facebook.cpp
+        google.cpp
         nonce.cpp
         odin.cpp
         pwhashproc.cpp
         user.cpp
-        facebook.cpp
-        google.cpp
     )
 target_include_directories(odin PUBLIC ../include)
 target_link_libraries(odin fost-crypto fost-inet fost-postgres fostgres)

@@ -228,8 +228,8 @@ add_custom_command(OUTPUT test-login-facebook
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/opts/email/001-initial.blue.sql
-            ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/facebook/001-initial.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
             login-facebook-test.json
             login-facebook.fg
@@ -241,7 +241,7 @@ add_custom_command(OUTPUT test-login-google
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/login-google-stub.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-google.fg
         MAIN_DEPENDENCY login-google.fg
         DEPENDS
@@ -252,9 +252,11 @@ add_custom_command(OUTPUT test-login-google
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
+            ../Schema/opts/email/001-initial.blue.sql
             ../Schema/opts/google/001-initial.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
-            login-google-stub.json
+            login-google-test.json
             login-google.fg
     )
 
@@ -273,6 +275,7 @@ add_custom_target(odin-tests DEPENDS
         test-session
         test-forgotten-password
         test-login-facebook
+        test-login-google
     )
 add_dependencies(stress odin-tests)
 
