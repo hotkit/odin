@@ -59,7 +59,7 @@ fostlib::json odin::google::credentials(fostlib::pg::connection &cnx, const f5::
     }
 
     fostlib::json user;
-    for ( std::size_t index{0}; index < record.size(); ++index ) {
+    for ( std::size_t index{}; index < record.size(); ++index ) {
         const auto parts = fostlib::split(data.first[index], "__");
         if ( parts.size() && parts[parts.size() - 1] == "tableoid" )
             continue;
