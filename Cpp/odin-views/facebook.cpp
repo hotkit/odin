@@ -52,7 +52,7 @@ namespace {
                     // Use access token as facebook ID
                     fostlib::insert(user_detail, "id", access_token);
                     fostlib::insert(user_detail, "name", "Test User");
-                    fostlib::insert(user_detail, "email", access_token + "@mail.com");
+                    fostlib::insert(user_detail, "email", access_token + "@example.com");
                 }
             } else {
                 user_detail = odin::facebook::get_user_detail(access_token);
