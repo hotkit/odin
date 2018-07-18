@@ -17,16 +17,24 @@
 
 
 fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
-    fostlib::url gg_url(fostlib::coerce<fostlib::string>("https://www.googleapis.com/oauth2/v3/tokeninfo"));
+    fostlib::url base_url(fostlib::coerce<fostlib::string>("https://www.googleapis.com"));
+    fostlib::url::filepath_string api{"/oauth2/v3/tokeninfo"};
+    fostlib::url gg_url(base_url, api);
     fostlib::url::query_string qs{};
     qs.append("id_token", user_token);
     gg_url.query(qs);
     fostlib::http::user_agent ua(gg_url);
     auto response = ua.get(gg_url);
-    fostlib::log::warning(c_odin)
-            ("response headers", response->headers());
-    fostlib::log::warning(c_odin)
-            ("response body", response->body()->data());
+
+    // Log details
+    fostlib::json rj;
+    fostlib::insert(rj, "status", response->status());
+    // fostlib::insert(rj, "body", "size", response->body()->data().size());
+    // fostlib::insert(rj, "body", "data",
+    //     fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(response->body()->data())));
+    fostlib::insert(rj, "headers", response->headers());
+    fostlib::log::warning(c_odin)("response", rj);
+    return fostlib::json();
     if ( response->status() == 400 )
         return fostlib::json();
     auto response_data = fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
