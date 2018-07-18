@@ -5,7 +5,7 @@
         "Facebook AppID": "204629570383193",
         "Facebook Secret": "ba672f36b2a11e2eb11b906d9ad550c2",
         "Facebook API Endpoint": "https://graph.facebook.com",
-        "Google AUD": "1008719970978-hb24n2dstb40o45d4feuo2ukqmcc6381.apps.googleusercontent.com"
+        "Google": "679793149059-mbvkughstsp7vk5i4joart3nf1m2uphc.apps.googleusercontent.com"
     },
     "webserver": {
         "Load": ["fostgres", "odin-views"],

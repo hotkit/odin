@@ -42,7 +42,7 @@ const fostlib::setting<fostlib::string> odin::c_facebook_endpoint(
     "odin/odin.cpp", "odin", "Facebook API Endpoint", "https://graph.facebook.com", true);
 
 const fostlib::setting<fostlib::string> odin::c_google_aud(
-    "odin/odin.cpp", "odin", "Google AUD", "", true);
+    "odin/odin.cpp", "odin", "Google", "", true);
 
 
 bool odin::is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name){
