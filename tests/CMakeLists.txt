@@ -241,6 +241,7 @@ add_custom_command(OUTPUT test-login-google
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../fost-web/Configuration/log-show-all.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-google.fg
         MAIN_DEPENDENCY login-google.fg
@@ -279,3 +280,6 @@ add_custom_target(odin-tests DEPENDS
     )
 add_dependencies(stress odin-tests)
 
+add_custom_target(gg-tests DEPENDS
+        test-login-google
+    )

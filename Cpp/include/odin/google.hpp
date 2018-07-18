@@ -17,9 +17,6 @@ namespace odin {
     namespace google {
 
 
-        /// Check user does authenticated with Google
-        bool is_user_authenticated(f5::u8view user_token);
-
         /// Return user data from Google
         fostlib::json get_user_detail(f5::u8view user_token);
 

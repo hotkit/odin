@@ -16,14 +16,6 @@
 #include <fost/insert>
 
 
-bool odin::google::is_user_authenticated(f5::u8view user_token) {
-    auto user_detail = odin::google::get_user_detail(user_token);
-    if ( user_detail.isnull() )
-        return true;
-    return false;
-}
-
-
 fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
     fostlib::url gg_url(fostlib::coerce<fostlib::string>("https://www.googleapis.com/oauth2/v3/tokeninfo"));
     fostlib::url::query_string qs{};
@@ -31,13 +23,19 @@ fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
     gg_url.query(qs);
     fostlib::http::user_agent ua(gg_url);
     auto response = ua.get(gg_url);
+    fostlib::log::warning(c_odin)
+            ("response headers", response->headers());
+    fostlib::log::warning(c_odin)
+            ("response body", response->body()->data());
     if ( response->status() == 400 )
         return fostlib::json();
     auto response_data = fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
     fostlib::json body = fostlib::json::parse(response_data);
+    fostlib::log::warning(c_odin)
+            ("response_data", response_data);
     auto aud = fostlib::coerce<fostlib::string>(body["aud"]);
-    if ( aud != odin::c_google_aud.value())
-        return fostlib::json();
+    // if ( aud != odin::c_google_aud.value())
+        // return fostlib::json();
     return body;
 }
 
