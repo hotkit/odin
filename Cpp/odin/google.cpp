@@ -17,34 +17,37 @@
 
 
 fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
+    auto logger = fostlib::log::debug(c_odin);
+
     fostlib::url base_url(fostlib::coerce<fostlib::string>("https://www.googleapis.com"));
     fostlib::url::filepath_string api{"/oauth2/v3/tokeninfo"};
     fostlib::url gg_url(base_url, api);
     fostlib::url::query_string qs{};
     qs.append("id_token", user_token);
     gg_url.query(qs);
+    logger("url", gg_url);
+
     fostlib::http::user_agent ua(gg_url);
     auto response = ua.get(gg_url);
 
     // Log details
-    fostlib::json rj;
-    fostlib::insert(rj, "status", response->status());
-    // fostlib::insert(rj, "body", "size", response->body()->data().size());
-    // fostlib::insert(rj, "body", "data",
-    //     fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(response->body()->data())));
-    fostlib::insert(rj, "headers", response->headers());
-    fostlib::log::warning(c_odin)("response", rj);
+    logger
+        ("response", "status", response->status())
+        ("response", "headers", response->headers())
+        ("response", "body", "size", response->body()->data().size());
+        ("response", "body", "data",
+            fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
     return fostlib::json();
-    if ( response->status() == 400 )
-        return fostlib::json();
-    auto response_data = fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
-    fostlib::json body = fostlib::json::parse(response_data);
-    fostlib::log::warning(c_odin)
-            ("response_data", response_data);
-    auto aud = fostlib::coerce<fostlib::string>(body["aud"]);
-    // if ( aud != odin::c_google_aud.value())
-        // return fostlib::json();
-    return body;
+//     if ( response->status() == 400 )
+//         return fostlib::json();
+//     auto response_data = fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
+//     fostlib::json body = fostlib::json::parse(response_data);
+//     fostlib::log::warning(c_odin)
+//             ("response_data", response_data);
+//     auto aud = fostlib::coerce<fostlib::string>(body["aud"]);
+//     // if ( aud != odin::c_google_aud.value())
+//         // return fostlib::json();
+//     return body;
 }
 
 
