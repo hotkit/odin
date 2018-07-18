@@ -19,7 +19,7 @@ namespace odin {
 
 
         extern const fostlib::urlhandler::view
-            &login, &logout, &secure, &user_unsecure, &registration, &facebook;
+            &login, &logout, &secure, &user_unsecure, &registration, &facebook, &google;
 
 
     }

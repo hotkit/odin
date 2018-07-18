@@ -1,0 +1,45 @@
+{
+    "webserver": {
+        "views/odin/test/google/login/ok": {
+            "view": "odin.google.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "google-mock": "OK"
+            }
+        },
+        "views/odin/test/google/login/error": {
+            "view": "odin.google.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "google-mock": "ERROR"
+            }
+        },
+        "views/odin/test/google/validate_login": {
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [
+                    {
+                        "return": "object",
+                        "path": ["/count-google-users"],
+                        "GET": {
+                            "command": "SELECT COUNT(*) FROM odin.google_credentials WHERE 1=1 or identity_id=$1",
+                            "arguments": [
+                                ["request", "headers", "__user"]
+                            ]
+                        }
+                    },
+                    {
+                        "return": "object",
+                        "path": ["/count-users"],
+                        "GET": {
+                            "command": "SELECT COUNT(*) FROM odin.identity WHERE 1=1 or id=$1",
+                            "arguments": [
+                                ["request", "headers", "__user"]
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

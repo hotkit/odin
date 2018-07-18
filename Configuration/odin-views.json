@@ -6,6 +6,7 @@
                 "": "odin/static",
                 "api/": "odin/api",
                 "api/facebook/login/": "odin/facebook/login",
+                "api/google/login/": "odin/google/login",
                 "api/login/": "odin/login",
                 "api/register/": "odin/register",
                 "api/reset-forgotten-password/": "odin.password.reset-forgotten"
@@ -33,6 +34,12 @@
         },
         "views/odin/facebook/login": {
             "view": "odin.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72}
+            }
+        },
+        "views/odin/google/login": {
+            "view": "odin.google.login",
             "configuration": {
                 "expires": {"hours": 72}
             }
