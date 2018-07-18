@@ -8,7 +8,6 @@
 
 #include <odin/fg/native.hpp>
 #include <odin/nonce.hpp>
-#include <odin/google.hpp>
 #include <odin/user.hpp>
 #include <odin/pwhashproc.hpp>
 
@@ -71,12 +70,4 @@ const fg::frame::builtin odin::lib::expire =
         cnx.insert("odin.identity_expiry_ledger", user_values);
         cnx.commit();
         return fostlib::json();
-    };
-
-
-const fg::frame::builtin odin::lib::google_get_user_detail =
-    [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
-        auto cnx = connect(stack);
-        auto access_token = stack.resolve_string(stack.argument("access_token", pos, end));
-        return odin::google::get_user_detail(access_token);
     };

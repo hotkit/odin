@@ -49,7 +49,6 @@ namespace {
             stack.native["odin.superuser"] = odin::lib::superuser;
             stack.native["odin.user"] = odin::lib::user;
             stack.native["odin.user.expire"] = odin::lib::expire;
-            stack.native["odin.google.get_user_detail"] = odin::lib::google_get_user_detail;
         });
 
 

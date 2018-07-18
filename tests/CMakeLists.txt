@@ -279,7 +279,3 @@ add_custom_target(odin-tests DEPENDS
         test-login-google
     )
 add_dependencies(stress odin-tests)
-
-add_custom_target(gg-tests DEPENDS
-        test-login-google
-    )
