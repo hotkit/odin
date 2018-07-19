@@ -25,11 +25,12 @@ fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
     auto response = ua.get(gg_url);
     fostlib::json body = fostlib::json::parse(response->body()->data());
     auto aud = fostlib::coerce<fostlib::string>(body["aud"]);
-    if ( aud != odin::c_google_aud.value() ) {
-        return fostlib::json();
-    } else {
-        return body;
+    auto gg_aud = c_google_aud.value()["Client_ID"];
+    for ( std::size_t index{}; index < gg_aud.size(); ++index ) {
+        if ( aud == fostlib::coerce<fostlib::string>(gg_aud[index]) )
+            return body;
     }
+    return fostlib::json();
 }
 
 

@@ -41,7 +41,7 @@ const fostlib::setting<fostlib::string> odin::c_facebook_secret(
 const fostlib::setting<fostlib::string> odin::c_facebook_endpoint(
     "odin/odin.cpp", "odin", "Facebook API Endpoint", "https://graph.facebook.com", true);
 
-const fostlib::setting<fostlib::string> odin::c_google_aud(
+const fostlib::setting<fostlib::json> odin::c_google_aud(
     "odin/odin.cpp", "odin", "Google", "", true);
 
 
