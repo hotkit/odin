@@ -26,9 +26,8 @@ fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
     fostlib::json body = fostlib::json::parse(response->body()->data());
     auto aud = fostlib::coerce<fostlib::string>(body["aud"]);
     auto gg_aud = c_google_aud.value()["Client_ID"];
-    for ( std::size_t index{}; index < gg_aud.size(); ++index ) {
-        if ( aud == fostlib::coerce<fostlib::string>(gg_aud[index]) )
-            return body;
+    for ( const auto a : gg_aud ) {
+        if ( aud == fostlib::coerce<fostlib::string>(a) ) return body;
     }
     return fostlib::json();
 }
