@@ -1,11 +1,16 @@
 {
     "odin": {
-        "JWT secret": "TL/ITHZAnskZLbRCVBfrEBsQspjWkm4zysWWjnIF4zUfHhPUkBp3fiu97Wl90KrB",
-        "JWT reset forgotten password secret": "by0ix07Sm@C7QXu&^a#szU@BJT6AZKiMOjdFhH^!0jwjjM24GKM*eHlhMUcY8d2o",
-        "Facebook AppID": "204629570383193",
-        "Facebook Secret": "ba672f36b2a11e2eb11b906d9ad550c2",
-        "Facebook API Endpoint": "https://graph.facebook.com",
-        "Google": "679793149059-mbvkughstsp7vk5i4joart3nf1m2uphc.apps.googleusercontent.com"
+        "JWT secret": "<JWT_SECRET>",
+        "JWT reset forgotten password secret": "<JWT_RESET_FORGOTTEN_PASSWORD_SECRET>",
+        "Facebook AppID": "<FACEBOOK_APP_ID>",
+        "Facebook Secret": "<FACEBOOK_SECRET>",
+        "Facebook API Endpoint": "<FACEBOOK_API_ENDPOINT>",
+        "Google": {
+            "Client_ID" : [
+                "<GOOGLE_CLIENT_ID_1>",
+                "<GOOGLE_CLIENT_ID_2>"
+            ]
+        }
     },
     "webserver": {
         "Load": ["fostgres", "odin-views"],
