@@ -24,8 +24,7 @@ CREATE TABLE odin.logout_ledger (
 CREATE FUNCTION odin.logout_ledger_insert() RETURNS TRIGGER AS $body$
     BEGIN
         UPDATE odin.credentials SET
-                logout_count = logout_count + 1
-            WHERE identity_id = NEW.identity_id;
+            logout_count = logout_count + 1;
         RETURN NULL;
     END;
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
