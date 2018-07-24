@@ -15,7 +15,6 @@
 
 #include <fost/insert>
 #include <fost/log>
-#include <fost/crypto>
 #include <fostgres/sql.hpp>
 
 
@@ -39,7 +38,7 @@ namespace {
         fostlib::string t
     ) {
         const auto parts = fostlib::split(t, ".");
-        if ( parts.size() != 3u ) // We won't be able to parse this -- return a 403
+        if ( parts.size() != 3u )
             return fostlib::json();
         const fostlib::base64_string b64_payload(parts[1].c_str());
         const auto v64_payload = fostlib::coerce<std::vector<unsigned char>>(b64_payload);
