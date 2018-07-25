@@ -38,8 +38,9 @@ namespace {
         fostlib::string t
     ) {
         const auto parts = fostlib::split(t, ".");
-        if ( parts.size() != 3u )
-            return fostlib::json();
+        if ( parts.size() != 3u ) {
+            throw fostlib::exceptions::not_implemented(__func__,  "Can't parse to jwt. This should be a 403");
+        }
         const fostlib::base64_string b64_payload(parts[1].c_str());
         const auto v64_payload = fostlib::coerce<std::vector<unsigned char>>(b64_payload);
         const auto u8_payload = fostlib::coerce<fostlib::utf8_string>(v64_payload);
