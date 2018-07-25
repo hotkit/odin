@@ -44,9 +44,14 @@ const fg::frame::builtin odin::lib::mint_login_jwt =
 const fg::frame::builtin odin::lib::mint_jwt =
     [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) -> fg::json {
         auto payload = stack.resolve(stack.argument("payload", pos, end));
+        fostlib::string secret;
+        if ( pos == end ) {
+            secret = odin::c_jwt_secret.value();
+        } else {
+            auto payload = stack.resolve_string(stack.argument("secret", pos, end));
+        }
         return fg::json{fostlib::jwt::mint{
-            fostlib::sha256,
-            odin::c_jwt_secret.value(), std::move(payload)}.token()};
+            fostlib::sha256, secret, std::move(payload)}.token()};
     };
 
 
