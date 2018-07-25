@@ -48,7 +48,7 @@ const fg::frame::builtin odin::lib::mint_jwt =
         if ( pos == end ) {
             secret = odin::c_jwt_secret.value();
         } else {
-            auto payload = stack.resolve_string(stack.argument("secret", pos, end));
+            secret = odin::c_jwt_reset_forgotten_password_secret.value() + stack.resolve_string(stack.argument("secret", pos, end));
         }
         return fg::json{fostlib::jwt::mint{
             fostlib::sha256, secret, std::move(payload)}.token()};

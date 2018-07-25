@@ -50,6 +50,7 @@ namespace {
             stack.native["odin.superuser"] = odin::lib::superuser;
             stack.native["odin.user"] = odin::lib::user;
             stack.native["odin.user.expire"] = odin::lib::expire;
+            stack.native["odin.user.password-hash"] = odin::lib::password_hash;
         });
 
 

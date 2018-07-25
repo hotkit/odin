@@ -71,3 +71,21 @@ const fg::frame::builtin odin::lib::expire =
         cnx.commit();
         return fostlib::json();
     };
+
+
+const fg::frame::builtin odin::lib::password_hash =
+    [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
+        auto cnx = connect(stack);
+        auto ref = odin::reference();
+        auto username = stack.resolve_string(stack.argument("username", pos, end));
+        auto hash = stack.resolve_string(stack.argument("hash", pos, end));
+        auto process = stack.resolve(stack.argument("process", pos, end));
+        fg::json user_values;
+        fostlib::insert(user_values, "reference", ref);
+        fostlib::insert(user_values, "identity_id", username);
+        fostlib::insert(user_values, "password", hash);
+        fostlib::insert(user_values, "process", process);
+        cnx.insert("odin.credentials_password_ledger", user_values);
+        cnx.commit();
+        return fostlib::json();
+    };
