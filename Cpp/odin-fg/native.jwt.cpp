@@ -1,8 +1,8 @@
-/*
-    Copyright 2016-2017 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2016-2018 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
@@ -38,6 +38,15 @@ const fg::frame::builtin odin::lib::mint_login_jwt =
         stack.symbols["testserver.headers"] = headers;
 
         return fg::json(std::move(token));
+    };
+
+
+const fg::frame::builtin odin::lib::mint_jwt =
+    [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) -> fg::json {
+        auto payload = stack.resolve(stack.argument("payload", pos, end));
+        return fg::json{fostlib::jwt::mint{
+            fostlib::sha256,
+            odin::c_jwt_secret.value(), std::move(payload)}.token()};
     };
 
 
