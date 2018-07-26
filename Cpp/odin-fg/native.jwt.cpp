@@ -48,7 +48,7 @@ const fg::frame::builtin odin::lib::mint_jwt =
         if ( pos == end ) {
             secret = odin::c_jwt_secret.value();
         } else {
-            secret = odin::c_jwt_reset_forgotten_password_secret.value() + stack.resolve_string(stack.argument("secret", pos, end));
+            secret = stack.resolve_string(stack.argument("secret", pos, end));
         }
         return fg::json{fostlib::jwt::mint{
             fostlib::sha256, secret, std::move(payload)}.token()};
@@ -70,12 +70,11 @@ const fg::frame::builtin odin::lib::jwt_payload =
 
 const fg::frame::builtin odin::lib::mint_reset_password_jwt =
     [](fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end) {
-        auto username = stack.resolve_string(stack.argument("username", pos, end));
-        auto cnx = connect(stack);
-        if ( !odin::does_user_exist(cnx, username) )
-            throw fostlib::exceptions::not_implemented(__func__,
-                "The user does not appear in the database so no JWT can be minted");
-        auto token = odin::mint_reset_password_jwt(username).token();
-        return fg::json(std::move(token));
+        auto payload = stack.resolve(stack.argument("payload", pos, end));
+        fostlib::string secret = odin::c_jwt_reset_forgotten_password_secret.value();
+        if ( pos != end ) {
+            secret += stack.resolve_string(stack.argument("secret", pos, end));
+        }
+        return fg::json{fostlib::jwt::mint{
+            fostlib::sha256, secret, std::move(payload)}.token()};
     };
-
