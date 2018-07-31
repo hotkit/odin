@@ -66,14 +66,38 @@ namespace {
             auto facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
             auto identity_id = reference;
             if ( facebook_user.isnull() ) {
-                odin::create_user(cnx, reference, identity_id);
-                if ( user_detail.has_key("name") ) {
-                    const auto facebook_user_name = fostlib::coerce<f5::u8view>(user_detail["name"]);
-                    odin::set_full_name(cnx, reference, identity_id, facebook_user_name);
-                }
-                if ( user_detail.has_key("email") ) {
-                    const auto facebook_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
-                    odin::set_email(cnx, reference, identity_id, facebook_user_email);
+                if ( req.headers().exists("Authorization") ) {
+                    auto parts = fostlib::partition(req.headers()["Authorization"].value(), " ");
+                    if ( parts.first == "Bearer" && parts.second ) {
+                        auto jwt = fostlib::jwt::token::load(
+                            odin::c_jwt_secret.value(), parts.second.value());
+                        if ( !jwt ) {
+                            fostlib::log::warning(c_odin_facebook)
+                                ("", "Invalid FWT");
+                            throw fostlib::exceptions::not_implemented("odin.facebook.login",
+                    "User not authenticated");
+                        } else {
+                            throw fostlib::exceptions::not_implemented("odin.facebook.login",
+                    "Bla Bla Bla");
+                        }
+                    } else {
+                        fostlib::log::warning(c_odin_facebook)
+                            ("", "Invalid Authorization scheme")
+                            ("scheme", parts.first)
+                            ("data", parts.second);
+                        throw fostlib::exceptions::not_implemented("odin.facebook.login",
+                    "User not authenticated");
+                    }
+                } else {
+                    odin::create_user(cnx, reference, identity_id);
+                    if ( user_detail.has_key("name") ) {
+                        const auto facebook_user_name = fostlib::coerce<f5::u8view>(user_detail["name"]);
+                        odin::set_full_name(cnx, reference, identity_id, facebook_user_name);
+                    }
+                    if ( user_detail.has_key("email") ) {
+                        const auto facebook_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
+                        odin::set_email(cnx, reference, identity_id, facebook_user_email);
+                    }
                 }
             } else {
                 const fostlib::jcursor id("identity", "id");
