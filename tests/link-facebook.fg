@@ -18,7 +18,13 @@ GET odin/api / 200
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
-odin.jwt.authorization test password1234
+# Link facebook
 POST odin/test/facebook/login/ok / {"access_token": "user_token_1"} 200
-# GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
-# GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
+
+# Change facebook token should work
+POST odin/test/facebook/login/ok / {"access_token": "user_token_2"} 200
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
+

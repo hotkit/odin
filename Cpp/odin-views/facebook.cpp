@@ -77,8 +77,7 @@ namespace {
                             throw fostlib::exceptions::not_implemented("odin.facebook.login",
                     "User not authenticated");
                         } else {
-                            throw fostlib::exceptions::not_implemented("odin.facebook.login",
-                    "Bla Bla Bla");
+                            identity_id = fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]);
                         }
                     } else {
                         fostlib::log::warning(c_odin_facebook)
