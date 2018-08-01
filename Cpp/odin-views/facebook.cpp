@@ -73,7 +73,7 @@ namespace {
                             odin::c_jwt_secret.value(), parts.second.value());
                         if ( !jwt ) {
                             fostlib::log::warning(c_odin_facebook)
-                                ("", "Invalid FWT");
+                                ("", "Invalid JWT");
                             throw fostlib::exceptions::not_implemented("odin.facebook.login",
                     "User not authenticated");
                         } else {

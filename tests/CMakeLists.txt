@@ -216,7 +216,7 @@ add_custom_command(OUTPUT test-login-facebook
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/login-facebook-test.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-facebook.fg
         MAIN_DEPENDENCY login-facebook.fg
         DEPENDS
@@ -231,7 +231,7 @@ add_custom_command(OUTPUT test-login-facebook
             ../Schema/opts/facebook/001-initial.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
-            login-facebook-test.json
+            facebook-test.json
             login-facebook.fg
     )
 
@@ -241,7 +241,7 @@ add_custom_command(OUTPUT test-link-facebook
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/link-facebook-test.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/link-facebook.fg
         MAIN_DEPENDENCY link-facebook.fg
         DEPENDS
@@ -256,15 +256,9 @@ add_custom_command(OUTPUT test-link-facebook
             ../Schema/opts/facebook/001-initial.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
-            link-facebook-test.json
+            facebook-test.json
             link-facebook.fg
     )
-
-
-add_custom_target(facebook-tests DEPENDS
-        test-link-facebook
-    ) 
-
 
 add_custom_command(OUTPUT test-login-google
         COMMAND fostgres-test odin-test-login-google -o test-login-google

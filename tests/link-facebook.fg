@@ -8,10 +8,9 @@ odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 GET odin/test/facebook/validate_login /count-users 200 {"count": 0}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
-## Enable opts/email module, then user can register with email
+## User register and log in with email
 POST odin/register / {"username": "test", "password": "password1234", "email": "admin@example.com"} 201
-GET odin/secure/sql /user/test 200 {"user": {"id": "test", "expires": null, "full_name": null, "email": "admin@example.com"}}
-
+POST odin/login / {"username": "test", "password": "password1234"} 200
 odin.jwt.authorization test password1234
 GET odin/api / 200
 
@@ -28,3 +27,7 @@ POST odin/test/facebook/login/ok / {"access_token": "user_token_2"} 200
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 
+POST odin/login / {"username": "test", "password": "password1234"} 200
+POST odin/api /logout/ {} 200
+set-path testserver.headers ["Authorization"] ""
+GET odin/api / 401
