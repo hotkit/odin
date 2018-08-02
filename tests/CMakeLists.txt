@@ -260,6 +260,10 @@ add_custom_command(OUTPUT test-link-facebook
             link-facebook.fg
     )
 
+add_custom_target(link-tests DEPENDS
+        test-link-facebook
+    ) 
+
 add_custom_command(OUTPUT test-login-google
         COMMAND fostgres-test odin-test-login-google -o test-login-google
             $<TARGET_SONAME_FILE:odin-fg>
@@ -302,5 +306,6 @@ add_custom_target(odin-tests DEPENDS
         test-forgotten-password
         test-login-facebook
         test-login-google
+        test-link-facebook
     )
 add_dependencies(stress odin-tests)

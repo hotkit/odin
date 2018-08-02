@@ -10,7 +10,7 @@ GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
 ## User register and log in with email
 POST odin/register / {"username": "test", "password": "password1234", "email": "admin@example.com"} 201
-POST odin/login / {"username": "test", "password": "password1234"} 200
+# POST odin/login / {"username": "test", "password": "password1234"} 200
 odin.jwt.authorization test password1234
 GET odin/api / 200
 
@@ -18,15 +18,18 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
 # Link facebook
-POST odin/test/facebook/login/ok / {"access_token": "user_token_1"} 200
+POST odin/test/facebook/link/ok / {"access_token": "user_token_1"} 202
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 
 # Change facebook token should work
-POST odin/test/facebook/login/ok / {"access_token": "user_token_2"} 200
+POST odin/test/facebook/link/ok / {"access_token": "user_token_2"} 202
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 
+setting odin "Perform JWT logout check" true
+setting odin "Trust JWT" false
+
 POST odin/api /logout/ {} 200
-odin.jwt.authorization test password1234
-POST odin/test/facebook/login/ok / {"access_token": "user_token_3"} 401
+set-path testserver.headers ["Authorization"] ""
+POST odin/test/facebook/link/ok / {"access_token": "user_token_2"} 401
