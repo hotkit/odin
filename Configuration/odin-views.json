@@ -6,7 +6,7 @@
                 "": "odin/static",
                 "api/": "odin/api",
                 "api/facebook/login/": "odin/facebook/login",
-                "api/facebook/link": "odin/facebook/link",
+                "api/facebook/link/": "odin/facebook/link",
                 "api/google/login/": "odin/google/login",
                 "api/login/": "odin/login",
                 "api/register/": "odin/register",
@@ -44,23 +44,14 @@
             "configuration": {
                 "secure": {
                     "view": "odin.facebook.link",
-                    "expires": {"hours": 72}
+                    "configuration": {
+                        "expires": {"hours": 72}
+                    }
                 },
                 "unsecure": {
-                    "view": "fost.view.pathprefix",
+                    "view": "fost.response.401",
                     "configuration": {
-                        "": {
-                            "view": "fost.response.401",
-                            "configuration": {
-                                "schemes": {
-                                    "Bearer": {}
-                                },
-                                "view": "odin/unsecure/sql"
-                            }
-                        },
-                        "me/": "fost.response.403",
-                        "me/password": "odin.password.me",
-                        "forgotten-password/": "odin/forgotten-password"
+                        
                     }
                 }
             }

@@ -142,13 +142,20 @@ namespace {
             } else {
                 user_detail = odin::facebook::get_user_detail(access_token);
             }
-            if ( user_detail.isnull() )
+            if ( user_detail.isnull() ) {
                 throw fostlib::exceptions::not_implemented("odin.facebook.link",
                     "User not authenticated");
+            }
             const auto facebook_user_id = fostlib::coerce<f5::u8view>(user_detail["id"]);
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto reference = odin::reference();
             auto facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
+            if ( !facebook_user.isnull() ) {
+                fostlib::log::warning(odin::c_odin)
+                            ("facebook user", facebook_user.isnull() );
+                throw fostlib::exceptions::not_implemented("odin.facebook.link",
+                    "Other user already linked with this facebook");
+            }
             auto identity_id = fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]);
 
             odin::facebook::set_facebook_credentials(cnx, reference, identity_id, facebook_user_id);
@@ -174,4 +181,5 @@ namespace {
 
 
 const fostlib::urlhandler::view &odin::view::facebook = c_facebook;
+const fostlib::urlhandler::view &odin::view::facebook_link = c_facebook_link;
 
