@@ -6,6 +6,7 @@
                 "": "odin/static",
                 "api/": "odin/api",
                 "api/facebook/login/": "odin/facebook/login",
+                "api/facebook/link/": "odin/facebook/link",
                 "api/google/login/": "odin/google/login",
                 "api/login/": "odin/login",
                 "api/register/": "odin/register",
@@ -36,6 +37,23 @@
             "view": "odin.facebook.login",
             "configuration": {
                 "expires": {"hours": 72}
+            }
+        },
+        "views/odin/facebook/link": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "odin.facebook.link",
+                    "configuration": {
+                        "expires": {"hours": 72}
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        
+                    }
+                }
             }
         },
         "views/odin/google/login": {

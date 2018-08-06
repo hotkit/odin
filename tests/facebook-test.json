@@ -14,6 +14,31 @@
                 "facebook-mock": "ERROR"
             }
         },
+        "views/odin/test/facebook/link/ok": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "odin.facebook.link",
+                    "configuration": {
+                        "expires": {"hours": 72},
+                        "facebook-mock": "OK"
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        
+                    }
+                }
+            }
+        },
+        "views/odin/test/facebook/link/error": {
+            "view": "odin.facebook.link",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": "ERROR"
+            }
+        },
         "views/odin/test/facebook/validate_login": {
             "view": "fostgres.sql",
             "configuration": {

@@ -216,7 +216,7 @@ add_custom_command(OUTPUT test-login-facebook
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/login-facebook-test.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-facebook.fg
         MAIN_DEPENDENCY login-facebook.fg
         DEPENDS
@@ -231,9 +231,38 @@ add_custom_command(OUTPUT test-login-facebook
             ../Schema/opts/facebook/001-initial.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
-            login-facebook-test.json
+            facebook-test.json
             login-facebook.fg
     )
+
+add_custom_command(OUTPUT test-link-facebook
+        COMMAND fostgres-test odin-test-link-facebook -o test-link-facebook
+            $<TARGET_SONAME_FILE:odin-fg>
+            $<TARGET_SONAME_FILE:odin-views>
+            ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+            ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/link-facebook.fg
+        MAIN_DEPENDENCY link-facebook.fg
+        DEPENDS
+            fostgres-test
+            fostgres
+            odin-fg
+            odin-views
+            ../Schema/bootstrap.sql
+            ../Schema/core/000-initial.blue.sql
+            ../Schema/authn/001-initial.blue.sql
+            ../Schema/opts/email/001-initial.blue.sql
+            ../Schema/opts/facebook/001-initial.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
+            ../Configuration/odin-views.json
+            facebook-test.json
+            link-facebook.fg
+    )
+
+add_custom_target(link-tests DEPENDS
+        test-link-facebook
+    ) 
 
 add_custom_command(OUTPUT test-login-google
         COMMAND fostgres-test odin-test-login-google -o test-login-google
@@ -277,5 +306,6 @@ add_custom_target(odin-tests DEPENDS
         test-forgotten-password
         test-login-facebook
         test-login-google
+        test-link-facebook
     )
 add_dependencies(stress odin-tests)
