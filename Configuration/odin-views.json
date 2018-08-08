@@ -126,6 +126,11 @@
                         }
                     },
                     {
+                        "path": ["/me"],
+                        "DELETE": "INSERT INTO odin.identity_expiry_ledger (identity_id, reference, expires)
+                                    VALUES (current_setting('odin.jwt.sub'), current_setting('odin.reference'), now())"
+                    },
+                    {
                         "path": ["/me", "/permissions"],
                         "GET": {
                             "command": "SELECT
