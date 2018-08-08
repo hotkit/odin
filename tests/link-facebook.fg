@@ -19,14 +19,17 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
 # Link facebook
-POST odin/test/facebook/link/ok / {"access_token": "user_token_1"} 202
+PUT odin/test/facebook/link/ok / {"access_token": "user_token_1"} 202
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 
 # Change facebook token should work
-POST odin/test/facebook/link/ok / {"access_token": "user_token_2"} 202
+PUT odin/test/facebook/link/ok / {"access_token": "user_token_2"} 202
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
+
+# Same user link facebook more than one time should not work
+PUT odin/test/facebook/link/ok / {"access_token": "user_token_2"} 501
 
 setting odin "Perform JWT logout check" true
 setting odin "Trust JWT" false
@@ -38,14 +41,14 @@ GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup jwt_user2))
 GET odin/api / 200
-POST odin/test/facebook/link/ok / {"access_token": "user_token_2"} 501
+PUT odin/test/facebook/link/ok / {"access_token": "user_token_2"} 501
 
 # If user already logout link facebook should fail
 POST odin/login / {"username": "test", "password": "password1234"} 200
 odin.jwt.authorization test password1234
 POST odin/api /logout/ {} 200
 GET odin/api / 401
-POST odin/test/facebook/link/ok / {"access_token": "user_token_2"} 501
+PUT odin/test/facebook/link/ok / {"access_token": "user_token_2"} 501
 
 # User log in with facebook should work
 set jwt_user1 (POST odin/test/facebook/login/ok / {"access_token": "user_token_2"} 200)

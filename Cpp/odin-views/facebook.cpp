@@ -109,27 +109,18 @@ namespace {
             fostlib::http::server::request &req,
             const fostlib::host &host
         ) const {
-            if ( req.method() != "POST" )
+            if ( req.method() != "PUT" ) {
                 throw fostlib::exceptions::not_implemented(__func__,
-                    "Facebook link requires POST. This should be a 405");
-
+                    "Facebook link requires PUT. This should be a 405");
+            }
             auto body_str = fostlib::coerce<fostlib::string>(
                 fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
-            if ( !body.has_key("access_token") )
+            if ( !body.has_key("access_token") ) {
                 throw fostlib::exceptions::not_implemented("odin.facebook.link",
                     "Must pass access_token field");
-            const auto access_token = fostlib::coerce<fostlib::string>(body["access_token"]);
-            
-            
-            if ( !req.headers().exists("Authorization") ) {
-                throw fostlib::exceptions::not_implemented("odin.facebook.link",
-            "Request header must have authorization");
             }
-
-            auto parts = fostlib::partition(req.headers()["Authorization"].value(), " ");
-            auto jwt = fostlib::jwt::token::load(
-                odin::c_jwt_secret.value(), parts.second.value());
+            const auto access_token = fostlib::coerce<fostlib::string>(body["access_token"]);
             
             fostlib::json user_detail;
             if ( config.has_key("facebook-mock") ) {
@@ -146,18 +137,25 @@ namespace {
                 throw fostlib::exceptions::not_implemented("odin.facebook.link",
                     "User not authenticated");
             }
+            if ( !req.headers().exists("__user") ) {
+                throw fostlib::exceptions::not_implemented("odin.facebook.link",
+                    "Request header must contain __user field");
+            }
+            auto identity_id = fostlib::coerce<fostlib::string>(req.headers()["__user"]);
             const auto facebook_user_id = fostlib::coerce<f5::u8view>(user_detail["id"]);
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            const auto reference = odin::reference();
             auto facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
-            if ( !facebook_user.isnull() ) {
-                fostlib::log::warning(odin::c_odin)
-                            ("facebook user", facebook_user.isnull() );
-                throw fostlib::exceptions::not_implemented("odin.facebook.link",
-                    "Other user already linked with this facebook");
-            }
-            auto identity_id = fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]);
 
+            if ( !facebook_user.isnull() ) {
+                if ( identity_id == fostlib::coerce<fostlib::string>(facebook_user["facebook_credentials"]["identity_id"]) ) {
+                    throw fostlib::exceptions::not_implemented("odin.facebook.link",
+                        "This user already linked to this facebook");
+                } else {
+                    throw fostlib::exceptions::not_implemented("odin.facebook.link",
+                        "Other user already linked with this facebook");
+                }
+            }
+            const auto reference = odin::reference();
             odin::facebook::set_facebook_credentials(cnx, reference, identity_id, facebook_user_id);
             cnx.commit();
 
