@@ -12,8 +12,8 @@ odin.sql.file (module.path.join ../Schema/opts/logout/003-fix-logout-count.blue.
 odin.user test password1234
 odin.user tester password1234
 
-# Delete user without log in should not work
-DELETE odin/delete / 401
+# Expire user without log in should not work
+DELETE odin/api /expire/ 401
 
 # Check that logging in and registering same user should not works
 POST odin/login / {"username": "test", "password": "password1234"} 200
@@ -23,17 +23,17 @@ POST odin/register / {"username": "test", "password": "password1234", "email": "
 odin.jwt.authorization test password1234
 
 # Check delete user works
-DELETE odin/delete / 200
-DELETE odin/delete / 401
+DELETE odin/api /expire/ 200
+DELETE odin/api /expire/ 401
 
-# Check that user is actually deleted
+# Check that user is actually expired
 POST odin/login / {"username": "test", "password": "password1234"} 401
 
 # Mint a new JWT for out user
 set-path testserver.headers ["Authorization"] (cat "Bearer " "test-string")
 
-# User that doesn't have right permission should not be able to delete
-DELETE odin/delete / 401
+# User that doesn't have right permission should not be able to expire
+DELETE odin/api /expire/ 401
 
 # Other user should log in success
 set jwt_user (POST odin/login / {"username": "tester", "password": "password1234"} 200)
@@ -43,4 +43,4 @@ GET odin/api / 200
 # Delete should not work after logged out
 POST odin/api /logout/ {} 200
 GET odin/api / 401
-DELETE odin/delete / 401
+DELETE odin/api /expire/ 401

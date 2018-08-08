@@ -5,7 +5,6 @@
             "configuration": {
                 "": "odin/static",
                 "api/": "odin/api",
-                "api/delete/": "odin/delete",
                 "api/facebook/login/": "odin/facebook/login",
                 "api/facebook/link/": "odin/facebook/link",
                 "api/google/login/": "odin/google/login",
@@ -80,7 +79,8 @@
                     "configuration": {
                         "": "odin/secure/sql",
                         "logout/": "odin/logout",
-                        "me/password": "odin.password.me"
+                        "me/password": "odin.password.me",
+                        "expire/": "odin/expire"
                     }
                 },
                 "unsecure": {
@@ -96,6 +96,14 @@
                             }
                         },
                         "me/": "fost.response.403",
+                        "expire/": {
+                            "view": "fost.response.401",
+                            "configuration": {
+                                "schemes": {
+                                    "Bearer": {}
+                                }
+                            }
+                        },
                         "me/password": "odin.password.me",
                         "forgotten-password/": "odin/forgotten-password"
                     }
@@ -219,26 +227,13 @@
                 }]
             }
         },
-        "views/odin/delete": {
-            "view": "odin.secure",
+        "views/odin/expire": {
+            "view": "fostgres.sql",
             "configuration": {
-                "secure": {
-                    "view": "fostgres.sql",
-                    "configuration": {
-                        "sql": [{
-                            "path": [],
-                            "DELETE": "INSERT INTO odin.identity_expiry_ledger (identity_id, reference, expires) VALUES (current_setting('odin.jwt.sub'), current_setting('odin.reference'), now())"
-                        }]
-                    }
-                },
-                "unsecure": {
-                    "view": "fost.response.401",
-                    "configuration": {
-                        "schemes": {
-                            "Bearer": {}
-                        }
-                    }
-                }
+                "sql": [{
+                    "path": [],
+                    "DELETE": "INSERT INTO odin.identity_expiry_ledger (identity_id, reference, expires) VALUES (current_setting('odin.jwt.sub'), current_setting('odin.reference'), now())"
+                }]
             }
         }
     }

@@ -286,15 +286,15 @@ add_custom_command(OUTPUT test-login-google
             login-google.fg
     )
 
-add_custom_command(OUTPUT test-delete-user
-        COMMAND fostgres-test odin-test-delete-user -o test-delete-user
+add_custom_command(OUTPUT test-expire-user
+        COMMAND fostgres-test odin-test-expire-user -o test-expire-user
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/delete-user.fg
-        MAIN_DEPENDENCY delete-user.fg
+            ${CMAKE_CURRENT_SOURCE_DIR}/expire-user.fg
+        MAIN_DEPENDENCY expire-user.fg
         DEPENDS
             fostgres-test
             fostgres
@@ -307,7 +307,7 @@ add_custom_command(OUTPUT test-delete-user
             ../Schema/opts/google/001-initial.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
-            delete-user.fg
+            expire-user.fg
     )
 
 ## Because of the way cmake works we need this stuff at the end to
@@ -326,7 +326,7 @@ add_custom_target(odin-tests DEPENDS
         test-login-facebook
         test-login-google
         test-link-facebook
-        test-delete-user
+        test-expire-user
     )
 add_dependencies(stress odin-tests)
 
