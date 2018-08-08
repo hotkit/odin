@@ -260,10 +260,6 @@ add_custom_command(OUTPUT test-link-facebook
             link-facebook.fg
     )
 
-add_custom_target(link-tests DEPENDS
-        test-link-facebook
-    ) 
-
 add_custom_command(OUTPUT test-login-google
         COMMAND fostgres-test odin-test-login-google -o test-login-google
             $<TARGET_SONAME_FILE:odin-fg>

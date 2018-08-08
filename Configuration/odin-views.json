@@ -51,7 +51,6 @@
                 "unsecure": {
                     "view": "fost.response.401",
                     "configuration": {
-                        
                     }
                 }
             }
