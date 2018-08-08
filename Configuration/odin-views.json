@@ -78,8 +78,7 @@
                     "configuration": {
                         "": "odin/secure/sql",
                         "logout/": "odin/logout",
-                        "me/password": "odin.password.me",
-                        "expire/": "odin/expire"
+                        "me/password": "odin.password.me"
                     }
                 },
                 "unsecure": {
@@ -95,14 +94,6 @@
                             }
                         },
                         "me/": "fost.response.403",
-                        "expire/": {
-                            "view": "fost.response.401",
-                            "configuration": {
-                                "schemes": {
-                                    "Bearer": {}
-                                }
-                            }
-                        },
                         "me/password": "odin.password.me",
                         "forgotten-password/": "odin/forgotten-password"
                     }
@@ -133,6 +124,11 @@
                                 ["request", "headers", "__user"]
                             ]
                         }
+                    },
+                    {
+                        "path": ["/me"],
+                        "DELETE": "INSERT INTO odin.identity_expiry_ledger (identity_id, reference, expires)
+                                    VALUES (current_setting('odin.jwt.sub'), current_setting('odin.reference'), now())"
                     },
                     {
                         "path": ["/me", "/permissions"],
@@ -223,15 +219,6 @@
                         },
                         "returning": ["'200' as status"]
                     }
-                }]
-            }
-        },
-        "views/odin/expire": {
-            "view": "fostgres.sql",
-            "configuration": {
-                "sql": [{
-                    "path": [],
-                    "DELETE": "INSERT INTO odin.identity_expiry_ledger (identity_id, reference, expires) VALUES (current_setting('odin.jwt.sub'), current_setting('odin.reference'), now())"
                 }]
             }
         }
