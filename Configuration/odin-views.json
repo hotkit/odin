@@ -5,6 +5,7 @@
             "configuration": {
                 "": "odin/static",
                 "api/": "odin/api",
+                "api/delete/": "odin/delete",
                 "api/facebook/login/": "odin/facebook/login",
                 "api/facebook/link/": "odin/facebook/link",
                 "api/google/login/": "odin/google/login",
@@ -51,7 +52,7 @@
                 "unsecure": {
                     "view": "fost.response.401",
                     "configuration": {
-                        
+
                     }
                 }
             }
@@ -216,6 +217,28 @@
                         "returning": ["'200' as status"]
                     }
                 }]
+            }
+        },
+        "views/odin/delete": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "fostgres.sql",
+                    "configuration": {
+                        "sql": [{
+                            "path": [],
+                            "DELETE": "INSERT INTO odin.identity_expiry_ledger (identity_id, reference, expires) VALUES (current_setting('odin.jwt.sub'), current_setting('odin.reference'), now())"
+                        }]
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
             }
         }
     }

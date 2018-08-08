@@ -64,6 +64,10 @@ namespace {
                 for ( const auto &sv : req.headers()["__jwt"] )
                     cnx.set_session("odin.jwt." + sv.first, sv.second);
             }
+            if ( req.headers().exists("__odin_reference") ) {
+                const auto &reference = req.headers()["__odin_reference"];
+                cnx.set_session("odin.reference", reference.value());
+            }
         });
 }
 
