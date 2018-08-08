@@ -10,7 +10,8 @@
                 "api/google/login/": "odin/google/login",
                 "api/login/": "odin/login",
                 "api/register/": "odin/register",
-                "api/reset-forgotten-password/": "odin.password.reset-forgotten"
+                "api/reset-forgotten-password/": "odin.password.reset-forgotten",
+                "api/app/": "odin/app"
             }
         },
         "views/odin/static": {
@@ -216,6 +217,12 @@
                         "returning": ["'200' as status"]
                     }
                 }]
+            }
+        },
+        "views/odin/app": {
+            "view": "fost.view.pathprefix",
+            "configuration": {
+                "exchange/": "odin.app.exchange"
             }
         }
     }

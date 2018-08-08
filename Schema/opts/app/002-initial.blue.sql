@@ -4,9 +4,10 @@ INSERT INTO odin.migration VALUES('opts/app', '002-initial.blue.sql');
 
 -- APP
 CREATE TABLE odin.app (
-    app_id TEXT NOT NULL CHECK (odin.url_safe(id)),
+    app_id TEXT NOT NULL CHECK (odin.url_safe(app_id)),
     app_name TEXT NOT NULL,
     access_policy TEXT NOT NULL,
+    data_sharing_policy TEXT NOT NULL,
     changed TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     PRIMARY KEY (app_id)
@@ -17,6 +18,7 @@ CREATE TABLE odin.app_ledger (
     app_id TEXT NOT NULL,
     app_name TEXT NOT NULL,
     access_policy TEXT NOT NULL,
+    data_sharing_policy TEXT NOT NULL,
     changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     pg_user TEXT NOT NULL,
     annotation JSON NOT NULL DEFAULT '{}',
@@ -25,11 +27,12 @@ CREATE TABLE odin.app_ledger (
 
 CREATE FUNCTION odin.app_ledger_insert() RETURNS TRIGGER AS $body$
 BEGIN
-    INSERT INTO odin.app (app_id, app_name, access_policy, changed, created)
-    VALUES (NEW.app_id, NEW.app_name, NEW.access_policy, NEW.changed, NEW.changed)
+    INSERT INTO odin.app (app_id, app_name, access_policy, data_sharing_policy, changed, created)
+    VALUES (NEW.app_id, NEW.app_name, NEW.access_policy, NEW.data_sharing_policy, NEW.changed, NEW.changed)
     ON CONFLICT (app_id) DO UPDATE SET
         app_name = EXCLUDED.app_name,
         access_policy = EXCLUDED.access_policy,
+        data_sharing_policy=NEW.data_sharing_policy,
         changed = EXCLUDED.changed; 
     RETURN NULL;
 END;
@@ -79,7 +82,7 @@ BEGIN
     ON CONFLICT (identity_id, app_id) DO UPDATE SET
         state=EXCLUDED.state, 
         changed=EXCLUDED.changed, 
-        pg_user=EXCLUDED.pg_user
+        pg_user=EXCLUDED.pg_user;
     RETURN NULL;
 END;
 $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
@@ -128,7 +131,7 @@ BEGIN
     ON CONFLICT (identity_id, app_id) DO UPDATE SET
         state=EXCLUDED.state, 
         changed=EXCLUDED.changed, 
-        pg_user=EXCLUDED.pg_user
+        pg_user=EXCLUDED.pg_user;
     RETURN NULL;
 END;
 $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
