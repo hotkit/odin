@@ -1,6 +1,0 @@
-# Set up the database
-odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/app/002-initial.blue.sql)
-
-GET odin.app.exchange / 501
-POST odin.app.exchange / {} 200
