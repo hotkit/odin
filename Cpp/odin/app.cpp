@@ -19,9 +19,9 @@ fostlib::json odin::app::get_detail(
 ) {
     // TODO: Check app access policy, now support only OPEN
     static const f5::u8view sql("SELECT "
-        "odin.app.tableoid AS app__tableoid, odin.app.*"
+        "odin.app.tableoid AS app__tableoid, odin.app.* "
         "FROM odin.app "
-        "WHERE odin.app.app_id = $1"
+        "WHERE odin.app.app_id = $1 "
         "AND odin.app.access_policy = 'OPEN'");
 
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id});
