@@ -54,6 +54,7 @@ namespace {
                 throw fostlib::exceptions::not_implemented(__func__, "App not found");
 
             if ( req.method() == "GET" ) {
+                // TODO: Serve static instead
                 fostlib::mime::mime_headers headers;
                 boost::shared_ptr<fostlib::mime> response(
                     new fostlib::text_body(
