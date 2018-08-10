@@ -286,15 +286,15 @@ add_custom_command(OUTPUT test-login-google
             login-google.fg
     )
 
-add_custom_command(OUTPUT test-app-exchange
-    COMMAND fostgres-test odin-test-app-exchange -o test-app-exchange
+add_custom_command(OUTPUT test-app-login
+    COMMAND fostgres-test odin-test-app-login -o test-app-login
         $<TARGET_SONAME_FILE:odin-fg>
         $<TARGET_SONAME_FILE:odin-views>
         ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
         ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
         ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-        ${CMAKE_CURRENT_SOURCE_DIR}/app-exchange.fg
-    MAIN_DEPENDENCY app-exchange.fg
+        ${CMAKE_CURRENT_SOURCE_DIR}/app-login.fg
+    MAIN_DEPENDENCY app-login.fg
     DEPENDS
         fostgres-test
         fostgres
@@ -302,16 +302,18 @@ add_custom_command(OUTPUT test-app-exchange
         odin-views
         ../Schema/bootstrap.sql
         ../Schema/core/000-initial.blue.sql
+        ../Schema/authn/001-initial.blue.sql
         ../Schema/opts/app/002-initial.blue.sql
         ../Configuration/odin-views.json
-        app-exchange.fg
+        app-login-test-figure.sql
+        app-login.fg
 )
 
 
 ## Because of the way cmake works we need this stuff at the end to
 ## actually make the above commands run when things change.
 add_custom_target(odin-tests DEPENDS
-        test-app-exchange
+        test-app-login
         test-authnz
         test-db-bypass
         test-login

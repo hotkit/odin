@@ -221,7 +221,13 @@
         "views/odin/app": {
             "view": "fost.view.pathprefix",
             "configuration": {
-                "exchange/": "odin.app.exchange"
+                "": "odin/static",
+                "login/": {
+                    "view": "odin.app.login",
+                    "configuration": {
+                        "expires": {"hours": 72}
+                    }
+                }
             }
         }
     }
