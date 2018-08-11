@@ -9,7 +9,8 @@ odin.user player1 password1234
 odin.user player2 password1234
 odin.sql.file (module.path.join app-login-test-figure.sql)
 
-GET odin/app /login/app01/ 200
+# TODO: Test GET that serve static file
+# GET odin/app /login/app01/ 200
 
 # Validate payload
 POST odin/app /login/app01/ {} 501

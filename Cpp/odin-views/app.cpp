@@ -52,13 +52,9 @@ namespace {
                 throw fostlib::exceptions::not_implemented(__func__, "App not found");
 
             if ( req.method() == "GET" ) {
-                // TODO: Serve static instead
-                fostlib::mime::mime_headers headers;
-                boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(
-                        fostlib::coerce<fostlib::string>(app["app"]["app_name"]) + " Login Page",
-                        headers, L"text/html"));
-                return std::make_pair(response, 200);
+                boost::filesystem::wpath filename(
+                    fostlib::coerce<boost::filesystem::wpath>(config["static"]));
+                return fostlib::urlhandler::serve_file(config, req, filename);
             }
             if ( req.method() != "POST" )
                 throw fostlib::exceptions::not_implemented(__func__,

@@ -225,7 +225,8 @@
                 "login/": {
                     "view": "odin.app.login",
                     "configuration": {
-                        "expires": {"hours": 72}
+                        "expires": {"hours": 72},
+                        "static": "etc/odin/Static/app/login.html"
                     }
                 }
             }
