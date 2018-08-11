@@ -293,6 +293,7 @@ add_custom_command(OUTPUT test-app-login
         ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
         ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
         ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-app.json
         ${CMAKE_CURRENT_SOURCE_DIR}/app-login.fg
     MAIN_DEPENDENCY app-login.fg
     DEPENDS
