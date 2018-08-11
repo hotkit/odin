@@ -37,6 +37,10 @@ Authentication. Primarily to do with ascertaining the identiy of a user. Manages
 
 Athorization. Primarily to do with ascertaining what a user is allowed to do in the system. Manages user's group membership and the assignment of permissions to groups.
 
+## app ##
+
+Application. Added application mechanism to Odin, user can login with desire app_id and get specific JWT token for that app.
+
 
 ## opts ##
 

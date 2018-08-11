@@ -303,7 +303,7 @@ add_custom_command(OUTPUT test-app-login
         ../Schema/bootstrap.sql
         ../Schema/core/000-initial.blue.sql
         ../Schema/authn/001-initial.blue.sql
-        ../Schema/opts/app/002-initial.blue.sql
+        ../Schema/app/002-initial.blue.sql
         ../Configuration/odin-views.json
         app-login-test-figure.sql
         app-login.fg
