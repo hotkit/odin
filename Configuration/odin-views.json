@@ -218,18 +218,6 @@
                 }]
             }
         },
-        "views/odin/app": {
-            "view": "fost.view.pathprefix",
-            "configuration": {
-                "": "odin/static",
-                "login/": {
-                    "view": "odin.app.login",
-                    "configuration": {
-                        "expires": {"hours": 72},
-                        "static": "etc/odin/Static/app/login.html"
-                    }
-                }
-            }
-        }
+        "views/odin/app": {"view": "fost.response.404"}
     }
 }

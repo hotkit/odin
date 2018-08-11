@@ -293,6 +293,7 @@ add_custom_command(OUTPUT test-app-login
         ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
         ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
         ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-app.json
         ${CMAKE_CURRENT_SOURCE_DIR}/app-login.fg
     MAIN_DEPENDENCY app-login.fg
     DEPENDS
@@ -303,7 +304,7 @@ add_custom_command(OUTPUT test-app-login
         ../Schema/bootstrap.sql
         ../Schema/core/000-initial.blue.sql
         ../Schema/authn/001-initial.blue.sql
-        ../Schema/opts/app/002-initial.blue.sql
+        ../Schema/app/002-initial.blue.sql
         ../Configuration/odin-views.json
         ../Static/app/login.html
         app-login-test-figure.sql

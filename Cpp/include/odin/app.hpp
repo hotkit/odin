@@ -17,7 +17,7 @@ namespace odin {
     namespace app {
 
         /// Return the database row for the app
-        fostlib::json get_detail(fostlib::pg::connection &cnx, const f5::u8view &app_id);
+        fostlib::json get_detail(fostlib::pg::connection &cnx, const f5::u8view app_id);
 
         /// Mint App specific JWT for this user and set common fields on it
         fostlib::jwt::mint mint_user_jwt(const fostlib::json &user, const fostlib::json &app,
