@@ -77,14 +77,17 @@ namespace {
             fostlib::mime::mime_headers headers;
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
             headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
+
             const auto jwt_token = fostlib::utf8_string(jwt.token());
             const auto redirect_url = fostlib::coerce<fostlib::string>(app["app"]["redirect_url"]);
 
-            // Do we have a better way to doing this?
-            headers.add("Location", redirect_url + "#" + jwt_token);
+            fostlib::json result;
+            fostlib::insert(result, "access_token", jwt_token);
+            fostlib::insert(result, "scheme", "Bearer");
+            fostlib::insert(result, "redirect_url", redirect_url);
             boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(jwt_token, headers, L"application/jwt"));
-            return std::make_pair(response, 303);
+                new fostlib::text_body(fostlib::json::unparse(result, true), headers, L"application/json"));
+            return std::make_pair(response, 200);
         }
 
     } c_app_login;
