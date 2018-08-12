@@ -69,6 +69,10 @@
                 color: #34495e;
                 margin-bottom: 30px;
             }
+            #msg {
+                font-size: 0.8em;
+                color: #7f8c8d;
+            }
         </style>
     </head>
     <body>
@@ -76,13 +80,47 @@
             <div class="login-page">
                 <div class="form">
                     <h2 class="header">Login with Odin</h2>
-                    <form class="login-form" action="/" method="POST">
-                        <input type="text" placeholder="username"/>
-                        <input type="password" placeholder="password"/>
-                        <button type="submit">login</button>
+                    <form class="login-form" id="login-form">
+                        <input id="username" type="text" placeholder="username" required/>
+                        <input id="password" type="password" minlength="8" placeholder="password" required/>
+                        <button id="btn-login" type="submit" value="Login">Login</button>
+                        <p><span id="msg"></span>&nbsp;</p>
                     </form>
                 </div>
             </div>
         </div>
+        <script>
+            document.getElementById("login-form")
+                .addEventListener("submit", function(evt) {
+                    evt.preventDefault();
+                    var paths = location.pathname.split('/');
+                    var app_id = paths.pop() || paths.pop(); // Handle potential trailing slash
+                    var username = document.getElementById("username").value;
+                    var password = document.getElementById("password").value;
+                    login(username, password, app_id);
+                });
+            function login(username, password, app_id) {
+                displayMsg("");
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", location.pathname, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                var data = JSON.stringify({"username": username, "password": password, "app_id": app_id});
+                xhr.onreadystatechange = function () {
+                    if(xhr.readyState === 4) {
+                        switch(xhr.status) {
+                            case 200:
+                                var resp = JSON.parse(xhr.responseText);
+                                window.location = resp.redirect_url + "#" + resp.access_token;
+                            case 500:
+                                displayMsg("Invalid login or password");
+                        }
+                    }
+                };
+                xhr.send(data);
+            }
+            function displayMsg(text){
+                document.getElementById('msg').innerHTML = text;
+            }
+        </script>
     </body>
 </html>

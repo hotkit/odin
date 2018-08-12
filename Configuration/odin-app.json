@@ -3,7 +3,12 @@
         "views/odin/app": {
             "view": "fost.view.pathprefix",
             "configuration": {
-                "": "odin/static",
+                "": {
+                    "view": "fost.static",
+                    "configuration": {
+                        "root": "etc/odin/Static/app/"
+                    }
+                },
                 "login/": {
                     "view": "odin.app.login",
                     "configuration": {
