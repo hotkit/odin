@@ -1,3 +1,6 @@
+2018-08-12  Tle Ekkul  <e.aryuth@gmail.com>
+ * Added Login with Odin page
+
 2018-08-10  Tle Ekkul  <e.aryuth@gmail.com>
  * Added App module
  * Added odin.api.login view
