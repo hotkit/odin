@@ -306,7 +306,6 @@ add_custom_command(OUTPUT test-app-login
         ../Schema/authn/001-initial.blue.sql
         ../Schema/app/002-initial.blue.sql
         ../Configuration/odin-views.json
-        ../Static/app/login.html
         app-login-test-figure.sql
         app-login.fg
 )
