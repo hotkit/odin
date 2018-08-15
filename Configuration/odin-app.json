@@ -6,14 +6,14 @@
                 "": {
                     "view": "fost.static",
                     "configuration": {
-                        "root": "etc/odin/Static/app/"
+                        "root": "usr/share/odin/Static/app/"
                     }
                 },
                 "login/": {
                     "view": "odin.app.login",
                     "configuration": {
                         "expires": {"hours": 72},
-                        "static": "etc/odin/Static/app/login.html"
+                        "static": "usr/share/odin/Static/app/login.html"
                     }
                 }
             }
