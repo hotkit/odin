@@ -91,7 +91,7 @@ namespace {
                 try {
                     const auto email = fostlib::coerce<fostlib::email_address>(body["email"]);
                     if ( odin::does_email_exist(cnx, fostlib::coerce<fostlib::string>(body["email"])) ) {
-                        return respond("This email already exists", 400);
+                        return respond("This email already exists", 422);
                     }
                     odin::set_email(cnx, ref, username.value(), email);
                 } catch ( fostlib::exceptions::parse_error &e ) {

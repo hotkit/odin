@@ -33,10 +33,10 @@ POST odin/test/google/login/ok / {"access_token": "user_2"} 200
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 2}
 
-# If user already registered with Odin, return 400 with error message
+# If user already registered with Odin, return 422 with error message
 POST odin/register / {"username": "exist_user", "password": "password1234", "email": "exist_user@example.com"} 201
-POST odin/test/google/login/ok / {"access_token": "exist_user"} 400 {"message": "This email already exists"}
+POST odin/test/google/login/ok / {"access_token": "exist_user"} 422 {"message": "This email already exists"}
 
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 POST odin/test/facebook/login/ok / {"access_token": "login_via_gp"} 200
-POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 400 {"message": "This email already exists"}
+POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 422 {"message": "This email already exists"}

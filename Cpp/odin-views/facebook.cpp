@@ -85,7 +85,7 @@ namespace {
                 if ( user_detail.has_key("email") ) {
                     const auto facebook_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
                     if ( odin::does_email_exist(cnx, fostlib::coerce<fostlib::string>(user_detail["email"])) ) {
-                        return respond("This email already exists", 400);
+                        return respond("This email already exists", 422);
                     }
                     odin::set_email(cnx, reference, identity_id, facebook_user_email);
                 }
