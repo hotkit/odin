@@ -1,5 +1,5 @@
 2018-08-16  Tle Ekkul  <e.aryuth@gmail.com>
- Returned BadRequest when user's email already exists in the system.
+ Returned Unprocessable Entity when user's email already exists in the system.
 
 2018-08-12  Tle Ekkul  <e.aryuth@gmail.com>
  Added Login with Odin page
