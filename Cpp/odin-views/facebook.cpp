@@ -23,6 +23,17 @@ namespace {
 
     const fostlib::module c_odin_facebook(odin::c_odin, "facebook.cpp");
 
+    std::pair<boost::shared_ptr<fostlib::mime>, int> respond(
+        fostlib::string message, int code=403
+    ) {
+        fostlib::json ret;
+        if ( not message.empty() ) fostlib::insert(ret, "message", std::move(message));
+        fostlib::mime::mime_headers headers;
+        boost::shared_ptr<fostlib::mime> response(
+            new fostlib::text_body(fostlib::json::unparse(ret, true), headers, "application/json"));
+        return std::make_pair(response, code);
+    }
+
     const class facebook : public fostlib::urlhandler::view {
     public:
         facebook()
@@ -73,6 +84,9 @@ namespace {
                 }
                 if ( user_detail.has_key("email") ) {
                     const auto facebook_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
+                    if ( odin::does_email_exist(cnx, fostlib::coerce<fostlib::string>(user_detail["email"])) ) {
+                        return respond("This email has been used", 400);
+                    }
                     odin::set_email(cnx, reference, identity_id, facebook_user_email);
                 }
             } else {
@@ -121,7 +135,7 @@ namespace {
                     "Must pass access_token field");
             }
             const auto access_token = fostlib::coerce<fostlib::string>(body["access_token"]);
-            
+
             fostlib::json user_detail;
             if ( config.has_key("facebook-mock") ) {
                 if ( fostlib::coerce<fostlib::string>(config["facebook-mock"]) == "OK") {

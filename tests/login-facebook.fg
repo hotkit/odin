@@ -1,5 +1,6 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
@@ -23,3 +24,6 @@ POST odin/test/facebook/login/ok / {"access_token": "user_2"} 200
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
 
+# If user email is already exists in Odin, return 400 with error message
+POST odin/register / {"username": "exist_user", "password": "password1234", "email": "exist_user@example.com"} 201
+POST odin/test/facebook/login/ok / {"access_token": "exist_user"} 400 {"message": "This email has been used"}
