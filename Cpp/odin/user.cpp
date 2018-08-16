@@ -101,3 +101,11 @@ void odin::set_email(
     fostlib::insert(user_values, "email", email.email());
     cnx.insert("odin.identity_email_ledger", user_values);
 }
+
+
+bool odin::does_email_exist(fostlib::pg::connection &cnx, fostlib::string email) {
+    static const fostlib::string sql("SELECT * FROM odin.identity WHERE email=$1");
+    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});
+    auto &rs = data.second;
+    return rs.begin() != rs.end();
+}
