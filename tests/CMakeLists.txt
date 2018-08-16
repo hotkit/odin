@@ -149,6 +149,8 @@ add_custom_command(OUTPUT test-registration-self
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/registration-self.fg
         MAIN_DEPENDENCY registration-self.fg
         DEPENDS
@@ -162,6 +164,8 @@ add_custom_command(OUTPUT test-registration-self
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/email/001-initial.blue.sql
             ../Configuration/odin-views.json
+            login-google-test.json
+            facebook-test.json
             registration-self.fg
     )
 
@@ -217,6 +221,7 @@ add_custom_command(OUTPUT test-login-facebook
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
             ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-facebook.fg
         MAIN_DEPENDENCY login-facebook.fg
         DEPENDS
@@ -232,6 +237,7 @@ add_custom_command(OUTPUT test-login-facebook
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
             facebook-test.json
+            login-google-test.json
             login-facebook.fg
     )
 
@@ -268,6 +274,7 @@ add_custom_command(OUTPUT test-login-google
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
             ${CMAKE_CURRENT_SOURCE_DIR}/login-google.fg
         MAIN_DEPENDENCY login-google.fg
         DEPENDS
@@ -283,6 +290,7 @@ add_custom_command(OUTPUT test-login-google
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Configuration/odin-views.json
             login-google-test.json
+            facebook-test.json
             login-google.fg
     )
 
