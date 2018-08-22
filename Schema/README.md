@@ -1,23 +1,31 @@
-# Managing database schemas #
+# Managing database schemas
 
-These schemas are intended to be run in numerical order with blue before green. Modules run in the order:
-
-1. core
-2. authn
-3. authz
-4. authz-pg
-5. opt/*
-
-So, run all `001.blue` scripts for the modules you need before you run any `001.green` ones. Then you can move on to `002` etc.
 
 Before any of the modules can be loaded the `bootstrap.sql` must be run in the database you want to put the Odin data into.
 
 Individual migration files can be easily run using the Python `odin` command.
 
 
+# Enabling modules and migrating the schema
+
+Modules should be enabled using the `odin enable-modules` command:
+
+    odin enable-modules mod1 [mod2 [mod3 ...]]
+
+Enabling a module does not run its migrations and the core module is always enabled whether or not it is listed.
+
+Whenever fetching a new version of Odin its migrations need to be run. This is done using the `odin migrate` command.
+
+    odin migrate
+
+It will report any migration scripts that it executes.
+
+
+# The Modules
+
 ## core ##
 
-Central management of the identity of the users of a system.
+Central management of the identity of the users of a system. This module is always enabled.
 
 
 ## authn ##
@@ -29,10 +37,9 @@ Authentication. Primarily to do with ascertaining the identiy of a user. Manages
 
 Athorization. Primarily to do with ascertaining what a user is allowed to do in the system. Manages user's group membership and the assignment of permissions to groups.
 
+## app ##
 
-## authz-pg ##
-
-Handles management of user authorization through Postgres roles.
+Application. Added application mechanism to Odin, user can login with desire app_id and get specific JWT token for that app.
 
 
 ## opts ##
@@ -55,6 +62,3 @@ The schema is designed to provide tracking of changes for auditability. It is al
 In general application code is expected to write entries into the `ledger` tables whose triggers then make the requested change in the underlying data table.
 
 
-# Notes on specific migrations #
-
-Some migrations will have choices depending on how you want to manage certain features. For example, if you want to use the identity field for the log in name or the user's password.

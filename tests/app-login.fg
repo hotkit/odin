@@ -1,0 +1,29 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+
+# Set up new users and apps
+odin.user owner password1234
+odin.user player1 password1234
+odin.user player2 password1234
+odin.sql.file (module.path.join app-login-test-figure.sql)
+
+# TODO: Test GET that serve static file
+# GET odin/app /login/app01/ 200
+
+# Validate payload
+POST odin/app /login/app01/ {} 501
+POST odin/app /login/app01/app02/ {} 501
+POST odin/app /login/ {"username": "player1", "password": "password1234"} 501
+POST odin/app /login/app01/ {"username": "player1"} 501
+POST odin/app /login/app01/ {"password": "password1234"} 501
+
+# Only registered user can login to App
+POST odin/app /login/app01/ {"username": "random_player", "password": "random_pwd"} 501
+
+# Return error when app does not exists
+POST odin/app /login/random_app/ {"username": "player1", "password": "password1234"} 501
+
+# Return redirect url if successfully login
+POST odin/app /login/app01/ {"username": "player1", "password": "password1234"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}

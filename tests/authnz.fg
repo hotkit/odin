@@ -1,7 +1,8 @@
 # Set up the database
-odin.sql.file (module.path.join ../Schema/core/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
 setting odin "Trust JWT" true
 odin.user test password1234
 odin.permission p1
@@ -13,11 +14,11 @@ odin.membership test g1
 
 # Use the login API to get our JWT and then check it works
 set odin.jwt (POST odin/test/authnz / {"username": "test", "password": "password1234"} 200)
-set-path testserver.headers (Authorization) (cat "Bearer " (lookup odin.jwt))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup odin.jwt))
 GET odin/api / 200
 
 # Blank the header and it will fail again, then set it back up properly
-set-path testserver.headers (Authorization) ""
+set-path testserver.headers ["Authorization"] ""
 GET odin/api / 401
 
 # Check that the default JWT contains the subject key

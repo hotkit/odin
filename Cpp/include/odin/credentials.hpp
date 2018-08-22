@@ -1,8 +1,8 @@
-/*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2018 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
@@ -28,8 +28,11 @@ namespace odin {
         const fostlib::nullable<fostlib::host> &source = fostlib::null,
         const fostlib::json &annotation = fostlib::json::object_t());
 
-    /// Mint a JWT for this user and set common fields on it
-    fostlib::jwt::mint mint_jwt(const fostlib::json &user, fostlib::json payload = fostlib::json{});
+    /// Mint Login JWT for this user and set common fields on it
+    fostlib::jwt::mint mint_login_jwt(const fostlib::json &user, fostlib::json payload = fostlib::json{});
+
+    /// Mint Reset Password JWT for this user and set common fields on it
+    fostlib::jwt::mint mint_reset_password_jwt(const f5::u8view username);
 
 
 }

@@ -1,7 +1,0 @@
-
-install odin-py-bin :
-        [ glob-tree * : Jamfile *.md ]
-    :
-        <location>$(PREFIX)/bin
-        <install-source-root>$(TOP)/Python/bin
-    ;

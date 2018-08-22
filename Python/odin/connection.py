@@ -9,6 +9,13 @@ from psycopg2.extensions import ISOLATION_LEVEL_SERIALIZABLE
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 
+class OdinSchemaNotPresent(Exception):
+    """Thrown if we can't load the list of modules because the `odin.modules`
+    table doesn't exist.
+    """
+    pass
+
+
 class ModuleNotPresent(Exception):
     """ Thrown when a required module has not been installed.
     """
@@ -28,7 +35,7 @@ class Connection(object):
                 raise e
         self.pg.set_session(isolation_level=ISOLATION_LEVEL_SERIALIZABLE)
         self.cursor = self.pg.cursor()
-        self.load_modules()
+        self._modules = set()
         self.new_reference()
 
 
@@ -40,9 +47,16 @@ class Connection(object):
 
 
     def load_modules(self):
-        self.cursor.execute("SELECT name FROM odin.module")
-        self.modules = set([m[0] for m in self.cursor.fetchall()])
-
+        if not self._modules:
+            try:
+                self.cursor.execute("SELECT name FROM odin.module")
+                self._modules = set([m[0] for m in self.cursor.fetchall()])
+            except psycopg2.ProgrammingError as e:
+                if e.pgcode == "42P01":
+                    raise OdinSchemaNotPresent()
+                else:
+                    raise
+        return self._modules
 
     def assert_module(self, module):
         """ Stops execution with an error if a required module is not installed
@@ -54,7 +68,7 @@ class Connection(object):
     def has_module(self, module):
         """ Returns true if the module has been installed.
         """
-        return module in self.modules
+        return module in self.load_modules()
 
 
     def execute(self, cmd, *args, **kwargs):
@@ -74,3 +88,14 @@ class Connection(object):
         self.pg.commit()
         self.new_reference()
 
+
+def execute_sql_file(cnx, filename):
+    try:
+        with open(filename) as f:
+            cmds = f.read()
+            cnx.cursor.execute(cmds)
+        cnx.load_modules()
+        print("Executed", filename)
+    except Exception:
+        print("Error whilst running", filename)
+        raise

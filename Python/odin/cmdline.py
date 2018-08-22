@@ -1,8 +1,10 @@
 import csv
+from odin.connection import execute_sql_file
 from odin.display import listing
 from odin.group import (addmembership, assignpermission, removemembership,
     setgroup)
 from odin.permission import setpermission
+from odin.schema import enablemodules, migrate
 from odin.user import (createuser, expireuser, setfullname, setpassword,
     setsuperuser)
 
@@ -23,13 +25,16 @@ opts are one or more of:
 
     -?                      Print this text
     -h hostname             Postgres host
-    -d database             Database  name
-    -U username             Database username
+    -d database             Database name
+    -U username             Database username (role)
 
-Comand is one of:
+Command is one of:
 
     assign group permission1 [permission2 [permission3 ...]]
         Assign one or more permissions to a group.
+
+    enable-modules mod1 [mod2 [mod3 ...]]
+        Enable the modules in the Odin database schema.
 
     exclude username group1 [group2 [group3 ...]]
         Remove the user from the specified groups. Requires the `authz`
@@ -39,7 +44,7 @@ Comand is one of:
         Expire the identity for the user at this time.
 
     full-name username "Full Name"
-        Set the full name field. Requres module `opt/full-name`
+        Set the full name field. Requires module `opts/full-name`
 
     help
         Show this text
@@ -50,11 +55,14 @@ Comand is one of:
     include filename
         Find commands (one per line) in the specified file and run them
 
-    list [users|user-groups|user-permissions]
+    list [modules|users|user-groups|user-permissions]
         List information about the current configuration of the system.
 
     membership user group1 [group2 [group3 ...]]
         Add the user to one or more groups. Requires the `authz` module.
+
+    migrate
+        Run all migrations for the Odin database schema.
 
     password name [password]
         Set (or reset) the user's password. If the password is not provided
@@ -71,6 +79,9 @@ Comand is one of:
     user username [password]
         Ensure the requested user is in the system. Setting the password
         requires the module `authn`.
+
+        WARNING: Setting the password in this way is deprecated. Use the
+        'password' command instead.
 
     superuser username [True|False]
         Sets the superuser bit (defaults to True). Requires the `authz`
@@ -94,16 +105,9 @@ def include(cnx, filename):
                 command(cnx, *[p for p in line if p])
 
 
-def sql(cnx, filename):
-    with open(filename) as f:
-        cmds = f.read()
-        cnx.cursor.execute(cmds)
-    cnx.load_modules()
-    print("Executed", filename)
-
-
 COMMANDS = {
         'assign': assignpermission,
+        'enable-modules': enablemodules,
         'exclude': removemembership,
         'expire': expireuser,
         'full-name': setfullname,
@@ -111,9 +115,10 @@ COMMANDS = {
         'include': include,
         'list': listing,
         'membership': addmembership,
+        'migrate': migrate,
         'password': setpassword,
         'permission': setpermission,
-        'sql': sql,
+        'sql': execute_sql_file,
         'superuser': setsuperuser,
         'user': createuser,
     }

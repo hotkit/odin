@@ -27,6 +27,8 @@ def createuser(cnx, username, password=None):
     cnx.execute(INSERT_USER, (cnx.reference, username))
     print(username, "set up")
     if password:
+        print("WARNING: Using createuser (Python) or user (Odin script) to set a password is deprecated")
+        print("Instead use a separate call to setpassword (Python) or password (Odin script).")
         setpassword(cnx, username, password)
 
 
@@ -46,7 +48,7 @@ def expireuser(cnx, username, expire=None):
 
 
 def setfullname(cnx, username, full_name):
-    cnx.assert_module('opt.full-name')
+    cnx.assert_module('opts/full-name')
     cnx.execute(SET_FULLNAME, (cnx.reference, username, full_name))
     print(username, "full name set")
 

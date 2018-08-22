@@ -23,8 +23,7 @@ namespace odin {
 
 
     /// Set the given user's password
-    std::pair<fostlib::string, fostlib::json> set_password(
-        const fostlib::string &password);
+    std::pair<fostlib::string, fostlib::json> hash_password(f5::u8view password);
 
 
 }

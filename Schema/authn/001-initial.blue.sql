@@ -1,4 +1,4 @@
-INSERT INTO odin.module VALUES('authn');
+INSERT INTO odin.module VALUES('authn') ON CONFLICT (name) DO NOTHING;
 INSERT INTO odin.migration VALUES('authn', '001-initial.blue.sql');
 
 

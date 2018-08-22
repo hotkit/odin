@@ -5,7 +5,13 @@
             "configuration": {
                 "": "odin/static",
                 "api/": "odin/api",
-                "api/login/": "odin/login"
+                "api/facebook/login/": "odin/facebook/login",
+                "api/facebook/link/": "odin/facebook/link",
+                "api/google/login/": "odin/google/login",
+                "api/login/": "odin/login",
+                "api/register/": "odin/register",
+                "api/reset-forgotten-password/": "odin.password.reset-forgotten",
+                "app/": "odin/app"
             }
         },
         "views/odin/static": {
@@ -17,9 +23,6 @@
         "views/odin/login": {
             "view": "odin.login",
             "configuration": {
-                "host": ["request", "headers", "__pgdsn", "host"],
-                "user": ["request", "headers", "__pgdsn", "user"],
-                "dbname": ["request", "headers", "__pgdsn", "dbname"],
                 "expires": {"hours": 72},
                 "failure": {
                     "view": "fost.response.401",
@@ -29,6 +32,39 @@
                         }
                     }
                 }
+            }
+        },
+        "views/odin/facebook/login": {
+            "view": "odin.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72}
+            }
+        },
+        "views/odin/facebook/link": {
+            "view": "odin.secure",
+            "configuration": {
+                "secure": {
+                    "view": "odin.facebook.link",
+                    "configuration": {
+                        "expires": {"hours": 72}
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                    }
+                }
+            }
+        },
+        "views/odin/google/login": {
+            "view": "odin.google.login",
+            "configuration": {
+                "expires": {"hours": 72}
+            }
+        },
+        "views/odin/register": {
+            "view": "odin.register",
+            "configuration": {
             }
         },
         "views/odin/logout": {
@@ -47,21 +83,20 @@
                     }
                 },
                 "unsecure": {
-                    "view": "fost.response.401",
+                    "view": "fost.view.pathprefix",
                     "configuration": {
-                        "schemes": {
-                            "Bearer": {}
-                        },
-                        "view": "fost.view.pathprefix",
-                        "configuration": {
-                            "": "odin/unsecure/sql",
-                            "me/": "fost.response.403",
-                            "me/password": "odin.password.me",
-                            "user/": {
-                                "view": "odin.user.unsecure",
-                                "configuration": "odin/unsecure/sql"
+                        "": {
+                            "view": "fost.response.401",
+                            "configuration": {
+                                "schemes": {
+                                    "Bearer": {}
+                                },
+                                "view": "odin/unsecure/sql"
                             }
-                        }
+                        },
+                        "me/": "fost.response.403",
+                        "me/password": "odin.password.me",
+                        "forgotten-password/": "odin/forgotten-password"
                     }
                 }
             }
@@ -69,9 +104,6 @@
         "views/odin/secure/sql": {
             "view": "fostgres.sql",
             "configuration": {
-                "host": ["request", "headers", "__pgdsn", "host"],
-                "user": ["request", "headers", "__pgdsn", "user"],
-                "dbname": ["request", "headers", "__pgdsn", "dbname"],
                 "sql": [
                     {
                         "return": "object",
@@ -134,9 +166,6 @@
         "views/odin/unsecure/sql": {
             "view": "fostgres.sql",
             "configuration": {
-                "host": ["request", "headers", "__pgdsn", "host"],
-                "user": ["request", "headers", "__pgdsn", "user"],
-                "dbname": ["request", "headers", "__pgdsn", "dbname"],
                 "sql": [
                     {
                         "return": "object",
@@ -168,6 +197,27 @@
                     }
                 ]
             }
-        }
+        },
+        "views/odin/forgotten-password": {
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [{
+                    "return": "object",
+                    "path": [],
+                    "POST": {
+                        "table": "odin.request_reset_password_ledger",
+                        "columns": {
+                            "email": {"key": true},
+                            "reference": {
+                                "key": true,
+                                "source": ["request", "headers", "__odin_reference"]
+                            }
+                        },
+                        "returning": ["'200' as status"]
+                    }
+                }]
+            }
+        },
+        "views/odin/app": {"view": "fost.response.404"}
     }
 }

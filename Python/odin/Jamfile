@@ -1,7 +1,0 @@
-
-install odin-py-odin :
-        [ glob-tree *.* : *.pyc ]
-    :
-        <location>$(PREFIX)/lib/python3/site-packages/odin
-        <install-source-root>$(TOP)/Python/odin
-    ;
