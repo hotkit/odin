@@ -15,4 +15,5 @@ CREATE FUNCTION odin.logout_ledger_insert() RETURNS TRIGGER AS $body$
 CREATE TRIGGER odin_logout_ledger_insert_trigger
     AFTER INSERT ON odin.logout_ledger
     FOR EACH ROW EXECUTE PROCEDURE odin.logout_ledger_insert();
-
+ 
+ 

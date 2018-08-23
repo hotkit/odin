@@ -21,6 +21,17 @@ namespace {
 
     const fostlib::module c_odin_registration(odin::c_odin, "registration.cpp");
 
+    std::pair<boost::shared_ptr<fostlib::mime>, int> respond(
+        fostlib::string message, int code=403
+    ) {
+        fostlib::json ret;
+        if ( not message.empty() ) fostlib::insert(ret, "message", std::move(message));
+        fostlib::mime::mime_headers headers;
+        boost::shared_ptr<fostlib::mime> response(
+            new fostlib::text_body(fostlib::json::unparse(ret, true), headers, "application/json"));
+        return std::make_pair(response, code);
+    }
+
     const class registration : public fostlib::urlhandler::view {
     public:
         registration()
@@ -79,6 +90,9 @@ namespace {
             if ( body.has_key("email") ) {
                 try {
                     const auto email = fostlib::coerce<fostlib::email_address>(body["email"]);
+                    if ( odin::does_email_exist(cnx, fostlib::coerce<fostlib::string>(body["email"])) ) {
+                        return respond("This email already exists", 422);
+                    }
                     odin::set_email(cnx, ref, username.value(), email);
                 } catch ( fostlib::exceptions::parse_error &e ) {
                     fostlib::log::error(c_odin_registration)

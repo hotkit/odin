@@ -6,4 +6,5 @@ install(DIRECTORY
         authz
         core
         opts
+        app
     DESTINATION share/odin/Schema)

@@ -44,5 +44,7 @@ namespace odin {
     void set_email(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view username,
         fostlib::email_address email);
 
+    /// Check email already exists in the database
+    bool does_email_exist(fostlib::pg::connection &cnx, fostlib::string email);
 
 }

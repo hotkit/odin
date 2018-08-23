@@ -23,6 +23,17 @@ namespace {
 
     const fostlib::module c_odin_google(odin::c_odin, "google.cpp");
 
+    std::pair<boost::shared_ptr<fostlib::mime>, int> respond(
+        fostlib::string message, int code=403
+    ) {
+        fostlib::json ret;
+        if ( not message.empty() ) fostlib::insert(ret, "message", std::move(message));
+        fostlib::mime::mime_headers headers;
+        boost::shared_ptr<fostlib::mime> response(
+            new fostlib::text_body(fostlib::json::unparse(ret, true), headers, "application/json"));
+        return std::make_pair(response, code);
+    }
+
     const class google : public fostlib::urlhandler::view {
     public:
         google()
@@ -52,7 +63,7 @@ namespace {
                     // Use access token as google ID
                     fostlib::insert(user_detail, "sub", access_token);
                     fostlib::insert(user_detail, "name", "Test User");
-                    fostlib::insert(user_detail, "email", access_token + "@mail.com");
+                    fostlib::insert(user_detail, "email", access_token + "@example.com");
                 }
             } else {
                 user_detail = odin::google::get_user_detail(access_token);
@@ -73,6 +84,9 @@ namespace {
                 }
                 if ( user_detail.has_key("email") ) {
                     const auto google_user_email = fostlib::coerce<fostlib::email_address>(user_detail["email"]);
+                    if ( odin::does_email_exist(cnx, fostlib::coerce<fostlib::string>(user_detail["email"])) ) {
+                        return respond("This email already exists", 422);
+                    }
                     odin::set_email(cnx, reference, identity_id, google_user_email);
                 }
             } else {

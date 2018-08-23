@@ -1,24 +1,34 @@
+2018-08-16  Tle Ekkul  <e.aryuth@gmail.com>
+ Returned Unprocessable Entity when user's email already exists in the system.
+
+2018-08-12  Tle Ekkul  <e.aryuth@gmail.com>
+ Added Login with Odin page
+
+2018-08-10  Tle Ekkul  <e.aryuth@gmail.com>
+ Added App module
+ Added odin.api.login view
+
 2018-08-08 Sem <pumidon@proteus-tech.com>
- * Added Expire user module
+ Added Expire user module
 
 2018-08-08  Nut  <tobestupid@gmail.com>
- * Added link Facebook module
+ Added link Facebook module
 
 2018-07-18  Nut  <tobestupid@gmail.com>
- * Added login with Google module
+ Added login with Google module
 
 2018-07-17  Tle Ekkul  <e.aryuth@gmail.com>
- * Added login with Facebook module
+ Added login with Facebook module
 
 2018-07-11  Tle Ekkul  <e.aryuth@gmail.com>
- * Added reset forgotten password API view
+ Added reset forgotten password API view
 
 2018-07-09  Tle Ekkul  <e.aryuth@gmail.com>
- * Added forgotten-password module
+ Added forgotten-password module
 
 2018-07-08  Tle Ekkul  <e.aryuth@gmail.com>
- * Added self registration API with full-name
- * Added self registration API with e-mail address
+ Added self registration API with full-name
+ Added self registration API with e-mail address
 
 2018-07-07  Kirit Saelensminde  <kirit@felspar.com>
  Change the way that Odin migrations are run.

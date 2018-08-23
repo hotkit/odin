@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Login with Odin</title>
+        <style>
+            html, body {height: 100%;margin:0;}
+            body {
+                background: #ecf0f1; /* fallback for old browsers */
+                margin: 0;
+            }
+            .container {
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                display: -webkit-box;
+                display: -moz-box;
+                display: -ms-flexbox;
+                display: -webkit-flex;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .login-page {
+                width: 360px;
+                padding: 8% 0 0;
+                margin: auto;
+                font-family: Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            }
+            .form {
+                position: relative;
+                z-index: 1;
+                background: #FFFFFF;
+                max-width: 360px;
+                padding: 45px;
+                margin-bottom: 180px;
+                text-align: center;
+                box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+            }
+            .form input {
+                outline: 0;
+                background: #f2f2f2;
+                width: 100%;
+                border: 0;
+                margin: 0 0 15px;
+                padding: 15px;
+                box-sizing: border-box;
+                font-size: 14px;
+            }
+            .form button {
+                text-transform: uppercase;
+                outline: 0;
+                background: #34495e;
+                width: 100%;
+                border: 0;
+                padding: 15px;
+                color: #FFFFFF;
+                font-size: 14px;
+                -webkit-transition: all 0.3 ease;
+                transition: all 0.3 ease;
+                cursor: pointer;
+            }
+            .form button:hover,.form button:active,.form button:focus {
+                background: #34495e;
+            }
+            .form .header {
+                color: #34495e;
+                margin-bottom: 30px;
+            }
+            #msg {
+                font-size: 0.8em;
+                color: #7f8c8d;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="login-page">
+                <div class="form">
+                    <h2 class="header">Login with Odin</h2>
+                    <form class="login-form" id="login-form">
+                        <input id="username" type="text" placeholder="username" required/>
+                        <input id="password" type="password" minlength="8" placeholder="password" required/>
+                        <button id="btn-login" type="submit" value="Login">Login</button>
+                        <p><span id="msg"></span>&nbsp;</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.getElementById("login-form")
+                .addEventListener("submit", function(evt) {
+                    evt.preventDefault();
+                    var paths = location.pathname.split('/');
+                    var app_id = paths.pop() || paths.pop(); // Handle potential trailing slash
+                    var username = document.getElementById("username").value;
+                    var password = document.getElementById("password").value;
+                    login(username, password, app_id);
+                });
+            function login(username, password, app_id) {
+                displayMsg("");
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", location.pathname, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                var data = JSON.stringify({"username": username, "password": password, "app_id": app_id});
+                xhr.onreadystatechange = function () {
+                    if(xhr.readyState === 4) {
+                        switch(xhr.status) {
+                            case 200:
+                                var resp = JSON.parse(xhr.responseText);
+                                window.location = resp.redirect_url + "#" + resp.access_token;
+                            case 500:
+                                displayMsg("Invalid login or password");
+                        }
+                    }
+                };
+                xhr.send(data);
+            }
+            function displayMsg(text){
+                document.getElementById('msg').innerHTML = text;
+            }
+        </script>
+    </body>
+</html>
