@@ -16,6 +16,7 @@ GET odin/app/secure /app01 401
 
 
 # Mint App jwt
-set app_jwt (odin.jwt.mint {"sub": "app01"} APP_TOKEN)
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "app01"} APP_TOKEN)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET odin/app/secure /app02 401
 GET odin/app/secure /app01 200

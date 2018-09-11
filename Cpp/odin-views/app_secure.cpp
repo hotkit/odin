@@ -51,14 +51,17 @@ namespace {
                     auto jwt = fostlib::jwt::token::load(
                         fostlib::coerce<fostlib::string>(app["app"]["token"]), parts.second.value());
                     if ( jwt ) {
-                        fostlib::log::debug(odin::c_odin)
-                            ("", "JWT authenticated")
-                            ("header", jwt.value().header)
-                            ("payload", jwt.value().payload);
-                        req.headers().set("__jwt", jwt.value().payload, "sub");
-                        req.headers().set("__app",
-                            fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]));
-                        return execute(config["secure"], path, req, host);
+                        auto iss = fostlib::coerce<fostlib::string>(jwt.value().payload["iss"]);
+                        if ( iss == app_id ) {
+                            fostlib::log::debug(odin::c_odin)
+                                ("", "JWT authenticated")
+                                ("header", jwt.value().header)
+                                ("payload", jwt.value().payload);
+                            req.headers().set("__jwt", jwt.value().payload, "sub");
+                            req.headers().set("__app",
+                                fostlib::coerce<fostlib::string>(jwt.value().payload["iss"]));
+                            return execute(config["secure"], path, req, host);
+                        }
                     }
                 } else {
                     fostlib::log::warning(odin::c_odin)
