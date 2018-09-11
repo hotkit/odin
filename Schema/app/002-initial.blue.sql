@@ -6,6 +6,7 @@ INSERT INTO odin.migration VALUES('app', '002-initial.blue.sql');
 CREATE TABLE odin.app (
     app_id TEXT NOT NULL,
     app_name TEXT NOT NULL,
+    token TEXT NOT NULL,
     access_policy TEXT NOT NULL,
     data_sharing_policy TEXT NOT NULL,
     redirect_url TEXT NOT NULL,
@@ -21,6 +22,7 @@ CREATE TABLE odin.app_ledger (
     reference TEXT NOT NULL,
     app_id TEXT NOT NULL,
     app_name TEXT NOT NULL,
+    token TEXT NOT NULL,
     access_policy TEXT NOT NULL DEFAULT 'OPEN',
     data_sharing_policy TEXT NOT NULL DEFAULT 'ALL',
     redirect_url TEXT NOT NULL,
@@ -32,13 +34,14 @@ CREATE TABLE odin.app_ledger (
 
 CREATE FUNCTION odin.app_ledger_insert() RETURNS TRIGGER AS $body$
 BEGIN
-    INSERT INTO odin.app (app_id, app_name, access_policy, data_sharing_policy, redirect_url, changed, created)
-    VALUES (NEW.app_id, NEW.app_name, NEW.access_policy, NEW.data_sharing_policy, NEW.redirect_url, NEW.changed, NEW.changed)
+    INSERT INTO odin.app (app_id, app_name, token, access_policy, data_sharing_policy, redirect_url, changed, created)
+    VALUES (NEW.app_id, NEW.app_name, NEW.token, NEW.access_policy, NEW.data_sharing_policy, NEW.redirect_url, NEW.changed, NEW.changed)
     ON CONFLICT (app_id) DO UPDATE SET
         app_name = EXCLUDED.app_name,
         access_policy = EXCLUDED.access_policy,
         data_sharing_policy=NEW.data_sharing_policy,
         redirect_url=NEW.redirect_url,
+        token=NEW.token,
         changed = EXCLUDED.changed;
     RETURN NULL;
 END;
