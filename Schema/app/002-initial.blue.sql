@@ -4,14 +4,17 @@ INSERT INTO odin.migration VALUES('app', '002-initial.blue.sql');
 
 -- APP
 CREATE TABLE odin.app (
-    app_id TEXT NOT NULL CHECK (odin.url_safe(app_id)),
+    app_id TEXT NOT NULL,
     app_name TEXT NOT NULL,
     access_policy TEXT NOT NULL,
     data_sharing_policy TEXT NOT NULL,
     redirect_url TEXT NOT NULL,
     changed TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    PRIMARY KEY (app_id)
+    PRIMARY KEY (app_id),
+    FOREIGN KEY (app_id)
+        REFERENCES odin.identity (id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE
 );
 
 CREATE TABLE odin.app_ledger (
