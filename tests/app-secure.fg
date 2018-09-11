@@ -1,0 +1,21 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+
+# Set up new users and apps
+odin.user owner password1234
+odin.user player1 password1234
+odin.user player2 password1234
+odin.sql.file (module.path.join app-login-test-figure.sql)
+
+GET odin/app/secure / 501
+GET odin/app/secure /random-app 501
+
+GET odin/app/secure /app01 401
+
+
+# Mint App jwt
+set app_jwt (odin.jwt.mint {"sub": "app01"} APP_TOKEN)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET odin/app/secure /app01 200
