@@ -359,8 +359,8 @@ add_custom_command(OUTPUT test-app-secure
         ../Schema/core/000-initial.blue.sql
         ../Schema/authn/001-initial.blue.sql
         ../Schema/app/002-initial.blue.sql
-        ../Configuration/odin-views.json
         app-login-test-figure.sql
+        app-secure-test-view.json
         app-secure.fg
 )
 
