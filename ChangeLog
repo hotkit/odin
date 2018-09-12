@@ -1,3 +1,6 @@
+2018-09-12  Tle Ekkul  <e.aryuth@gmail.com>
+ Added odin.app.secure view
+
 2018-08-16  Tle Ekkul  <e.aryuth@gmail.com>
  Returned Unprocessable Entity when user's email already exists in the system.
 

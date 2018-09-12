@@ -1,5 +1,6 @@
 add_library(odin-views
         app.cpp
+        app_secure.cpp
         facebook.cpp
         google.cpp
         login.cpp

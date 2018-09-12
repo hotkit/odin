@@ -1,0 +1,20 @@
+{
+    "webserver": {
+        "views/test/app/secure": {
+            "view": "odin.app.secure",
+            "configuration": {
+                "secure": {
+                    "view": "fost.response.200"
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

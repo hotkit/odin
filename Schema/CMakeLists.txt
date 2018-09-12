@@ -2,9 +2,9 @@ install(FILES
         bootstrap.sql
     DESTINATION share/odin/Schema/)
 install(DIRECTORY
+        app
         authn
         authz
         core
         opts
-        app
     DESTINATION share/odin/Schema)
