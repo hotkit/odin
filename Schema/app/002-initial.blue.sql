@@ -5,22 +5,25 @@ INSERT INTO odin.migration VALUES('app', '002-initial.blue.sql');
 -- APP
 CREATE TABLE odin.app (
     app_id TEXT NOT NULL,
+    PRIMARY KEY (app_id),
+    FOREIGN KEY (app_id)
+        REFERENCES odin.identity (id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+
     app_name TEXT NOT NULL,
     token TEXT NOT NULL,
     access_policy TEXT NOT NULL,
     data_sharing_policy TEXT NOT NULL,
     redirect_url TEXT NOT NULL,
     changed TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    PRIMARY KEY (app_id),
-    FOREIGN KEY (app_id)
-        REFERENCES odin.identity (id) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE
+    created TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE odin.app_ledger (
     reference TEXT NOT NULL,
     app_id TEXT NOT NULL,
+    PRIMARY KEY (reference, app_id),
+
     app_name TEXT NOT NULL,
     token TEXT NOT NULL,
     access_policy TEXT NOT NULL DEFAULT 'OPEN',
@@ -28,8 +31,7 @@ CREATE TABLE odin.app_ledger (
     redirect_url TEXT NOT NULL,
     changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     pg_user TEXT NOT NULL DEFAULT current_user,
-    annotation JSON NOT NULL DEFAULT '{}',
-    PRIMARY KEY (reference, app_id)
+    annotation JSON NOT NULL DEFAULT '{}'
 );
 
 CREATE FUNCTION odin.app_ledger_insert() RETURNS TRIGGER AS $body$
@@ -55,33 +57,37 @@ EXECUTE PROCEDURE odin.app_ledger_insert();
 -- APP OWNER
 CREATE TABLE odin.app_owner (
     identity_id TEXT NOT NULL,
-    app_id TEXT NOT NULL,
-    state TEXT NOT NULL,
-    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    pg_user TEXT NOT NULL,
-    PRIMARY KEY (identity_id, app_id),
     FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+
+    app_id TEXT NOT NULL,
     FOREIGN KEY (app_id)
         REFERENCES odin.app (app_id) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    PRIMARY KEY (identity_id, app_id),
+
+    state TEXT NOT NULL,
+    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    pg_user TEXT NOT NULL
 );
 
 CREATE TABLE odin.app_owner_ledger (
     reference TEXT NOT NULL,
     identity_id TEXT NOT NULL,
-    app_id TEXT NOT NULL,
-    state TEXT NOT NULL DEFAULT 'ACTIVE',
-    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    pg_user TEXT NOT NULL DEFAULT current_user,
-    PRIMARY KEY (reference, identity_id, app_id),
     FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+
+    app_id TEXT NOT NULL,
     FOREIGN KEY (app_id)
         REFERENCES odin.app (app_id) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+
+    PRIMARY KEY (reference, identity_id, app_id),
+    state TEXT NOT NULL DEFAULT 'ACTIVE',
+    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    pg_user TEXT NOT NULL DEFAULT current_user
 );
 
 CREATE FUNCTION odin.app_owner_ledger_insert() RETURNS TRIGGER AS $body$
@@ -104,33 +110,39 @@ EXECUTE PROCEDURE odin.app_owner_ledger_insert();
 -- APP USER
 CREATE TABLE odin.app_user (
     identity_id TEXT NOT NULL,
-    app_id TEXT NOT NULL,
-    state TEXT NOT NULL,
-    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    pg_user TEXT NOT NULL,
-    PRIMARY KEY (identity_id, app_id),
     FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+
+    app_id TEXT NOT NULL,
     FOREIGN KEY (app_id)
         REFERENCES odin.app (app_id) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+
+    PRIMARY KEY (identity_id, app_id),
+
+    state TEXT NOT NULL,
+    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    pg_user TEXT NOT NULL
 );
 
 CREATE TABLE odin.app_user_ledger (
     reference TEXT NOT NULL,
     identity_id TEXT NOT NULL,
-    app_id TEXT NOT NULL,
-    state TEXT NOT NULL DEFAULT 'ACTIVE',
-    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    pg_user TEXT NOT NULL DEFAULT current_user,
-    PRIMARY KEY (reference, identity_id, app_id),
     FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+
+    app_id TEXT NOT NULL,
     FOREIGN KEY (app_id)
         REFERENCES odin.app (app_id) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+
+    PRIMARY KEY (reference, identity_id, app_id),
+
+    state TEXT NOT NULL DEFAULT 'ACTIVE',
+    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    pg_user TEXT NOT NULL DEFAULT current_user
 );
 
 CREATE FUNCTION odin.app_user_ledger_insert() RETURNS TRIGGER AS $body$
