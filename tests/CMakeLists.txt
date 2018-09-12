@@ -347,9 +347,7 @@ add_custom_command(OUTPUT test-app-secure
         $<TARGET_SONAME_FILE:odin-fg>
         $<TARGET_SONAME_FILE:odin-views>
         ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-app.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/app-secure-test-view.json
         ${CMAKE_CURRENT_SOURCE_DIR}/app-secure.fg
     MAIN_DEPENDENCY app-secure.fg
     DEPENDS

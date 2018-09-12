@@ -9,14 +9,14 @@ odin.user player1 password1234
 odin.user player2 password1234
 odin.sql.file (module.path.join app-login-test-figure.sql)
 
-GET odin/app/secure / 501
-GET odin/app/secure /random-app 501
+GET test/app/secure / 501
+GET test/app/secure /random-app 501
 
-GET odin/app/secure /app01 401
+GET test/app/secure /app01 401
 
 
 # Mint App jwt
 set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "app01"} APP_TOKEN)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
-GET odin/app/secure /app02 401
-GET odin/app/secure /app01 200
+GET test/app/secure /app02 401
+GET test/app/secure /app01 200
