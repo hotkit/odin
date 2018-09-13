@@ -5,7 +5,10 @@
     See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
+#include <fostgres/sql.hpp>
+
 #include <odin/app.hpp>
+#include <odin/fg/native.hpp>
 #include <odin/odin.hpp>
 
 #include <fost/insert>
@@ -54,4 +57,15 @@ fostlib::jwt::mint odin::app::mint_user_jwt(
     fostlib::jwt::mint jwt{fostlib::sha256, jwt_secret, std::move(payload)};
     jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
     return jwt;
+}
+
+void odin::app::save_app_user(
+    fostlib::pg::connection &cnx, f5::u8view reference,
+    const fostlib::json &user, const fostlib::json &app
+) {
+    fg::json app_user_values;
+    fostlib::insert(app_user_values, "reference", reference);
+    fostlib::insert(app_user_values, "identity_id", user["identity"]["id"]);
+    fostlib::insert(app_user_values, "app_id", app["app"]["app_id"]);
+    cnx.insert("odin.app_user_ledger", app_user_values);
 }

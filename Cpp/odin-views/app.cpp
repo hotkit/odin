@@ -7,6 +7,7 @@
 
 #include <odin/app.hpp>
 #include <odin/credentials.hpp>
+#include <odin/nonce.hpp>
 #include <odin/odin.hpp>
 #include <odin/user.hpp>
 #include <odin/views.hpp>
@@ -69,10 +70,11 @@ namespace {
 
 
             auto user = odin::credentials(cnx, username, password, req.remote_address());
-            cnx.commit();
             if ( user.isnull() )
                 throw fostlib::exceptions::not_implemented(__func__, "User not found");
-
+            auto ref = odin::reference();
+            odin::app::save_app_user(cnx, ref, user, app);
+            cnx.commit();
             auto jwt = odin::app::mint_user_jwt(user, app);
             fostlib::mime::mime_headers headers;
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);

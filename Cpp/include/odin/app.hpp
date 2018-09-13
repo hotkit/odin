@@ -23,6 +23,10 @@ namespace odin {
         fostlib::jwt::mint mint_user_jwt(const fostlib::json &user, const fostlib::json &app,
             fostlib::json payload = fostlib::json{});
 
+        /// Save the given app user, this does not commit the transaction
+        void save_app_user(fostlib::pg::connection &cnx, f5::u8view reference,
+            const fostlib::json &user, const fostlib::json &app);
+
     }
 
 
