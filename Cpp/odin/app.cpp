@@ -56,6 +56,7 @@ fostlib::jwt::mint odin::app::mint_user_jwt(
             + fostlib::coerce<fostlib::string>(app[app_id]);
     fostlib::jwt::mint jwt{fostlib::sha256, jwt_secret, std::move(payload)};
     jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
+    jwt.claim("iss", app[app_id]);
     return jwt;
 }
 
