@@ -32,7 +32,7 @@ namespace {
             const fostlib::host &host
         ) const {
             const auto paths = fostlib::split(path, "/");
-            if ( paths.size() != 1)
+            if ( not paths.size() )
                 throw fostlib::exceptions::not_implemented(__func__,
                     "Must pass app_id in the URL");
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
