@@ -31,12 +31,14 @@ namespace {
             fostlib::http::server::request &req,
             const fostlib::host &host
         ) const {
-            const auto paths = fostlib::split(path, "/");
-            if ( paths.size() != 1)
+            fostlib::log::debug(odin::c_odin)("path", path);
+            const auto slash = path.find("/");
+            const auto app_id = path.substr(0, slash);
+            if ( app_id.empty() )
                 throw fostlib::exceptions::not_implemented(__func__,
                     "Must pass app_id in the URL");
+
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            const auto app_id = paths[0];
             fostlib::json app = odin::app::get_detail(cnx, app_id);
             if ( app.isnull() )
                 throw fostlib::exceptions::not_implemented(__func__, "App not found");
@@ -59,7 +61,7 @@ namespace {
                             req.headers().set("__jwt", jwt.value().payload, "sub");
                             req.headers().set("__app",
                                 fostlib::coerce<fostlib::string>(jwt.value().payload["iss"]));
-                            return execute(config["secure"], path, req, host);
+                            return execute(config["secure"], slash == fostlib::string::npos ? fostlib::string{} : path.substr(slash + 1), req, host);
                         }
                     }
                 } else {
