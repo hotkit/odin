@@ -10,23 +10,12 @@ odin.user player2 password1234
 odin.sql.file (module.path.join app-login-test-figure.sql)
 
 # Support only POST
-GET odin/app /verify/ 501
-GET odin/app /verify/app01/ 501
+GET test/app/handover / 501
+GET test/app/handover /app02 501
+
 
 # Validate Payload
-POST odin/app /verify/ {} 501
-POST odin/app /verify/app01/ {} 501
-POST odin/app /verify/app01/ {"random_key": "player1"} 501
-POST odin/app /verify/random_app/ {} 501
-POST odin/app /verify/app01/ {"token": "player1"} 501
+POST test/app/handover / {} 501
 
-set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "app01"} <JWT_SECRET>app01)
-set payload {}
-set-path payload ["token"] (lookup user_jwt)
-POST odin/app /verify/app01/ (lookup payload) 200 {}
-
-# Use wrong app
-set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "app02"} <JWT_SECRET>app02)
-set payload {}
-set-path payload ["token"] (lookup user_jwt)
-POST odin/app /verify/app01/ (lookup payload) 501
+POST test/app/handover / {"token": "mock"} 200
+GET test/app/handover/validate /mock_user 200 {"id": "mock_user"}
