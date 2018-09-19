@@ -9,6 +9,7 @@
 #include <odin/credentials.hpp>
 #include <odin/nonce.hpp>
 #include <odin/odin.hpp>
+#include <odin/user.hpp>
 #include <odin/views.hpp>
 
 #include <fost/insert>
@@ -44,7 +45,6 @@ namespace {
                 }
                 const auto username = fostlib::coerce<fostlib::string>(body["username"]);
                 const auto password = fostlib::coerce<fostlib::string>(body["password"]);
-                const auto installation_id = fostlib::coerce<fostlib::string>(body["installation_id"]);
                 if ( username.empty() || password.empty() ) {
                     throw fostlib::exceptions::not_implemented("odin.login",
                         "Must pass both a username and password");
@@ -78,7 +78,21 @@ namespace {
                         if ( not allowed.isnull() ) {
                             jwt.claim(odin::c_jwt_permissions_claim.value(), allowed);
                         }
-                        odin::set_installation_id(cnx, reference, username, installation_id)
+                    }
+
+                    if ( body.has_key("installation_id") ) {
+                        if ( body["installation_id"].isnull() ) {
+                            throw fostlib::exceptions::not_implemented("odin.login",
+                                "Installation_id cannot be null");
+                        }
+                        const fostlib::string installation_id = fostlib::coerce<fostlib::string>(body["installation_id"]);
+                        if ( installation_id.empty() ) {
+                            throw fostlib::exceptions::not_implemented("odin.login",
+                                "Installation_id cannot be empty");
+                        }
+                        const fostlib::string identity_id = fostlib::coerce<fostlib::string>(user["identity"]["id"]);
+                        odin::set_installation_id(cnx, odin::reference(), identity_id, installation_id);
+                        cnx.commit();
                     }
 
                     fostlib::mime::mime_headers headers;
