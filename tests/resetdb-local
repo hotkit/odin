@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+cd $(dirname $0)
+set -ex
+
+: "${1:?Need to pass in the path to the Postgres unix domain socket}"
+
+dropdb -h $1 local-odin || echo "OK, local-odin database hasn't been created before"
+createdb -h $1 local-odin
+
+odin -h $1 -d local-odin include local-setup.odin
+

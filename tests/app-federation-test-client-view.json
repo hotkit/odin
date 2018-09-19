@@ -1,0 +1,29 @@
+{
+    "webserver": {
+        "views/test/app/handover": {
+            "view": "odin.app.handover",
+            "configuration": {
+                "federation_url": "http://localhost:8001/odin/app/verify/bowling_app/",
+                "app_id": "bowling_app",
+                "mock": "OK"
+            }
+        },
+        "views/test/app/handover/validate": {
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [
+                    {
+                        "return": "object",
+                        "path": [1],
+                        "GET": {
+                            "command": "SELECT * FROM odin.identity WHERE identity.id=$1",
+                            "arguments": [
+                                1
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -95,6 +95,60 @@ namespace {
     } c_app_login;
 
 
+    const class app_handover : public fostlib::urlhandler::view {
+    public:
+        app_handover()
+        : view("odin.app.handover") {
+        }
+
+        std::pair<boost::shared_ptr<fostlib::mime>, int> operator () (
+            const fostlib::json &config,
+            const fostlib::string &path,
+            fostlib::http::server::request &req,
+            const fostlib::host &host
+        ) const {
+            const auto app_id = fostlib::coerce<fostlib::string>(config["app_id"]);
+            if ( req.method() != "POST" )
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
+                    "App Handover required POST, this should be a 405");
+
+            fostlib::json body = parse_payload(req);
+            if ( !body.has_key("token") )
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
+                    "Must pass token field");
+            fostlib::json fed_response_data{};
+            if ( config.has_key("mock") ) {
+                fostlib::json mock_identity{};
+                fostlib::insert(mock_identity, "id", "mock_user");
+                fostlib::insert(mock_identity, "email", "mock_user@email.com");
+                fostlib::insert(mock_identity, "full_name", "Mock User");
+                fostlib::insert(fed_response_data, "identity", mock_identity);
+            } else {
+                fostlib::url federation_url(fostlib::coerce<fostlib::string>(config["federation_url"]));
+                fostlib::http::user_agent ua{};
+                fostlib::http::user_agent::request p("POST", federation_url, req.data());
+                auto fed_resp = ua(p);
+                fed_response_data = fostlib::json::parse(fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(fed_resp->body()->data())));
+            }
+            // Create user
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
+            auto ref = odin::reference();
+            odin::create_user(cnx, ref, fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]));
+            cnx.commit();
+            auto jwt(odin::mint_login_jwt(fed_response_data));
+            auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
+
+            fostlib::mime::mime_headers headers;
+            headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
+            boost::shared_ptr<fostlib::mime> response(
+                            new fostlib::text_body(fostlib::utf8_string(jwt.token()),
+                                headers, L"application/jwt"));
+            return std::make_pair(response, 200);
+        }
+
+    } c_app_handover;
+
+
     const class app_verify : public fostlib::urlhandler::view {
     public:
         app_verify()
