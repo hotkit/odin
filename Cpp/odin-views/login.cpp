@@ -44,6 +44,7 @@ namespace {
                 }
                 const auto username = fostlib::coerce<fostlib::string>(body["username"]);
                 const auto password = fostlib::coerce<fostlib::string>(body["password"]);
+                const auto installation_id = fostlib::coerce<fostlib::string>(body["installation_id"]);
                 if ( username.empty() || password.empty() ) {
                     throw fostlib::exceptions::not_implemented("odin.login",
                         "Must pass both a username and password");
@@ -77,6 +78,7 @@ namespace {
                         if ( not allowed.isnull() ) {
                             jwt.claim(odin::c_jwt_permissions_claim.value(), allowed);
                         }
+                        odin::set_installation_id(cnx, reference, username, installation_id)
                     }
 
                     fostlib::mime::mime_headers headers;
