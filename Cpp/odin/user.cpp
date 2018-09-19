@@ -103,6 +103,20 @@ void odin::set_email(
 }
 
 
+void odin::set_installation_id(
+    fostlib::pg::connection &cnx,
+    f5::u8view reference,
+    f5::u8view identity_id,
+    f5::u8view installation_id
+) {
+    fg::json user_values;
+    fostlib::insert(user_values, "reference", reference);
+    fostlib::insert(user_values, "identity_id", identity_id);
+    fostlib::insert(user_values, "installation_id", installation_id);
+    cnx.insert("odin.identity_installation_id_ledger", user_values);
+}
+
+
 bool odin::does_email_exist(fostlib::pg::connection &cnx, fostlib::string email) {
     static const fostlib::string sql("SELECT email FROM odin.identity WHERE email=$1");
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});

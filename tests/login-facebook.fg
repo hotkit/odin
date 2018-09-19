@@ -31,3 +31,18 @@ POST odin/test/facebook/login/ok / {"access_token": "exist_user"} 422 {"message"
 odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
 POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
 POST odin/test/facebook/login/ok / {"access_token": "login_via_gp"} 422 {"message": "This email already exists"}
+
+
+# Enable opts/installation-id
+odin.sql.file (module.path.join ../Schema/opts/installation-id/001-initial.blue.sql)
+POST odin/test/facebook/login/ok / {"access_token": "test-installation", "installation_id": "INSTALL01"} 200
+GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL01"}
+
+POST odin/test/facebook/login/ok / {"access_token": "test-installation", "installation_id": "INSTALL02"} 200
+GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
+
+POST odin/test/facebook/login/ok / {"access_token": "test-installation", "installation_id": null} 501
+GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
+
+POST odin/test/facebook/login/ok / {"access_token": "test-installation", "installation_id": ""} 501
+GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}

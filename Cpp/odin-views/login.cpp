@@ -9,6 +9,7 @@
 #include <odin/credentials.hpp>
 #include <odin/nonce.hpp>
 #include <odin/odin.hpp>
+#include <odin/user.hpp>
 #include <odin/views.hpp>
 
 #include <fost/insert>
@@ -50,8 +51,8 @@ namespace {
                 }
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
                 auto user = odin::credentials(cnx, username, password, req.remote_address());
-                cnx.commit();
                 if ( user.isnull() ) {
+                    cnx.commit();
                     return execute(config["failure"], path, req, host);
                 } else {
                     auto jwt(odin::mint_login_jwt(user));
@@ -78,6 +79,21 @@ namespace {
                             jwt.claim(odin::c_jwt_permissions_claim.value(), allowed);
                         }
                     }
+
+                    if ( body.has_key("installation_id") ) {
+                        if ( body["installation_id"].isnull() ) {
+                            throw fostlib::exceptions::not_implemented("odin.login",
+                                "Installation_id cannot be null");
+                        }
+                        const fostlib::string installation_id = fostlib::coerce<fostlib::string>(body["installation_id"]);
+                        if ( installation_id.empty() ) {
+                            throw fostlib::exceptions::not_implemented("odin.login",
+                                "Installation_id cannot be empty");
+                        }
+                        const fostlib::string identity_id = fostlib::coerce<fostlib::string>(user["identity"]["id"]);
+                        odin::set_installation_id(cnx, odin::reference(), identity_id, installation_id);
+                    }
+                    cnx.commit();
 
                     fostlib::mime::mime_headers headers;
                     headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
