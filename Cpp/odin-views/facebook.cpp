@@ -96,6 +96,20 @@ namespace {
             odin::facebook::set_facebook_credentials(cnx, reference, identity_id, facebook_user_id);
             cnx.commit();
 
+            if ( body.has_key("installation_id") ) {
+                if ( body["installation_id"].isnull() ) {
+                    throw fostlib::exceptions::not_implemented("odin.login",
+                        "Installation_id cannot be null");
+                }
+                const fostlib::string installation_id = fostlib::coerce<fostlib::string>(body["installation_id"]);
+                if ( installation_id.empty() ) {
+                    throw fostlib::exceptions::not_implemented("odin.login",
+                        "Installation_id cannot be empty");
+                }
+                odin::set_installation_id(cnx, odin::reference(), identity_id, installation_id);
+                cnx.commit();
+            }
+
             facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
 
             auto jwt(odin::mint_login_jwt(facebook_user));
