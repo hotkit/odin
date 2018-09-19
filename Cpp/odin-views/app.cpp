@@ -73,7 +73,7 @@ namespace {
             if ( user.isnull() )
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "User not found");
             auto ref = odin::reference();
-            odin::app::save_app_user(cnx, ref, user, app_id);
+            odin::app::save_app_user(cnx, ref, fostlib::coerce<f5::u8view>(user["identity"]["id"]), app_id);
             cnx.commit();
             auto jwt = odin::app::mint_user_jwt(user, app);
             fostlib::mime::mime_headers headers;
@@ -162,33 +162,38 @@ namespace {
             const fostlib::host &host
         ) const {
             const auto paths = fostlib::split(path, "/");
-            if ( paths.size() != 1)
+            if ( paths.size() != 1) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "Must pass app_id in the URL");
+            }
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto app_id = paths[0];
             fostlib::json app = odin::app::get_detail(cnx, app_id);
-            if ( app.isnull() )
+            if ( app.isnull() ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "App not found");
+            }
 
-            if ( req.method() != "POST" )
+            if ( req.method() != "POST" ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "App Login required POST, this should be a 405");
-
+            }
             fostlib::json body = parse_payload(req);
-            if ( !body.has_key("token") )
+            if ( !body.has_key("token") ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "Must pass token field");
+            }
             const auto user_token = fostlib::coerce<fostlib::string>(body["token"]);
             const fostlib::string jwt_secret = odin::c_jwt_secret.value()
                 + fostlib::coerce<fostlib::string>(app["app"]["app_id"]);
 
             auto jwt = fostlib::jwt::token::load(jwt_secret, user_token);
-            if ( not jwt )
+            if ( not jwt ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "JWT unauthenticated");
+            }
             auto const iss = fostlib::coerce<fostlib::string>(jwt.value().payload["iss"]);
-            if ( iss != app_id )
+            if ( iss != app_id ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "app_id mismatch");
+            }
 
             fostlib::log::debug(odin::c_odin)
                 ("", "Hands over JWT authenticated")
@@ -207,8 +212,9 @@ namespace {
             auto &rs = data.second;
             auto row = rs.begin();
 
-            if ( row == rs.end() )
+            if ( row == rs.end() ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "App user not found");
+            }
 
             auto record = *row;
             if ( ++row != rs.end() ) {
@@ -219,8 +225,9 @@ namespace {
             fostlib::json user;
             for ( std::size_t index{0}; index < record.size(); ++index ) {
                 const auto parts = fostlib::split(data.first[index], "__");
-                if ( parts.size() && parts[parts.size() - 1] == "tableoid" )
+                if ( parts.size() && parts[parts.size() - 1] == "tableoid" ) {
                     continue;
+                }
                 fostlib::jcursor pos;
                 for ( const auto &p : parts ) pos /= p;
                 fostlib::insert(user, pos, record[index]);
