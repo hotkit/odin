@@ -325,7 +325,7 @@ add_custom_command(OUTPUT test-app-login
         ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
         ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
         ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-app.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
         ${CMAKE_CURRENT_SOURCE_DIR}/app-login.fg
     MAIN_DEPENDENCY app-login.fg
     DEPENDS
@@ -364,12 +364,60 @@ add_custom_command(OUTPUT test-app-secure
         app-secure.fg
 )
 
+add_custom_command(OUTPUT test-app-verify
+    COMMAND fostgres-test odin-test-app-verify -o test-app-verify
+        $<TARGET_SONAME_FILE:odin-fg>
+        $<TARGET_SONAME_FILE:odin-views>
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/app-verify.fg
+    MAIN_DEPENDENCY app-verify.fg
+    DEPENDS
+        fostgres-test
+        fostgres
+        odin-fg
+        odin-views
+        ../Schema/bootstrap.sql
+        ../Schema/core/000-initial.blue.sql
+        ../Schema/authn/001-initial.blue.sql
+        ../Schema/app/002-initial.blue.sql
+        app-login-test-figure.sql
+        app-verify.fg
+)
+
+add_custom_command(OUTPUT test-app-handover
+    COMMAND fostgres-test odin-test-app-handover -o test-app-handover
+        $<TARGET_SONAME_FILE:odin-fg>
+        $<TARGET_SONAME_FILE:odin-views>
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/app-federation-test-client-view.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/app-handover.fg
+    MAIN_DEPENDENCY app-handover.fg
+    DEPENDS
+        fostgres-test
+        fostgres
+        odin-fg
+        odin-views
+        ../Schema/bootstrap.sql
+        ../Schema/core/000-initial.blue.sql
+        ../Schema/authn/001-initial.blue.sql
+        ../Schema/app/002-initial.blue.sql
+        app-federation-test-client-view.json
+        app-handover.fg
+)
+
 
 ## Because of the way cmake works we need this stuff at the end to
 ## actually make the above commands run when things change.
 add_custom_target(odin-tests DEPENDS
+        test-app-handover
         test-app-login
         test-app-secure
+        test-app-verify
         test-authnz
         test-db-bypass
         test-login

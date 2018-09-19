@@ -38,7 +38,7 @@ script:
     - PostgreSQL/configure
     - git clone https://github.com/KayEss/fost-postgres.git
     - git clone https://github.com/KayEss/fost-web.git
-    - git clone -b feature/json-schema https://github.com/KayEss/fostgres.git
+    - git clone -b develop https://github.com/KayEss/fostgres.git
     - git clone https://github.com/KayEss/json-schema.git
     - ln -s ../../boost-cache fost-boost/boost
     - cp ../.travis.CMakeLists.txt CMakeLists.txt

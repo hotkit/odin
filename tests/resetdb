@@ -10,5 +10,6 @@ createdb -h $1 odin-test
 odin -h $1 -d odin-test include setup.odin
 
 # App figure
-psql -h $1 -d odin-test -c "INSERT INTO odin.app_ledger (reference, app_id, app_name, redirect_url) VALUES ('ref1', 'bowling_app', 'Bowling with Fred', 'http://localhost:8001/odin/app/logged_in.html');"
+psql -h $1 -d odin-test -c "INSERT INTO odin.identity (id) VALUES ('bowling_app');"
+psql -h $1 -d odin-test -c "INSERT INTO odin.app_ledger (reference, app_id, app_name, token, redirect_url) VALUES ('ref1', 'bowling_app', 'Bowling with Fred', '<APP_TOKEN>', 'http://localhost:8001/odin/app/logged_in.html');"
 psql -h $1 -d odin-test -c "INSERT INTO odin.app_owner_ledger (reference, identity_id, app_id) VALUES ('ref1', 'fred', 'bowling_app');"

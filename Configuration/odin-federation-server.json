@@ -15,6 +15,9 @@
                         "expires": {"hours": 72},
                         "static": "usr/share/odin/Static/app/login.html"
                     }
+                },
+                "verify/": {
+                    "view": "odin.app.verify"
                 }
             }
         }
