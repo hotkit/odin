@@ -43,14 +43,14 @@ namespace {
         ) const {
             const auto paths = fostlib::split(path, "/");
             if ( paths.size() != 1)
-                throw fostlib::exceptions::not_implemented(__func__,
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "Must pass app_id in the URL");
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto app_id = paths[0];
             fostlib::json app = odin::app::get_detail(cnx, app_id);
             cnx.commit();
             if ( app.isnull() )
-                throw fostlib::exceptions::not_implemented(__func__, "App not found");
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "App not found");
 
             if ( req.method() == "GET" ) {
                 boost::filesystem::wpath filename(
@@ -58,12 +58,12 @@ namespace {
                 return fostlib::urlhandler::serve_file(config, req, filename);
             }
             if ( req.method() != "POST" )
-                throw fostlib::exceptions::not_implemented(__func__,
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "App Login required POST, this should be a 405");
 
             fostlib::json body = parse_payload(req);
             if ( !body.has_key("username") || !body.has_key("password"))
-                throw fostlib::exceptions::not_implemented(__func__,
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "Must pass both username and password fields");
             const auto username = fostlib::coerce<fostlib::string>(body["username"]);
             const auto password = fostlib::coerce<fostlib::string>(body["password"]);
@@ -71,9 +71,9 @@ namespace {
 
             auto user = odin::credentials(cnx, username, password, req.remote_address());
             if ( user.isnull() )
-                throw fostlib::exceptions::not_implemented(__func__, "User not found");
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "User not found");
             auto ref = odin::reference();
-            odin::app::save_app_user(cnx, ref, user, app);
+            odin::app::save_app_user(cnx, ref, user, app_id);
             cnx.commit();
             auto jwt = odin::app::mint_user_jwt(user, app);
             fostlib::mime::mime_headers headers;
@@ -109,21 +109,21 @@ namespace {
         ) const {
             const auto paths = fostlib::split(path, "/");
             if ( paths.size() != 1)
-                throw fostlib::exceptions::not_implemented(__func__,
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "Must pass app_id in the URL");
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto app_id = paths[0];
             fostlib::json app = odin::app::get_detail(cnx, app_id);
             if ( app.isnull() )
-                throw fostlib::exceptions::not_implemented(__func__, "App not found");
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "App not found");
 
             if ( req.method() != "POST" )
-                throw fostlib::exceptions::not_implemented(__func__,
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "App Login required POST, this should be a 405");
 
             fostlib::json body = parse_payload(req);
             if ( !body.has_key("token") )
-                throw fostlib::exceptions::not_implemented(__func__,
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "Must pass token field");
             const auto user_token = fostlib::coerce<fostlib::string>(body["token"]);
             const fostlib::string jwt_secret = odin::c_jwt_secret.value()
@@ -131,10 +131,10 @@ namespace {
 
             auto jwt = fostlib::jwt::token::load(jwt_secret, user_token);
             if ( not jwt )
-                throw fostlib::exceptions::not_implemented(__func__, "JWT unauthenticated");
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "JWT unauthenticated");
             auto const iss = fostlib::coerce<fostlib::string>(jwt.value().payload["iss"]);
             if ( iss != app_id )
-                throw fostlib::exceptions::not_implemented(__func__, "app_id mismatch");
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "app_id mismatch");
 
             fostlib::log::debug(odin::c_odin)
                 ("", "Hands over JWT authenticated")
@@ -154,11 +154,11 @@ namespace {
             auto row = rs.begin();
 
             if ( row == rs.end() )
-                throw fostlib::exceptions::not_implemented(__func__, "App user not found");
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "App user not found");
 
             auto record = *row;
             if ( ++row != rs.end() ) {
-                throw fostlib::exceptions::not_implemented(__func__,
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
                     "More than one user returned");
             }
 

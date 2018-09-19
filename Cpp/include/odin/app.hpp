@@ -25,7 +25,7 @@ namespace odin {
 
         /// Save the given app user, this does not commit the transaction
         void save_app_user(fostlib::pg::connection &cnx, f5::u8view reference,
-            const fostlib::json &user, const fostlib::json &app);
+            const fostlib::json &user, const f5::u8view app_id);
 
     }
 
