@@ -94,7 +94,6 @@ namespace {
                 identity_id = fostlib::coerce<fostlib::string>(facebook_user[id]);
             }
             odin::facebook::set_facebook_credentials(cnx, reference, identity_id, facebook_user_id);
-            cnx.commit();
 
             if ( body.has_key("installation_id") ) {
                 if ( body["installation_id"].isnull() ) {
@@ -107,8 +106,8 @@ namespace {
                         "Installation_id cannot be empty");
                 }
                 odin::set_installation_id(cnx, odin::reference(), identity_id, installation_id);
-                cnx.commit();
             }
+            cnx.commit();
 
             facebook_user = odin::facebook::credentials(cnx, facebook_user_id);
 

@@ -51,8 +51,8 @@ namespace {
                 }
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
                 auto user = odin::credentials(cnx, username, password, req.remote_address());
-                cnx.commit();
                 if ( user.isnull() ) {
+                    cnx.commit();
                     return execute(config["failure"], path, req, host);
                 } else {
                     auto jwt(odin::mint_login_jwt(user));
@@ -92,8 +92,8 @@ namespace {
                         }
                         const fostlib::string identity_id = fostlib::coerce<fostlib::string>(user["identity"]["id"]);
                         odin::set_installation_id(cnx, odin::reference(), identity_id, installation_id);
-                        cnx.commit();
                     }
+                    cnx.commit();
 
                     fostlib::mime::mime_headers headers;
                     headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());

@@ -94,8 +94,6 @@ namespace {
                 identity_id = fostlib::coerce<fostlib::string>(google_user[id]);
             }
             odin::google::set_google_credentials(cnx, reference, identity_id, google_user_id);
-            cnx.commit();
-
             google_user = odin::google::credentials(cnx, google_user_id);
 
             if ( body.has_key("installation_id") ) {
@@ -109,8 +107,8 @@ namespace {
                         "Installation_id cannot be empty");
                 }
                 odin::set_installation_id(cnx, odin::reference(), identity_id, installation_id);
-                cnx.commit();
             }
+            cnx.commit();
 
             auto jwt(odin::mint_login_jwt(google_user));
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
