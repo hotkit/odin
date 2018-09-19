@@ -73,7 +73,7 @@ namespace {
             if ( user.isnull() )
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "User not found");
             auto ref = odin::reference();
-            odin::app::save_app_user(cnx, ref, user, app_id);
+            odin::app::save_app_user(cnx, ref, fostlib::coerce<f5::u8view>(user["identity"]["id"]), app_id);
             cnx.commit();
             auto jwt = odin::app::mint_user_jwt(user, app);
             fostlib::mime::mime_headers headers;
