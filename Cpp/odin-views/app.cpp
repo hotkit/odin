@@ -126,7 +126,10 @@ namespace {
             } else {
                 fostlib::url federation_url(fostlib::coerce<fostlib::string>(config["federation_url"]));
                 fostlib::http::user_agent ua{};
-                auto fed_resp = ua.post(federation_url, fostlib::json::unparse(body, true));
+                boost::shared_ptr<fostlib::mime> fed_data(
+                    new fostlib::text_body(fostlib::json::unparse(body, true),
+                        fostlib::mime::mime_headers(), L"application/json"));
+                auto fed_resp = ua.post(federation_url, fed_data);
                 fed_response_data = fostlib::json::parse(fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(fed_resp->body()->data())));
             }
             // Create user
