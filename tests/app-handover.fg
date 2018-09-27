@@ -19,3 +19,12 @@ POST test/app/handover / {} 501
 
 POST test/app/handover / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user"}
+
+# Should record identity data if modules are enabled
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+POST test/app/handover / {"token": "mock"} 200
+GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User"}
+
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+POST test/app/handover / {"token": "mock"} 200
+GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User", "email": "mock_user@email.com"}

@@ -136,6 +136,16 @@ namespace {
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto ref = odin::reference();
             odin::create_user(cnx, ref, fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]));
+            if ( odin::is_module_enabled(cnx, "opts/full-name") ){
+                odin::set_full_name(cnx, ref,
+                    fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]),
+                    fostlib::coerce<fostlib::string>(fed_response_data["identity"]["full_name"]));
+            }
+            if ( odin::is_module_enabled(cnx, "opts/email") ){
+                odin::set_email(cnx, ref,
+                    fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]),
+                    fostlib::coerce<fostlib::email_address>(fed_response_data["identity"]["email"]));
+            }
             cnx.commit();
             auto jwt(odin::mint_login_jwt(fed_response_data));
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
