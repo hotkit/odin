@@ -38,3 +38,8 @@ GET odin/api / 200 {"user": {"installation_id": "INSTALL02"}}
 
 POST odin/login / {"username": "test-installation", "password": "password1234", "installation_id": ""} 501
 GET odin/api / 200 {"user": {"installation_id": "INSTALL02"}}
+
+# Enable fix pk migration
+odin.sql.file (module.path.join ../Schema/opts/installation-id/002-fix-pk.blue.sql)
+POST odin/login / {"username": "test-installation", "password": "password1234", "installation_id": "INSTALL02"} 200
+GET odin/api / 200 {"user": {"installation_id": "INSTALL02"}}
