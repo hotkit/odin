@@ -434,5 +434,5 @@ add_custom_target(odin-tests DEPENDS
         test-expire-user
     )
 add_dependencies(stress odin-tests)
-
+add_dependencies(pgtest odin-tests)
 
