@@ -33,7 +33,17 @@ This view is used when different HTTP verbs require different permissions.
             "allowed": "example-view",
             "forbidden": "fost.response.403"
         },
-        "PUT": "permission2-name"
+        "PUT": {
+            "permission": "permission2-name",
+            "allowed": "example-view",
+            "forbidden": "read-only-view"
+        }
+        "otherwise": {
+            "view": "fost.response.405",
+            "configuration": {
+                "verbs": ["GET", "HEAD", "PUT"]
+            }
+        }
     }
 }
 ```
