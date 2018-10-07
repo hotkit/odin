@@ -183,22 +183,6 @@
                             './me/permissions'::text AS odin__my__permissions,
                             './me/password'::text AS odin__my__password,
                             './user/:user-id/'::text AS odin__user"
-                    },
-                    {
-                        "return": "object",
-                        "path": ["/user", 1],
-                        "PUT": {
-                            "table": "odin.identity_ledger",
-                            "columns": {
-                                "reference": {
-                                    "key": true,
-                                    "source": ["request", "headers", "__odin_reference"]
-                                },
-                                "identity_id": {
-                                    "source": 1
-                                }
-                            }
-                        }
                     }
                 ]
             }
