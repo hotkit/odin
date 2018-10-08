@@ -110,10 +110,8 @@
                         "path": [],
                         "GET": {
                             "command": "SELECT
-                                    'odin/handshake'::text AS \"@context\",
                                     array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
                                     current_setting('odin.jwt.sub') AS jwt__subject,
-                                    './login/'::text AS odin__login,
                                     './logout/'::text AS odin__logout,
                                     './me/permissions'::text AS odin__my__permissions,
                                     './me/password'::text AS odin__my__password,
@@ -176,29 +174,8 @@
                         "return": "object",
                         "path": [],
                         "GET": "SELECT
-                            'odin/handshake'::text AS \"@context\",
                             array_to_json(ARRAY(SELECT * FROM odin.module)) AS odin__modules,
-                            './login/'::text AS odin__login,
-                            './logout/'::text AS odin__logout,
-                            './me/permissions'::text AS odin__my__permissions,
-                            './me/password'::text AS odin__my__password,
-                            './user/:user-id/'::text AS odin__user"
-                    },
-                    {
-                        "return": "object",
-                        "path": ["/user", 1],
-                        "PUT": {
-                            "table": "odin.identity_ledger",
-                            "columns": {
-                                "reference": {
-                                    "key": true,
-                                    "source": ["request", "headers", "__odin_reference"]
-                                },
-                                "identity_id": {
-                                    "source": 1
-                                }
-                            }
-                        }
+                            './login/'::text AS odin__login"
                     }
                 ]
             }

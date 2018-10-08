@@ -126,7 +126,7 @@ add_custom_command(OUTPUT test-permissions
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/permissions.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/permissions-test-view.json
             ${CMAKE_CURRENT_SOURCE_DIR}/permissions.fg
         MAIN_DEPENDENCY permissions.fg
         DEPENDS
@@ -140,7 +140,7 @@ add_custom_command(OUTPUT test-permissions
             ../Schema/authz/001-initial.blue.sql
             ../Configuration/odin-views.json
             permissions.fg
-            permissions.json
+            permissions-test-view.json
     )
 
 add_custom_command(OUTPUT test-registration-self
@@ -434,5 +434,5 @@ add_custom_target(odin-tests DEPENDS
         test-expire-user
     )
 add_dependencies(stress odin-tests)
-
+add_dependencies(pgtest odin-tests)
 
