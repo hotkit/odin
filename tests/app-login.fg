@@ -27,3 +27,6 @@ POST odin/app /login/random_app/ {"username": "player1", "password": "password12
 
 # Return redirect url if successfully login
 POST odin/app /login/app01/ {"username": "player1", "password": "password1234"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}
+
+# Return error to uninvited user
+POST odin/app /login/app01/ {"username": "player2", "password": "password1234"} 501
