@@ -49,8 +49,13 @@ namespace {
             const auto app_id = paths[0];
             fostlib::json app = odin::app::get_detail(cnx, app_id);
             cnx.commit();
-            if ( app.isnull() )
+            if ( app.isnull() ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "App not found");
+            }
+
+            if ( fostlib::coerce<fostlib::string>(app["app"]["access_policy"]) != "INVITE_ONLY" ) {
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "Invalid access policy, supported only INVITE_ONLY");
+            }
 
             if ( req.method() == "GET" ) {
                 boost::filesystem::wpath filename(

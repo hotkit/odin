@@ -24,8 +24,7 @@ fostlib::json odin::app::get_detail(
     static const f5::u8view sql("SELECT "
         "odin.app.tableoid AS app__tableoid, odin.app.* "
         "FROM odin.app "
-        "WHERE odin.app.app_id = $1 "
-        "AND odin.app.access_policy = 'OPEN'");
+        "WHERE odin.app.app_id = $1");
 
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id});
     auto &rs = data.second;
