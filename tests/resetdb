@@ -13,3 +13,7 @@ odin -h $1 -d odin-test include setup.odin
 psql -h $1 -d odin-test -c "INSERT INTO odin.identity (id) VALUES ('bowling_app');"
 psql -h $1 -d odin-test -c "INSERT INTO odin.app_ledger (reference, app_id, app_name, token, redirect_url) VALUES ('ref1', 'bowling_app', 'Bowling with Fred', '<APP_TOKEN>', 'http://localhost:8001/odin/app/logged_in.html');"
 psql -h $1 -d odin-test -c "INSERT INTO odin.app_owner_ledger (reference, identity_id, app_id) VALUES ('ref1', 'fred', 'bowling_app');"
+psql -h $1 -d odin-test -c "INSERT INTO odin.app_user_ledger (reference, identity_id, app_id) VALUES ('ref2', 'fred', 'bowling_app');"
+psql -h $1 -d odin-test -c "INSERT INTO odin.app_role (app_id, role) VALUES ('bowling_app', 'shop-owner'), ('bowling_app', 'player');"
+psql -h $1 -d odin-test -c "INSERT INTO odin.app_user_role (identity_id, app_id, role) VALUES ('fred', 'bowling_app', 'shop-owner');"
+psql -h $1 -d odin-test -c "INSERT INTO odin.app_user_role (identity_id, app_id, role) VALUES ('fred', 'bowling_app', 'player');"

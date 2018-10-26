@@ -9,7 +9,7 @@ CREATE TABLE odin.app_role (
     role TEXT NOT NULL,
     PRIMARY KEY (app_id, role),
     changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    pg_user TEXT NOT NULL
+    pg_user TEXT NOT NULL DEFAULT current_user
 );
 
 -- APP USER ROLE
@@ -25,5 +25,5 @@ CREATE TABLE odin.app_user_role (
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
     PRIMARY KEY (app_id, identity_id, role),
     changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    pg_user TEXT NOT NULL
+    pg_user TEXT NOT NULL DEFAULT current_user
 );

@@ -382,6 +382,7 @@ add_custom_command(OUTPUT test-app-verify
         ../Schema/core/000-initial.blue.sql
         ../Schema/authn/001-initial.blue.sql
         ../Schema/app/002-initial.blue.sql
+        ../Schema/app/003-app-role.blue.sql
         app-login-test-figure.sql
         app-verify.fg
 )

@@ -223,14 +223,19 @@ namespace {
                 ("payload", jwt.value().payload);
 
             static const fostlib::string sql("SELECT "
-                    "odin.identity.tableoid AS identity__tableoid, "
-                    "odin.identity.* "
-                "FROM odin.identity "
-                "INNER JOIN odin.app_user ON odin.identity.id = odin.app_user.identity_id "
-                "WHERE odin.identity.id = $1 "
+                "odin.identity.tableoid AS identity__tableoid, "
+                "odin.identity.*, "
+                "(SELECT json_agg(role) "
+                "FROM odin.app_user_role "
+                "WHERE odin.app_user_role.app_id= $1 "
+                "AND odin.app_user_role.identity_id= $2) as roles "
+            "FROM odin.identity "
+            "INNER JOIN odin.app_user ON odin.identity.id = odin.app_user.identity_id "
+            "WHERE odin.identity.id = $2 "
+            "AND odin.app_user.app_id = $1"
             );
             const auto user_id = fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]);
-            auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{user_id});
+            auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id, user_id});
             auto &rs = data.second;
             auto row = rs.begin();
 

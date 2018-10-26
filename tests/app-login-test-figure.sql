@@ -9,4 +9,7 @@ INSERT INTO odin.app_owner_ledger (reference, identity_id, app_id)
     VALUES ('ref1', 'owner', 'app01');
 
 INSERT INTO odin.app_user_ledger (reference, identity_id, app_id)
-    VALUES ('ref2', 'player1', 'app01');
+    VALUES ('ref2', 'player1', 'app01'), ('ref3', 'player3', 'app01');
+
+INSERT INTO odin.app_role (app_id, role) VALUES ('app01', 'pro-player'), ('app01', 'noob');
+INSERT INTO odin.app_user_role (identity_id, app_id, role) VALUES ('player1', 'app01', 'pro-player');
