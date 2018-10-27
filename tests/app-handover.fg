@@ -30,3 +30,11 @@ GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 POST test/app/handover / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User", "email": "mock_user@email.com"}
+
+
+# Should record user into groups
+odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+POST test/app/handover / {"token": "mock"} 200
+GET test/app/handover/validate /mock_user 200
+GET test/app/handover/validate /mock_user/group-membership 200 {"groups": ["admin-group", "admin-user"]}

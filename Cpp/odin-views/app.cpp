@@ -7,6 +7,7 @@
 
 #include <odin/app.hpp>
 #include <odin/credentials.hpp>
+#include <odin/group.hpp>
 #include <odin/nonce.hpp>
 #include <odin/odin.hpp>
 #include <odin/user.hpp>
@@ -133,6 +134,7 @@ namespace {
                 fostlib::insert(mock_identity, "email", "mock_user@email.com");
                 fostlib::insert(mock_identity, "full_name", "Mock User");
                 fostlib::insert(fed_response_data, "identity", mock_identity);
+                fostlib::insert(fed_response_data, "roles", fostlib::json::parse( L"[\"admin-group\", \"admin-user\"]" ));
             } else {
                 fostlib::url federation_url(fostlib::coerce<fostlib::string>(config["federation_url"]));
                 fostlib::http::user_agent ua{};
@@ -145,17 +147,27 @@ namespace {
             // Create user
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto ref = odin::reference();
-            odin::create_user(cnx, ref, fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]));
+            auto const identity_id = fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]);
+            odin::create_user(cnx, ref, identity_id);
+
             if ( odin::is_module_enabled(cnx, "opts/full-name") ){
-                odin::set_full_name(cnx, ref,
-                    fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]),
+                odin::set_full_name(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::string>(fed_response_data["identity"]["full_name"]));
             }
+
             if ( odin::is_module_enabled(cnx, "opts/email") ){
-                odin::set_email(cnx, ref,
-                    fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]),
+                odin::set_email(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::email_address>(fed_response_data["identity"]["email"]));
             }
+
+            // Add membership to group
+            if ( odin::is_module_enabled(cnx, "authz") ){
+                for ( const auto &group : fed_response_data["roles"] ) {
+                    odin::group::add_membership(cnx, ref, identity_id,
+                        fostlib::coerce<fostlib::string>(group));
+                }
+            }
+
             cnx.commit();
             auto jwt(odin::mint_login_jwt(fed_response_data));
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
