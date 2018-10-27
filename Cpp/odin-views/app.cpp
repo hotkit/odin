@@ -225,7 +225,7 @@ namespace {
             static const fostlib::string sql("SELECT "
                 "odin.identity.tableoid AS identity__tableoid, "
                 "odin.identity.*, "
-                "(SELECT json_agg(role) "
+                "(SELECT COALESCE(json_agg(role), '[]'::json) "
                 "FROM odin.app_user_role "
                 "WHERE odin.app_user_role.app_id= $1 "
                 "AND odin.app_user_role.identity_id= $2) as roles "

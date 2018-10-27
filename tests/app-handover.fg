@@ -2,11 +2,13 @@
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 
 # Set up new users and apps
 odin.user owner password1234
 odin.user player1 password1234
 odin.user player2 password1234
+odin.user player3 password1234
 odin.sql.file (module.path.join app-login-test-figure.sql)
 
 # Support only POST
