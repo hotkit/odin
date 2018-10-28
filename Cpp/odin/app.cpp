@@ -77,7 +77,6 @@ fostlib::json odin::app::get_app_user(
     const f5::u8view app_id,
     const f5::u8view identity_id
 ) {
-    // TODO: Check app access policy, now support only OPEN
     static const f5::u8view sql("SELECT "
         "odin.app_user.tableoid AS app__tableoid, odin.app_user.* "
         "FROM odin.app_user "
