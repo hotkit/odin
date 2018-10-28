@@ -146,7 +146,8 @@ namespace {
                         fostlib::json::unparse(body, true),
                         fostlib::mime::mime_headers(), L"application/json")};
                 auto fed_resp = ua.post(federation_url, fed_data);
-                fed_response_data = fostlib::json::parse(fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(fed_resp->body()->data())));
+                fed_response_data = fostlib::json::parse(fostlib::coerce<fostlib::string>(
+                    fostlib::coerce<fostlib::utf8_string>(fed_resp->body()->data())));
             }
             // Create user
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
@@ -177,7 +178,7 @@ namespace {
 
                 std::transform(currentrs.begin(), currentrs.end(),
                     std::back_inserter(current), [](const auto &row) {
-                        return row[1];
+                        return row[0];
                     });
 
                 std::sort(current.begin(), current.end());
@@ -191,8 +192,8 @@ namespace {
                 for ( auto const diff : difference ) {
                     if ( std::find(fed.begin(), fed.end(), diff) == fed.end() ) {
                         /// Not in the federation set, so need to remove
-                        throw fostlib::exceptions::not_implemented(
-                            __PRETTY_FUNCTION__, "Remove group case");
+                        odin::group::remove_membership(cnx, ref, identity_id,
+                            fostlib::coerce<fostlib::string>(diff));
                     } else {
                         /// On the federation set, so need to add
                         odin::group::add_membership(cnx, ref, identity_id,
@@ -206,7 +207,8 @@ namespace {
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
 
             fostlib::mime::mime_headers headers;
-            headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
+            headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
+                .underlying().underlying().c_str());
             boost::shared_ptr<fostlib::mime> response(
                             new fostlib::text_body(fostlib::utf8_string(jwt.token()),
                                 headers, L"application/jwt"));
