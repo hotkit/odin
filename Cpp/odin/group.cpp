@@ -28,23 +28,3 @@ void odin::group::alter_membership (
     fostlib::insert(group_membership, "member", is_member);
     cnx.insert("odin.group_membership_ledger", group_membership);
 }
-
-
-void odin::group::add_membership (
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view identity_id,
-    f5::u8view group_slug
-) {
-    odin::group::alter_membership(cnx, reference, identity_id, group_slug, true);
-}
-
-
-void odin::group::remove_membership (
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view identity_id,
-    f5::u8view group_slug
-) {
-    odin::group::alter_membership(cnx, reference, identity_id, group_slug, false);
-}
