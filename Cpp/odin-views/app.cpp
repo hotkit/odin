@@ -15,11 +15,13 @@
 
 #include <fost/exception/parse_error.hpp>
 #include <fost/insert>
+#include <fost/json>
 #include <fost/log>
 #include <fostgres/sql.hpp>
 
 
 namespace {
+
 
     const fostlib::module c_odin_app(odin::c_odin, "app.cpp");
 
@@ -152,21 +154,50 @@ namespace {
             auto const identity_id = fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]);
             odin::create_user(cnx, ref, identity_id);
 
-            if ( odin::is_module_enabled(cnx, "opts/full-name") ){
+            if ( odin::is_module_enabled(cnx, "opts/full-name") ) {
                 odin::set_full_name(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::string>(fed_response_data["identity"]["full_name"]));
             }
 
-            if ( odin::is_module_enabled(cnx, "opts/email") ){
+            if ( odin::is_module_enabled(cnx, "opts/email") ) {
                 odin::set_email(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::email_address>(fed_response_data["identity"]["email"]));
             }
 
             // Add membership to group
-            if ( odin::is_module_enabled(cnx, "authz") ){
-                for ( const auto &group : fed_response_data["roles"] ) {
-                    odin::group::add_membership(cnx, ref, identity_id,
-                        fostlib::coerce<fostlib::string>(group));
+            if ( odin::is_module_enabled(cnx, "authz") ) {
+                auto currentrs = cnx.procedure(
+                        "SELECT group_slug FROM odin.group_membership "
+                        "WHERE identity_id=$1")
+                    .exec(std::vector<fostlib::string>{{identity_id}});
+
+                std::vector<fostlib::json> difference, current,
+                    fed{fed_response_data["roles"].begin(),
+                        fed_response_data["roles"].end()};
+
+                std::transform(currentrs.begin(), currentrs.end(),
+                    std::back_inserter(current), [](const auto &row) {
+                        return row[1];
+                    });
+
+                std::sort(current.begin(), current.end());
+                std::sort(fed.begin(), fed.end());
+
+                std::set_symmetric_difference(
+                    current.begin(), current.end(),
+                    fed.begin(), fed.end(),
+                    std::back_inserter(difference));
+
+                for ( auto const diff : difference ) {
+                    if ( std::find(fed.begin(), fed.end(), diff) == fed.end() ) {
+                        /// Not in the federation set, so need to remove
+                        throw fostlib::exceptions::not_implemented(
+                            __PRETTY_FUNCTION__, "Remove group case");
+                    } else {
+                        /// On the federation set, so need to add
+                        odin::group::add_membership(cnx, ref, identity_id,
+                            fostlib::coerce<fostlib::string>(diff));
+                    }
                 }
             }
 
