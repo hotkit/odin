@@ -134,13 +134,15 @@ namespace {
                 fostlib::insert(mock_identity, "email", "mock_user@email.com");
                 fostlib::insert(mock_identity, "full_name", "Mock User");
                 fostlib::insert(fed_response_data, "identity", mock_identity);
-                fostlib::insert(fed_response_data, "roles", fostlib::json::parse( L"[\"admin-group\", \"admin-user\"]" ));
+                fostlib::push_back(fed_response_data, "roles", "admin-group");
+                fostlib::push_back( fed_response_data, "roles", "admin-user");
             } else {
                 fostlib::url federation_url(fostlib::coerce<fostlib::string>(config["federation_url"]));
                 fostlib::http::user_agent ua{};
-                boost::shared_ptr<fostlib::mime> fed_data(
-                    new fostlib::text_body(fostlib::json::unparse(body, true),
-                        fostlib::mime::mime_headers(), L"application/json"));
+                auto fed_data{
+                    boost::make_shared<fostlib::text_body>(
+                        fostlib::json::unparse(body, true),
+                        fostlib::mime::mime_headers(), L"application/json")};
                 auto fed_resp = ua.post(federation_url, fed_data);
                 fed_response_data = fostlib::json::parse(fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(fed_resp->body()->data())));
             }
