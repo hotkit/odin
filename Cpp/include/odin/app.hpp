@@ -27,6 +27,10 @@ namespace odin {
         void save_app_user(fostlib::pg::connection &cnx, f5::u8view reference,
             const f5::u8view identity_id, const f5::u8view app_id);
 
+        /// Return app user detail
+        fostlib::json get_app_user(fostlib::pg::connection &cnx, const f5::u8view app_id,
+            const f5::u8view identity_id);
+
     }
 
 

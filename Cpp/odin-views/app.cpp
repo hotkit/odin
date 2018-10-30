@@ -7,6 +7,7 @@
 
 #include <odin/app.hpp>
 #include <odin/credentials.hpp>
+#include <odin/group.hpp>
 #include <odin/nonce.hpp>
 #include <odin/odin.hpp>
 #include <odin/user.hpp>
@@ -14,11 +15,13 @@
 
 #include <fost/exception/parse_error.hpp>
 #include <fost/insert>
+#include <fost/json>
 #include <fost/log>
 #include <fostgres/sql.hpp>
 
 
 namespace {
+
 
     const fostlib::module c_odin_app(odin::c_odin, "app.cpp");
 
@@ -49,8 +52,14 @@ namespace {
             const auto app_id = paths[0];
             fostlib::json app = odin::app::get_detail(cnx, app_id);
             cnx.commit();
-            if ( app.isnull() )
+            if ( app.isnull() ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "App not found");
+            }
+
+            if ( fostlib::coerce<fostlib::string>(app["app"]["access_policy"]) != "INVITE_ONLY" ) {
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__,
+                    "Invalid access policy, supported only INVITE_ONLY");
+            }
 
             if ( req.method() == "GET" ) {
                 boost::filesystem::wpath filename(
@@ -70,11 +79,15 @@ namespace {
 
 
             auto user = odin::credentials(cnx, username, password, req.remote_address());
-            if ( user.isnull() )
+            if ( user.isnull() ) {
                 throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "User not found");
-            auto ref = odin::reference();
-            odin::app::save_app_user(cnx, ref, fostlib::coerce<f5::u8view>(user["identity"]["id"]), app_id);
-            cnx.commit();
+            }
+
+            auto app_user = odin::app::get_app_user(cnx, app_id, fostlib::coerce<f5::u8view>(user["identity"]["id"]));
+            if ( app_user.isnull() ) {
+                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "Forbidden");
+            }
+
             auto jwt = odin::app::mint_user_jwt(user, app);
             fostlib::mime::mime_headers headers;
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
@@ -123,35 +136,79 @@ namespace {
                 fostlib::insert(mock_identity, "email", "mock_user@email.com");
                 fostlib::insert(mock_identity, "full_name", "Mock User");
                 fostlib::insert(fed_response_data, "identity", mock_identity);
+                fostlib::push_back(fed_response_data, "roles", "admin-group");
+                fostlib::push_back( fed_response_data, "roles", "admin-user");
             } else {
                 fostlib::url federation_url(fostlib::coerce<fostlib::string>(config["federation_url"]));
                 fostlib::http::user_agent ua{};
-                boost::shared_ptr<fostlib::mime> fed_data(
-                    new fostlib::text_body(fostlib::json::unparse(body, true),
-                        fostlib::mime::mime_headers(), L"application/json"));
+                auto fed_data{
+                    boost::make_shared<fostlib::text_body>(
+                        fostlib::json::unparse(body, true),
+                        fostlib::mime::mime_headers(), L"application/json")};
                 auto fed_resp = ua.post(federation_url, fed_data);
-                fed_response_data = fostlib::json::parse(fostlib::coerce<fostlib::string>(fostlib::coerce<fostlib::utf8_string>(fed_resp->body()->data())));
+                fed_response_data = fostlib::json::parse(fostlib::coerce<fostlib::string>(
+                    fostlib::coerce<fostlib::utf8_string>(fed_resp->body()->data())));
             }
             // Create user
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto ref = odin::reference();
-            odin::create_user(cnx, ref, fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]));
-            if ( odin::is_module_enabled(cnx, "opts/full-name") ){
-                odin::set_full_name(cnx, ref,
-                    fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]),
+            auto const identity_id = fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]);
+            odin::create_user(cnx, ref, identity_id);
+
+            if ( odin::is_module_enabled(cnx, "opts/full-name") ) {
+                odin::set_full_name(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::string>(fed_response_data["identity"]["full_name"]));
             }
-            if ( odin::is_module_enabled(cnx, "opts/email") ){
-                odin::set_email(cnx, ref,
-                    fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]),
+
+            if ( odin::is_module_enabled(cnx, "opts/email") ) {
+                odin::set_email(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::email_address>(fed_response_data["identity"]["email"]));
             }
+
+            // Add membership to group
+            if ( odin::is_module_enabled(cnx, "authz") ) {
+                auto currentrs = cnx.procedure(
+                        "SELECT group_slug FROM odin.group_membership "
+                        "WHERE identity_id=$1")
+                    .exec(std::vector<fostlib::string>{{identity_id}});
+
+                std::vector<fostlib::json> difference, current,
+                    fed{fed_response_data["roles"].begin(),
+                        fed_response_data["roles"].end()};
+
+                std::transform(currentrs.begin(), currentrs.end(),
+                    std::back_inserter(current), [](const auto &row) {
+                        return row[0];
+                    });
+
+                std::sort(current.begin(), current.end());
+                std::sort(fed.begin(), fed.end());
+
+                std::set_symmetric_difference(
+                    current.begin(), current.end(),
+                    fed.begin(), fed.end(),
+                    std::back_inserter(difference));
+
+                for ( auto const diff : difference ) {
+                    if ( std::find(fed.begin(), fed.end(), diff) == fed.end() ) {
+                        /// Not in the federation set, so need to remove
+                        odin::group::remove_membership(cnx, ref, identity_id,
+                            fostlib::coerce<fostlib::string>(diff));
+                    } else {
+                        /// On the federation set, so need to add
+                        odin::group::add_membership(cnx, ref, identity_id,
+                            fostlib::coerce<fostlib::string>(diff));
+                    }
+                }
+            }
+
             cnx.commit();
             auto jwt(odin::mint_login_jwt(fed_response_data));
             auto exp = jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
 
             fostlib::mime::mime_headers headers;
-            headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp).underlying().underlying().c_str());
+            headers.add("Expires", fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
+                .underlying().underlying().c_str());
             boost::shared_ptr<fostlib::mime> response(
                             new fostlib::text_body(fostlib::utf8_string(jwt.token()),
                                 headers, L"application/jwt"));
@@ -213,14 +270,19 @@ namespace {
                 ("payload", jwt.value().payload);
 
             static const fostlib::string sql("SELECT "
-                    "odin.identity.tableoid AS identity__tableoid, "
-                    "odin.identity.* "
-                "FROM odin.identity "
-                "INNER JOIN odin.app_user ON odin.identity.id = odin.app_user.identity_id "
-                "WHERE odin.identity.id = $1 "
+                "odin.identity.tableoid AS identity__tableoid, "
+                "odin.identity.*, "
+                "(SELECT COALESCE(json_agg(role), '[]'::json) "
+                "FROM odin.app_user_role "
+                "WHERE odin.app_user_role.app_id= $1 "
+                "AND odin.app_user_role.identity_id= $2) as roles "
+            "FROM odin.identity "
+            "INNER JOIN odin.app_user ON odin.identity.id = odin.app_user.identity_id "
+            "WHERE odin.identity.id = $2 "
+            "AND odin.app_user.app_id = $1"
             );
             const auto user_id = fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]);
-            auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{user_id});
+            auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id, user_id});
             auto &rs = data.second;
             auto row = rs.begin();
 

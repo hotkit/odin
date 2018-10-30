@@ -21,6 +21,16 @@
                                 1
                             ]
                         }
+                    },
+                    {
+                        "return": "object",
+                        "path": [1, "/group-membership"],
+                        "GET": {
+                            "command": "SELECT json_agg(group_slug) as groups FROM odin.group_membership WHERE identity_id=$1",
+                            "arguments": [
+                                1
+                            ]
+                        }
                     }
                 ]
             }

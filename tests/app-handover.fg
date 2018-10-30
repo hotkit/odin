@@ -2,11 +2,13 @@
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 
 # Set up new users and apps
 odin.user owner password1234
 odin.user player1 password1234
 odin.user player2 password1234
+odin.user player3 password1234
 odin.sql.file (module.path.join app-login-test-figure.sql)
 
 # Support only POST
@@ -28,3 +30,23 @@ GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 POST test/app/handover / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User", "email": "mock_user@email.com"}
+
+
+# Should record user into groups
+odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+GET test/app/handover/validate /mock_user/group-membership 200 {"groups": null}
+POST test/app/handover / {"token": "mock"} 200
+GET test/app/handover/validate /mock_user 200
+GET test/app/handover/validate /mock_user/group-membership 200 {"groups": ["admin-group", "admin-user"]}
+
+# Should remove user from invalid groups
+sql.insert odin.group_membership_ledger {
+    "reference": "test-handover",
+    "identity_id": "mock_user",
+    "group_slug": "auditor",
+    "member": true
+}
+GET test/app/handover/validate /mock_user/group-membership 200 {"groups": ["admin-group", "admin-user", "auditor"]}
+POST test/app/handover / {"token": "mock"} 200
+GET test/app/handover/validate /mock_user/group-membership 200 {"groups": ["admin-group", "admin-user"]}
