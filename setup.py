@@ -24,8 +24,7 @@ setup(name='odin',
             ('share/odin/Schema/opts/facebook', ['Schema/opts/facebook/001-initial.blue.sql']),
             ('share/odin/Schema/opts/google', ['Schema/opts/google/001-initial.blue.sql']),
             ('share/odin/Schema/opts/installation-id', [
-                'Schema/opts/installation-id/001-initial.blue.sql',
-                'Schema/opts/installation-id/002-fix-pk.blue.sql'
+                'Schema/opts/installation-id/001-initial.blue.sql'
             ]),
             ('share/odin/Schema/app', ['Schema/app/002-initial.blue.sql']),
             ('share/odin/Schema/opts/logout', [

@@ -16,6 +16,7 @@ add_custom_command(OUTPUT test-authnz
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authz/001-initial.blue.sql
+            ../Schema/authz/002-view-user_permission.blue.sql
             ../Configuration/odin-views.json
             authnz-test-view.json
             authnz.fg
@@ -57,6 +58,9 @@ add_custom_command(OUTPUT test-login
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/email/001-initial.blue.sql
+            ../Schema/opts/installation-id/001-initial.blue.sql
             ../Configuration/odin-views.json
             login.fg
     )
@@ -235,6 +239,7 @@ add_custom_command(OUTPUT test-login-facebook
             ../Schema/opts/email/001-initial.blue.sql
             ../Schema/opts/facebook/001-initial.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/installation-id/001-initial.blue.sql
             ../Configuration/odin-views.json
             facebook-test.json
             login-google-test.json
@@ -288,6 +293,7 @@ add_custom_command(OUTPUT test-login-google
             ../Schema/opts/email/001-initial.blue.sql
             ../Schema/opts/google/001-initial.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/installation-id/001-initial.blue.sql
             ../Configuration/odin-views.json
             login-google-test.json
             facebook-test.json
@@ -406,7 +412,11 @@ add_custom_command(OUTPUT test-app-handover
         ../Schema/bootstrap.sql
         ../Schema/core/000-initial.blue.sql
         ../Schema/authn/001-initial.blue.sql
+        ../Schema/authz/001-initial.blue.sql
+        ../Schema/authz/002-view-user_permission.blue.sql
         ../Schema/app/002-initial.blue.sql
+        ../Schema/opts/full-name/001-initial.blue.sql
+        ../Schema/opts/email/001-initial.blue.sql
         app-federation-test-client-view.json
         app-handover.fg
 )
