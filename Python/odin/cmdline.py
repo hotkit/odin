@@ -1,13 +1,14 @@
 import csv
+
+from odin.app import addappuser, assignappuserrole, createapp, createapprole
 from odin.connection import execute_sql_file
 from odin.display import listing
 from odin.group import (addmembership, assignpermission, removemembership,
-    setgroup)
+                        setgroup)
 from odin.permission import setpermission
 from odin.schema import enablemodules, migrate
 from odin.user import (createuser, expireuser, setfullname, setpassword,
-    setsuperuser)
-
+                       setsuperuser)
 
 SHORTOPTS = '?d:h:p:U:'
 PGOPTMAP = {
@@ -32,6 +33,19 @@ Command is one of:
 
     assign group permission1 [permission2 [permission3 ...]]
         Assign one or more permissions to a group.
+
+    assign-app-user-role app_id identity_id role
+        Assign user to app's role. Required `add` module.
+
+    create-app app_id app_name [access_policy] [data_sharing_policy] [token] redirect_url]
+        Create an app. Now support ony access_policy=INVITE_ONLY and data_sharing_policy=ALL
+        Required `app` module.
+
+    create-app-role app_id role
+        Set up role in app. Required `app` module.
+
+    create-app-user app_id identity_id [state]
+        Add user to the app. Required `app` module.
 
     enable-modules mod1 [mod2 [mod3 ...]]
         Enable the modules in the Odin database schema.
@@ -121,6 +135,10 @@ COMMANDS = {
         'sql': execute_sql_file,
         'superuser': setsuperuser,
         'user': createuser,
+        'create-app': createapp,
+        'create-app-role': createapprole,
+        'add-app-user': addappuser,
+        'assign-app-user-role': assignappuserrole
     }
 
 
@@ -133,4 +151,3 @@ def command(cnx, cmd, *args):
         COMMANDS[cmd](cnx, *args)
     else:
         raise UnknownCommand(cmd)
-
