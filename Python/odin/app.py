@@ -23,8 +23,8 @@ CREATE_APP_ROLE = """
 
 ADD_APP_USER = """
     INSERT INTO odin.app_user_ledger 
-        (reference, app_id, identity_id, state)
-    VALUES (%s, %s, %s, %s)
+        (reference, app_id, identity_id)
+    VALUES (%s, %s, %s)
 """
 
 ASSIGN_APP_USER_ROLE = """
@@ -50,9 +50,9 @@ def createapprole(cnx, app_id, role):
     print('{}.{} set up'.format(app_id, role))
 
 
-def addappuser(cnx, app_id, identity_id, state='ACTIVE'):
+def addappuser(cnx, app_id, identity_id):
     cnx.assert_module('app')
-    cnx.execute(ADD_APP_USER, (cnx.reference, app_id, identity_id, state))
+    cnx.execute(ADD_APP_USER, (cnx.reference, app_id, identity_id))
     print('{} is an app user of {}'.format(identity_id, app_id))
 
 
