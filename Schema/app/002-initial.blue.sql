@@ -87,10 +87,7 @@ CREATE TABLE odin.app_user (
     FOREIGN KEY (identity_id)
         REFERENCES odin.identity (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
-
-    PRIMARY KEY (app_id, identity_id),
-
-    state TEXT NOT NULL
+    PRIMARY KEY (app_id, identity_id)
 );
 
 CREATE TABLE odin.app_user_ledger (
@@ -106,7 +103,6 @@ CREATE TABLE odin.app_user_ledger (
 
     PRIMARY KEY (reference, app_id, identity_id),
 
-    state TEXT NOT NULL DEFAULT 'ACTIVE',
     changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     pg_user TEXT NOT NULL DEFAULT current_user,
     annotation JSON NOT NULL DEFAULT '{}'
@@ -114,10 +110,9 @@ CREATE TABLE odin.app_user_ledger (
 
 CREATE FUNCTION odin.app_user_ledger_insert() RETURNS TRIGGER AS $body$
 BEGIN
-    INSERT INTO odin.app_user (app_id, identity_id, state)
-    VALUES (NEW.app_id, NEW.identity_id, NEW.state)
-    ON CONFLICT (app_id, identity_id) DO UPDATE SET
-        state=NEW.state;
+    INSERT INTO odin.app_user (app_id, identity_id)
+    VALUES (NEW.app_id, NEW.identity_id)
+    ON CONFLICT (app_id, identity_id) DO NOTHING;
     RETURN NULL;
 END;
 $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
