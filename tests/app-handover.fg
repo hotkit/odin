@@ -12,31 +12,45 @@ odin.user player3 password1234
 odin.sql.file (module.path.join app-login-test-figure.sql)
 
 # Support only POST
-GET test/app/handover / 501
-GET test/app/handover /app02 501
+GET test/app/handover/mock_user / 501
+GET test/app/handover/mock_user /app02 501
 
 
 # Validate Payload
-POST test/app/handover / {} 501
+POST test/app/handover/mock_user / {} 501
 
-POST test/app/handover / {"token": "mock"} 200
+POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user"}
 
 # Should record identity data if modules are enabled
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
-POST test/app/handover / {"token": "mock"} 200
+POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User"}
 
+# Should work with empty or null full-name
+POST test/app/handover/no_full-name / {"token": "mock"} 200
+GET test/app/handover/validate /no_full-name 200 {"id": "no_full-name", "full_name": null}
+
+POST test/app/handover/empty_full-name / {"token": "mock"} 200
+GET test/app/handover/validate /empty_full-name 200 {"id": "empty_full-name", "full_name": null}
+
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
-POST test/app/handover / {"token": "mock"} 200
+POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User", "email": "mock_user@email.com"}
+
+# Should work with empty or null email
+POST test/app/handover/no_email / {"token": "mock"} 200
+GET test/app/handover/validate /no_email 200 {"id": "no_email", "email": null}
+
+POST test/app/handover/empty_email / {"token": "mock"} 200
+GET test/app/handover/validate /empty_email 200 {"id": "empty_email", "email": null}
 
 
 # Should record user into groups
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
 GET test/app/handover/validate /mock_user/group-membership 200 {"groups": null}
-POST test/app/handover / {"token": "mock"} 200
+POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200
 GET test/app/handover/validate /mock_user/group-membership 200 {"groups": ["admin-group", "admin-user"]}
 
@@ -48,5 +62,5 @@ sql.insert odin.group_membership_ledger {
     "member": true
 }
 GET test/app/handover/validate /mock_user/group-membership 200 {"groups": ["admin-group", "admin-user", "auditor"]}
-POST test/app/handover / {"token": "mock"} 200
+POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user/group-membership 200 {"groups": ["admin-group", "admin-user"]}
