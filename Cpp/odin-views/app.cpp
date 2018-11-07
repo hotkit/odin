@@ -149,16 +149,16 @@ namespace {
             auto const identity_id = fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]);
             odin::create_user(cnx, ref, identity_id);
 
-            if ( odin::is_module_enabled(cnx, "opts/full-name")
-                && !fed_response_data["identity"]["full_name"].isnull()
-                && fed_response_data["identity"]["full_name"] != "" ) {
+            if ( !fed_response_data["identity"]["full_name"].isnull()
+                && fed_response_data["identity"]["full_name"] != ""
+                && odin::is_module_enabled(cnx, "opts/full-name") ) {
                 odin::set_full_name(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::string>(fed_response_data["identity"]["full_name"]));
             }
 
-            if ( odin::is_module_enabled(cnx, "opts/email")
-                && !fed_response_data["identity"]["email"].isnull()
-                && fed_response_data["identity"]["email"] != "" ) {
+            if ( !fed_response_data["identity"]["email"].isnull()
+                && fed_response_data["identity"]["email"] != ""
+                && odin::is_module_enabled(cnx, "opts/email") ) {
                 odin::set_email(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::email_address>(fed_response_data["identity"]["email"]));
             }
