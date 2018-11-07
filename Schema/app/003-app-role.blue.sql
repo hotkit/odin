@@ -6,7 +6,7 @@ CREATE TABLE odin.app_role (
     FOREIGN KEY (app_id)
         REFERENCES odin.app (app_id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
-    role TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (odin.url_safe(role)),
     PRIMARY KEY (app_id, role)
 );
 
@@ -16,7 +16,7 @@ CREATE TABLE odin.app_role_ledger (
     app_id text NOT NULL,
     FOREIGN KEY (app_id)
         REFERENCES odin.app (app_id) MATCH SIMPLE,
-    role TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (odin.url_safe(role)),
     CONSTRAINT odin_app_role_ledger_pk PRIMARY KEY (reference, app_id, role),
 
     created timestamp with time zone NOT NULL DEFAULT now(),
@@ -53,9 +53,7 @@ CREATE TABLE odin.app_user_role (
     FOREIGN KEY (app_id, role)
         REFERENCES odin.app_role (app_id, role) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
-    PRIMARY KEY (app_id, identity_id, role),
-    changed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    pg_user TEXT NOT NULL DEFAULT current_user
+    PRIMARY KEY (app_id, identity_id, role)
 );
 
 CREATE TABLE odin.app_user_role_ledger (

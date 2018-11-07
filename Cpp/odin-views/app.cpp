@@ -131,13 +131,7 @@ namespace {
                     "Must pass token field");
             fostlib::json fed_response_data{};
             if ( config.has_key("mock") ) {
-                fostlib::json mock_identity{};
-                fostlib::insert(mock_identity, "id", "mock_user");
-                fostlib::insert(mock_identity, "email", "mock_user@email.com");
-                fostlib::insert(mock_identity, "full_name", "Mock User");
-                fostlib::insert(fed_response_data, "identity", mock_identity);
-                fostlib::push_back(fed_response_data, "roles", "admin-group");
-                fostlib::push_back( fed_response_data, "roles", "admin-user");
+                fed_response_data = config["mock"];
             } else {
                 fostlib::url federation_url(fostlib::coerce<fostlib::string>(config["federation_url"]));
                 fostlib::http::user_agent ua{};
@@ -155,12 +149,16 @@ namespace {
             auto const identity_id = fostlib::coerce<fostlib::string>(fed_response_data["identity"]["id"]);
             odin::create_user(cnx, ref, identity_id);
 
-            if ( odin::is_module_enabled(cnx, "opts/full-name") ) {
+            if ( !fed_response_data["identity"]["full_name"].isnull()
+                && fed_response_data["identity"]["full_name"] != ""
+                && odin::is_module_enabled(cnx, "opts/full-name") ) {
                 odin::set_full_name(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::string>(fed_response_data["identity"]["full_name"]));
             }
 
-            if ( odin::is_module_enabled(cnx, "opts/email") ) {
+            if ( !fed_response_data["identity"]["email"].isnull()
+                && fed_response_data["identity"]["email"] != ""
+                && odin::is_module_enabled(cnx, "opts/email") ) {
                 odin::set_email(cnx, ref, identity_id,
                     fostlib::coerce<fostlib::email_address>(fed_response_data["identity"]["email"]));
             }
