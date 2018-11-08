@@ -1,3 +1,6 @@
+2018-11-08  Tle Ekkul  <e.aryuth@gmail.com>
+ odin.app.secure doesn't need app_id as a prefix anymore.
+
 2018-11-02  Tle Ekkul  <e.aryuth@gmail.com>
  Fix table app_user PK order
  Add table app_role_ledger
