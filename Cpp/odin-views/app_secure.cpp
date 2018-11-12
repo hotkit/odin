@@ -36,7 +36,7 @@ namespace {
                 if ( parts.first == "Bearer" && parts.second ) {
                     fostlib::pg::connection cnx{fostgres::connection(config, req)};
                     auto jwt = fostlib::jwt::token::load(
-                        [&cnx = cnx] (fostlib::json jwt_header, fostlib::json jwt_body) {
+                        [&cnx] (fostlib::json jwt_header, fostlib::json jwt_body) {
                             const auto app_id = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
                             fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
                             if ( app.isnull() ) {
