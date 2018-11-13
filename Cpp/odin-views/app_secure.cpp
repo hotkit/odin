@@ -31,38 +31,29 @@ namespace {
             fostlib::http::server::request &req,
             const fostlib::host &host
         ) const {
-            fostlib::log::debug(odin::c_odin)("path", path);
-            const auto slash = path.find("/");
-            const auto app_id = path.substr(0, slash);
-            if ( app_id.empty() )
-                throw fostlib::exceptions::not_implemented(__func__,
-                    "Must pass app_id in the URL");
-
-            fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            fostlib::json app = odin::app::get_detail(cnx, app_id);
-            if ( app.isnull() )
-                throw fostlib::exceptions::not_implemented(__func__, "App not found");
-            // Set the reference header
-            auto ref = odin::reference();
-            req.headers().set("__odin_reference", ref);
-            // Now check which sub-view to enter
             if ( req.headers().exists("Authorization") ) {
                 auto parts = fostlib::partition(req.headers()["Authorization"].value(), " ");
                 if ( parts.first == "Bearer" && parts.second ) {
+                    fostlib::pg::connection cnx{fostgres::connection(config, req)};
                     auto jwt = fostlib::jwt::token::load(
-                        fostlib::coerce<fostlib::string>(app["app"]["token"]), parts.second.value());
+                        [&cnx] (fostlib::json jwt_header, fostlib::json jwt_body) {
+                            const auto app_id = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
+                            fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
+                            if ( app.isnull() ) {
+                                throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__, "App not found");
+                            }
+                            return fostlib::coerce<fostlib::string>(app["app"]["token"]);
+                        }, parts.second.value());
                     if ( jwt ) {
                         auto iss = fostlib::coerce<fostlib::string>(jwt.value().payload["iss"]);
-                        if ( iss == app_id ) {
-                            fostlib::log::debug(odin::c_odin)
-                                ("", "JWT authenticated")
-                                ("header", jwt.value().header)
-                                ("payload", jwt.value().payload);
-                            req.headers().set("__jwt", jwt.value().payload, "sub");
-                            req.headers().set("__app",
-                                fostlib::coerce<fostlib::string>(jwt.value().payload["iss"]));
-                            return execute(config["secure"], slash == fostlib::string::npos ? fostlib::string{} : path.substr(slash + 1), req, host);
-                        }
+                        fostlib::log::debug(odin::c_odin)
+                            ("", "JWT authenticated")
+                            ("header", jwt.value().header)
+                            ("payload", jwt.value().payload);
+                        req.headers().set("__jwt", jwt.value().payload, "sub");
+                        req.headers().set("__user", fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]));
+                        req.headers().set("__app", fostlib::coerce<fostlib::string>(jwt.value().payload["iss"]));
+                        return execute(config["secure"], path, req, host);
                     }
                 } else {
                     fostlib::log::warning(odin::c_odin)
