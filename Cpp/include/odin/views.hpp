@@ -18,13 +18,12 @@ namespace odin {
     namespace view {
 
 
-        extern const fostlib::urlhandler::view
-            &login, &logout, &secure, &user_unsecure, &registration, &facebook, &facebook_link,
-            &google, &app_login, &app_secure;
+        extern const fostlib::urlhandler::view &login, &logout, &secure,
+                &user_unsecure, &registration, &facebook, &facebook_link,
+                &google, &app_login, &app_secure;
 
 
     }
 
 
 }
-

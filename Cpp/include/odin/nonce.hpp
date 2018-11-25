@@ -32,8 +32,8 @@ namespace odin {
 
 
     /// Sets the specified reference on a connection.
-    fostlib::pg::connection &reference(fostlib::pg::connection &, const fostlib::string &);
+    fostlib::pg::connection &
+            reference(fostlib::pg::connection &, const fostlib::string &);
 
 
 }
-

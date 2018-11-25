@@ -20,33 +20,29 @@ namespace {
 
 
     const class logout : public fostlib::urlhandler::view {
-    public:
-        logout()
-        : view("odin.logout") {
-        }
+      public:
+        logout() : view("odin.logout") {}
 
-        std::pair<boost::shared_ptr<fostlib::mime>, int> operator () (
-            const fostlib::json &config,
-            const fostlib::string &path,
-            fostlib::http::server::request &req,
-            const fostlib::host &host
-        ) const {
-            if ( req.method() == "POST" ) {
-                auto logout_claim =
-                    req.headers()["__jwt"].subvalue(odin::c_jwt_logout_claim.value());
+        std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
+                const fostlib::json &config,
+                const fostlib::string &path,
+                fostlib::http::server::request &req,
+                const fostlib::host &host) const {
+            if (req.method() == "POST") {
+                auto logout_claim = req.headers()["__jwt"].subvalue(
+                        odin::c_jwt_logout_claim.value());
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
-                if ( logout_claim ) {
-                    odin::logout_user(cnx,
-                        req.headers()["__odin_reference"].value(),
-                        req.headers()["__remote_addr"].value(),
-                        req.headers()["__user"].value()
-                    );
+                if (logout_claim) {
+                    odin::logout_user(
+                            cnx, req.headers()["__odin_reference"].value(),
+                            req.headers()["__remote_addr"].value(),
+                            req.headers()["__user"].value());
                     cnx.commit();
                 }
                 return execute(config, path, req, host);
             } else {
-                throw fostlib::exceptions::not_implemented(__func__,
-                    "Login requires POST. This should be a 405");
+                throw fostlib::exceptions::not_implemented(
+                        __func__, "Login requires POST. This should be a 405");
             }
         }
     } c_logout;
@@ -56,4 +52,3 @@ namespace {
 
 
 const fostlib::urlhandler::view &odin::view::logout = c_logout;
-

@@ -21,12 +21,12 @@ namespace {
 
 
     fg::json sql_file(
-        fg::frame &stack, fg::json::const_iterator pos, fg::json::const_iterator end
-    ) {
-        auto sql = fostlib::coerce<fostlib::utf8_string>(
-            fostlib::utf::load_file(
-                fostlib::coerce<boost::filesystem::path>(
-                    stack.resolve_string(stack.argument("filename", pos, end)))));
+            fg::frame &stack,
+            fg::json::const_iterator pos,
+            fg::json::const_iterator end) {
+        auto sql = fostlib::coerce<fostlib::utf8_string>(fostlib::utf::load_file(
+                fostlib::coerce<boost::filesystem::path>(stack.resolve_string(
+                        stack.argument("filename", pos, end)))));
         auto cnx = odin::connect(stack);
         cnx.exec(sql);
         cnx.commit();
@@ -34,23 +34,23 @@ namespace {
     }
 
 
-    const fg::register_builtins g_odin(
-        [](fg::frame &stack) {
-            stack.symbols["odin.reference"] = odin::reference();
-            stack.native["odin.assign"] = odin::lib::assign;
-            stack.native["odin.group"] = odin::lib::group;
-            stack.native["odin.hash"] = odin::lib::hash;
-            stack.native["odin.jwt.authorization"] = odin::lib::mint_login_jwt;
-            stack.native["odin.jwt.mint"] = odin::lib::mint_jwt;
-            stack.native["odin.jwt.mint.password-reset"] = odin::lib::mint_reset_password_jwt;
-            stack.native["odin.jwt.payload"] = odin::lib::jwt_payload;
-            stack.native["odin.membership"] = odin::lib::membership;
-            stack.native["odin.permission"] = odin::lib::permission;
-            stack.native["odin.sql.file"] = sql_file;
-            stack.native["odin.superuser"] = odin::lib::superuser;
-            stack.native["odin.user"] = odin::lib::user;
-            stack.native["odin.user.expire"] = odin::lib::expire;
-        });
+    const fg::register_builtins g_odin([](fg::frame &stack) {
+        stack.symbols["odin.reference"] = odin::reference();
+        stack.native["odin.assign"] = odin::lib::assign;
+        stack.native["odin.group"] = odin::lib::group;
+        stack.native["odin.hash"] = odin::lib::hash;
+        stack.native["odin.jwt.authorization"] = odin::lib::mint_login_jwt;
+        stack.native["odin.jwt.mint"] = odin::lib::mint_jwt;
+        stack.native["odin.jwt.mint.password-reset"] =
+                odin::lib::mint_reset_password_jwt;
+        stack.native["odin.jwt.payload"] = odin::lib::jwt_payload;
+        stack.native["odin.membership"] = odin::lib::membership;
+        stack.native["odin.permission"] = odin::lib::permission;
+        stack.native["odin.sql.file"] = sql_file;
+        stack.native["odin.superuser"] = odin::lib::superuser;
+        stack.native["odin.user"] = odin::lib::user;
+        stack.native["odin.user.expire"] = odin::lib::expire;
+    });
 
 
 }
@@ -61,4 +61,3 @@ fostlib::pg::connection odin::connect(fg::frame &stack) {
     odin::reference(cnx, stack.resolve_string(stack.lookup("odin.reference")));
     return cnx;
 }
-

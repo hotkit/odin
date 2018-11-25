@@ -14,13 +14,12 @@
 #include <fost/insert>
 
 
-void odin::group::alter_membership (
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view identity_id,
-    f5::u8view group_slug,
-    bool is_member
-) {
+void odin::group::alter_membership(
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view identity_id,
+        f5::u8view group_slug,
+        bool is_member) {
     fg::json group_membership;
     fostlib::insert(group_membership, "reference", reference);
     fostlib::insert(group_membership, "identity_id", identity_id);
