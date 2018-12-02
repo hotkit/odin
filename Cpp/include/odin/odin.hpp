@@ -37,9 +37,11 @@ namespace odin {
     /// The JWT claim for embedded permissions
     extern const fostlib::setting<fostlib::string> c_jwt_permissions_claim;
 
-    /// The secret used for JWT forgotten password reset tokens. Always pick a new value for this as
-    /// the default will change each time the mengmom is restarted.
-    extern const fostlib::setting<fostlib::string> c_jwt_reset_forgotten_password_secret;
+    /// The secret used for JWT forgotten password reset tokens. Always pick a
+    /// new value for this as the default will change each time the mengmom is
+    /// restarted.
+    extern const fostlib::setting<fostlib::string>
+            c_jwt_reset_forgotten_password_secret;
 
     /// Facebook AppID
     extern const fostlib::setting<fostlib::string> c_facebook_app_id;
@@ -56,4 +58,3 @@ namespace odin {
     /// Check module is enabled in the database, does not commit the transaction
     bool is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name);
 }
-

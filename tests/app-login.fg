@@ -2,11 +2,13 @@
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 
 # Set up new users and apps
 odin.user owner password1234
 odin.user player1 password1234
 odin.user player2 password1234
+odin.user player3 password1234
 odin.sql.file (module.path.join app-login-test-figure.sql)
 
 # TODO: Test GET that serve static file
@@ -27,3 +29,6 @@ POST odin/app /login/random_app/ {"username": "player1", "password": "password12
 
 # Return redirect url if successfully login
 POST odin/app /login/app01/ {"username": "player1", "password": "password1234"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}
+
+# Return error to uninvited user
+POST odin/app /login/app01/ {"username": "player2", "password": "password1234"} 501

@@ -17,9 +17,9 @@ namespace odin {
 
     /// Return true if the password matches the specified procedure
     bool check_password(
-        const fostlib::string &password,
-        const fostlib::string &hash,
-        const fostlib::json &procedure);
+            const fostlib::string &password,
+            const fostlib::string &hash,
+            const fostlib::json &procedure);
 
 
     /// Set the given user's password
@@ -27,4 +27,3 @@ namespace odin {
 
 
 }
-

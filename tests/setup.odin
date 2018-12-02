@@ -30,3 +30,15 @@ user barney password123
 full-name barney "Barney Rubble"
 membership barney testers auditor admin-user
 
+# Create test app
+create-app bowling_app "Bowling Game" INVITE_ONLY ALL "shhhh" "www.bowling-game.com/redirect"
+
+# Create test roles
+create-app-role bowling_app "player"
+create-app-role bowling_app "janitor"
+
+add-app-user bowling_app fred
+add-app-user bowling_app barney
+
+assign-app-user-role bowling_app fred player
+assign-app-user-role bowling_app barney janitor

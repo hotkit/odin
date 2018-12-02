@@ -1,11 +1,93 @@
 {
     "webserver": {
-        "views/test/app/handover": {
+        "views/test/app/handover/mock_user": {
             "view": "odin.app.handover",
             "configuration": {
                 "federation_url": "http://localhost:8001/odin/app/verify/bowling_app/",
                 "app_id": "bowling_app",
-                "mock": "OK"
+                "mock": {
+                    "identity": {
+                        "email": "mock_user@email.com",
+                        "expires": null,
+                        "full_name": "Mock User",
+                        "id": "mock_user",
+                        "installation_id": "164421a4-0176-4b2c-9edd-e98c21a99e77",
+                        "verified": false
+                    },
+                    "roles": ["admin-group", "admin-user"]
+                }
+            }
+        },
+        "views/test/app/handover/no_full-name": {
+            "view": "odin.app.handover",
+            "configuration": {
+                "federation_url": "http://localhost:8001/odin/app/verify/bowling_app/",
+                "app_id": "bowling_app",
+                "mock": {
+                    "identity": {
+                        "email": "no_full-name@email.com",
+                        "expires": null,
+                        "full_name": null,
+                        "id": "no_full-name",
+                        "installation_id": "164421a4-0176-4b2c-9edd-e98c21a99e77",
+                        "verified": false
+                    },
+                    "roles": ["admin-group", "admin-user"]
+                }
+            }
+        },
+        "views/test/app/handover/empty_full-name": {
+            "view": "odin.app.handover",
+            "configuration": {
+                "federation_url": "http://localhost:8001/odin/app/verify/bowling_app/",
+                "app_id": "bowling_app",
+                "mock": {
+                    "identity": {
+                        "email": "empty_full-name@email.com",
+                        "expires": null,
+                        "full_name": "",
+                        "id": "empty_full-name",
+                        "installation_id": "164421a4-0176-4b2c-9edd-e98c21a99e77",
+                        "verified": false
+                    },
+                    "roles": ["admin-group", "admin-user"]
+                }
+            }
+        },
+        "views/test/app/handover/no_email": {
+            "view": "odin.app.handover",
+            "configuration": {
+                "federation_url": "http://localhost:8001/odin/app/verify/bowling_app/",
+                "app_id": "bowling_app",
+                "mock": {
+                    "identity": {
+                        "email": null,
+                        "expires": null,
+                        "full_name": null,
+                        "id": "no_email",
+                        "installation_id": "164421a4-0176-4b2c-9edd-e98c21a99e77",
+                        "verified": false
+                    },
+                    "roles": ["admin-group", "admin-user"]
+                }
+            }
+        },
+        "views/test/app/handover/empty_email": {
+            "view": "odin.app.handover",
+            "configuration": {
+                "federation_url": "http://localhost:8001/odin/app/verify/bowling_app/",
+                "app_id": "bowling_app",
+                "mock": {
+                    "identity": {
+                        "email": "",
+                        "expires": null,
+                        "full_name": null,
+                        "id": "empty_email",
+                        "installation_id": "164421a4-0176-4b2c-9edd-e98c21a99e77",
+                        "verified": false
+                    },
+                    "roles": ["admin-group", "admin-user"]
+                }
             }
         },
         "views/test/app/handover/validate": {
@@ -17,6 +99,16 @@
                         "path": [1],
                         "GET": {
                             "command": "SELECT * FROM odin.identity WHERE identity.id=$1",
+                            "arguments": [
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "return": "object",
+                        "path": [1, "/group-membership"],
+                        "GET": {
+                            "command": "SELECT json_agg(group_slug) as groups FROM odin.group_membership WHERE identity_id=$1",
                             "arguments": [
                                 1
                             ]

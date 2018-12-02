@@ -23,13 +23,18 @@ namespace odin {
         /// Return the database row for the identity together with the
         /// google credentials. If the credentials failed to match an empty
         /// JSON instance (null) is returned.
-        fostlib::json credentials(fostlib::pg::connection &cnx, const f5::u8view &google_user_id);
+        fostlib::json credentials(
+                fostlib::pg::connection &cnx, const f5::u8view &google_user_id);
 
-        /// Save google credential of the given user to database, this does not commit the transaction
-        void set_google_credentials(fostlib::pg::connection &cnx, f5::u8view reference, f5::u8view identity_id, f5::u8view google_user_id);
+        /// Save google credential of the given user to database, this does not
+        /// commit the transaction
+        void set_google_credentials(
+                fostlib::pg::connection &cnx,
+                f5::u8view reference,
+                f5::u8view identity_id,
+                f5::u8view google_user_id);
 
     }
 
 
 }
-
