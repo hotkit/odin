@@ -19,6 +19,34 @@
 
 namespace {
 
+    std::optional<fostlib::string>
+            bearer_jwt(fostlib::http::server::request const &req) {
+        if (req.headers().exists("Authorization")) {
+            auto parts = fostlib::partition(
+                    req.headers()["Authorization"].value(), " ");
+            if (parts.first == "Bearer" && parts.second) {
+                return parts.second;
+            } else {
+                fostlib::log::warning(odin::c_odin)(
+                        "", "Invalid Authorization scheme")(
+                        "scheme", parts.first)("data", parts.second);
+            }
+        }
+        return {};
+    }
+
+    fostlib::string load_key(
+            fostlib::pg::connection &cnx,
+            fostlib::json jwt_header,
+            fostlib::json jwt_body) {
+        const auto app_id = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
+        fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
+        if (app.isnull()) {
+            throw fostlib::exceptions::not_implemented(
+                    __PRETTY_FUNCTION__, "App not found");
+        }
+        return fostlib::coerce<fostlib::string>(app["app"]["token"]);
+    }
 
     const class app_secure : public fostlib::urlhandler::view {
       public:
@@ -29,58 +57,35 @@ namespace {
                 const fostlib::string &path,
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
-            if (req.headers().exists("Authorization")) {
-                auto parts = fostlib::partition(
-                        req.headers()["Authorization"].value(), " ");
-                if (parts.first == "Bearer" && parts.second) {
-                    fostlib::pg::connection cnx{
-                            fostgres::connection(config, req)};
-                    auto jwt = fostlib::jwt::token::load(
-                            [&cnx](fostlib::json jwt_header,
-                                   fostlib::json jwt_body) {
-                                const auto app_id =
-                                        fostlib::coerce<fostlib::string>(
-                                                jwt_body["iss"]);
-                                fostlib::json app = odin::app::get_detail(
-                                        cnx, std::move(app_id));
-                                if (app.isnull()) {
-                                    throw fostlib::exceptions::not_implemented(
-                                            __PRETTY_FUNCTION__,
-                                            "App not found");
-                                }
-                                return fostlib::coerce<fostlib::string>(
-                                        app["app"]["token"]);
-                            },
-                            parts.second.value());
-                    if (jwt) {
-                        auto iss = fostlib::coerce<fostlib::string>(
-                                jwt.value().payload["iss"]);
-                        fostlib::log::debug(odin::c_odin)(
-                                "", "JWT authenticated")(
-                                "header", jwt.value().header)(
-                                "payload", jwt.value().payload);
-                        req.headers().set("__jwt", jwt.value().payload, "sub");
-                        req.headers().set(
-                                "__user",
-                                fostlib::coerce<fostlib::string>(
-                                        jwt.value().payload["sub"]));
-                        req.headers().set(
-                                "__app",
-                                fostlib::coerce<fostlib::string>(
-                                        jwt.value().payload["iss"]));
-                        return execute(config["secure"], path, req, host);
-                    }
-                } else {
-                    fostlib::log::warning(odin::c_odin)(
-                            "", "Invalid Authorization scheme")(
-                            "scheme", parts.first)("data", parts.second);
+            auto const jwt_body = bearer_jwt(req);
+            if (jwt_body) {
+                fostlib::pg::connection cnx{fostgres::connection(config, req)};
+                auto jwt = fostlib::jwt::token::load(
+                        [&cnx](fostlib::json h, fostlib::json b) {
+                            return load_key(cnx, h, b);
+                        },
+                        jwt_body.value());
+                if (jwt) {
+                    auto iss = fostlib::coerce<fostlib::string>(
+                            jwt.value().payload["iss"]);
+                    fostlib::log::debug(odin::c_odin)("", "JWT authenticated")(
+                            "header",
+                            jwt.value().header)("payload", jwt.value().payload);
+                    req.headers().set("__jwt", jwt.value().payload, "sub");
+                    req.headers().set(
+                            "__user",
+                            fostlib::coerce<fostlib::string>(
+                                    jwt.value().payload["sub"]));
+                    req.headers().set(
+                            "__app",
+                            fostlib::coerce<fostlib::string>(
+                                    jwt.value().payload["iss"]));
+                    return execute(config["secure"], path, req, host);
                 }
             }
             return execute(config["unsecure"], path, req, host);
         }
     } c_app_secure;
-
-
 }
 
 
