@@ -325,6 +325,33 @@ if(TARGET stress OR TARGET pgtest)
                 expire-user.fg
         )
 
+    add_custom_command(OUTPUT test-app-installation
+            COMMAND fostgres-test odin-test-app-installation -o test-app-installation
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app-installation-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app-installation.fg
+            MAIN_DEPENDENCY app-installation.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Configuration/odin-views.json
+                app-installation-test.json
+                app-installation.fg
+        )
+
     add_custom_command(OUTPUT test-app-login
         COMMAND fostgres-test odin-test-app-login -o test-app-login
             $<TARGET_SONAME_FILE:odin-fg>
@@ -344,6 +371,8 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/app/002-initial.blue.sql
+            ../Schema/app/003-app-role.blue.sql
+            ../Schema/app/004-app-installation.blue.sql
             ../Configuration/odin-views.json
             app-login-test-figure.sql
             app-login.fg
@@ -366,6 +395,8 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/core/000-initial.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/app/002-initial.blue.sql
+            ../Schema/app/003-app-role.blue.sql
+            ../Schema/app/004-app-installation.blue.sql
             app-login-test-figure.sql
             app-secure-test-view.json
             app-secure.fg
@@ -390,6 +421,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/authn/001-initial.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
+            ../Schema/app/004-app-installation.blue.sql
             app-login-test-figure.sql
             app-verify.fg
     )
@@ -416,6 +448,8 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/authz/001-initial.blue.sql
             ../Schema/authz/002-view-user_permission.blue.sql
             ../Schema/app/002-initial.blue.sql
+            ../Schema/app/003-app-role.blue.sql
+            ../Schema/app/004-app-installation.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/email/001-initial.blue.sql
             app-federation-test-client-view.json
@@ -427,6 +461,7 @@ if(TARGET stress OR TARGET pgtest)
     ## actually make the above commands run when things change.
     add_custom_target(odin-tests DEPENDS
             test-app-handover
+            test-app-installation
             test-app-login
             test-app-secure
             test-app-verify

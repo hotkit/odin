@@ -1,0 +1,7 @@
+{
+    "webserver": {
+        "views/test/app/installation": {
+            "view": "odin.app.installation"
+        }
+    }
+}

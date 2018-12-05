@@ -1,0 +1,12 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+
+# Must be wrapped by odin.app.secure
+PUT test/app/installation /install-1 {} 501
+
+set-path testserver.headers ["__app"] "bowling_app"
+# PUT test/app/installation /install-1 {} 200
