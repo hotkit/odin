@@ -12,7 +12,6 @@ odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.user owner password1234
 odin.user invited1 password1234
 odin.user player2 password1234
-odin.user player3 password1234
 
 # Register invite-only-app
 sql.insert odin.identity {"id": "invite-only-app"}
@@ -47,4 +46,19 @@ POST odin/app /login/invite-only-app/ {"username": "invited1", "password": "pass
 # Return error to uninvited user
 POST odin/app /login/invite-only-app/ {"username": "player2", "password": "password1234"} 501
 
+# Enable OPEN app access policy + app installation ID
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 
+sql.insert odin.identity {"id": "open-app"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "open-app",
+    "app_name": "OpenApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+odin.user random-player password1234
+POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200

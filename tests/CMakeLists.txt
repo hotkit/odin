@@ -374,7 +374,6 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
             ../Configuration/odin-views.json
-            app-login-test-figure.sql
             app-login.fg
     )
 
@@ -397,7 +396,6 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
-            app-login-test-figure.sql
             app-secure-test-view.json
             app-secure.fg
     )
@@ -422,7 +420,6 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
-            app-login-test-figure.sql
             app-verify.fg
     )
 

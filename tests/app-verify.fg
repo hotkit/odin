@@ -3,13 +3,46 @@ odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 
 # Set up new users and apps
 odin.user owner password1234
 odin.user player1 password1234
 odin.user player2 password1234
 odin.user player3 password1234
-odin.sql.file (module.path.join app-login-test-figure.sql)
+# Register app01
+sql.insert odin.identity {"id": "app01"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-verify",
+    "app_id": "app01",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "INVITE_ONLY",
+    "data_sharing_policy": "ALL"
+}
+
+# Register app02
+sql.insert odin.identity {"id": "app02"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-verify",
+    "app_id": "app02",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+
+# Set up app01 roles
+sql.insert odin.app_role_ledger {"reference": "test-app-verify", "app_id": "app01", "role": "pro-player"}
+
+# Invite players to app01
+sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player1"}
+sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player3"}
+
+sql.insert odin.app_user_role_ledger {"reference": "test-app-verify", "identity_id": "player1", "app_id": "app01", "role": "pro-player"}
 
 # Support only POST
 GET odin/app /verify/ 501
