@@ -35,3 +35,23 @@ CREATE TRIGGER odin_app_user_installation_id_ledger_insert_trigger
     AFTER INSERT ON odin.app_user_installation_id_ledger
     FOR EACH ROW
     EXECUTE PROCEDURE odin.app_user_installation_id_ledger_insert();
+
+-- Introduce new app access policy
+INSERT INTO odin.app_access_policy VALUES ('OPEN');
+
+CREATE FUNCTION odin.app_user_insert() RETURNS TRIGGER AS $body$
+BEGIN
+    IF (SELECT access_policy ='OPEN'
+        FROM odin.app WHERE app_id=NEW.app_id) THEN
+        INSERT INTO odin.identity (id)
+        VALUES (NEW.identity_id)
+        ON CONFLICT (id) DO NOTHING;
+    END IF;
+    RETURN NEW;
+END;
+$body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
+
+CREATE TRIGGER odin_app_user_insert_trigger
+BEFORE INSERT ON odin.app_user
+FOR EACH ROW
+EXECUTE PROCEDURE odin.app_user_insert();
