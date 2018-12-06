@@ -54,13 +54,6 @@ namespace {
                         __PRETTY_FUNCTION__, "App not found");
             }
 
-            if (fostlib::coerce<fostlib::string>(app["app"]["access_policy"])
-                != "INVITE_ONLY") {
-                throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__,
-                        "Invalid access policy, supported only INVITE_ONLY");
-            }
-
             if (req.method() == "GET") {
                 boost::filesystem::wpath filename(
                         fostlib::coerce<boost::filesystem::wpath>(
