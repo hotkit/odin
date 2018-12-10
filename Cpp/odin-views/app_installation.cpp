@@ -19,11 +19,25 @@
 
 namespace {
 
-    const fostlib::jcursor apploc{"headers", "__app"};
+    bool does_installation_id_has_been_claimed(
+        fostlib::pg::connection &cnx,
+        fostlib::string const app_id,
+        fostlib::string const installation_id
+    ) {
+        static const fostlib::string sql(
+            "SELECT installation_id FROM odin.app_user_installation_id_ledger "
+            "WHERE app_id=$1 AND installation_id=$2");
+        auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{
+                app_id, installation_id});
+        auto &rs = data.second;
+        return rs.begin() != rs.end();
+    }
 
     const class app_installation : public fostlib::urlhandler::view {
       public:
         app_installation() : view("odin.app.installation") {}
+
+        static const fostlib::jcursor apploc;
 
         std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
                 const fostlib::json &config,
@@ -31,23 +45,61 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-            if (not req[apploc]) {
+            if (req.method() != "POST") {
                 throw fostlib::exceptions::not_implemented(
-                        __func__,
-                        "The odin.app.installation view must be wrapped by an odin.app.secure "
-                        "view on the secure path so that there is a valid JWT to find the App ID in");
+                        __PRETTY_FUNCTION__,
+                        "App Login required POST, this should be a 405");
             }
 
-            /*
-                if is_exists(installation_id) and is not registered yet then
-                    raise error
+            if (!req.headers().exists("__app")) {
+                throw fostlib::exceptions::not_implemented(
+                        __func__,
+                        "The odin.app.installation view must be wrapped by an "
+                        "odin.app.secure "
+                        "view on the secure path so that there is a valid JWT "
+                        "to find the App ID in");
+            }
 
-           */
+            auto const body_str = fostlib::coerce<fostlib::string>(
+                fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
+            auto const body = fostlib::json::parse(body_str);
 
-            return execute(config["unsecure"], path, req, host);
+            if (!body.has_key("installation_id")) {
+                throw fostlib::exceptions::not_implemented(
+                        __PRETTY_FUNCTION__,
+                        "Must pass installation_id field");
+            }
+
+            auto const app_id = req.headers()["__app"].value();
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
+            fostlib::json const app = odin::app::get_detail(cnx, app_id);
+
+            // Not support INVITE_ONLY application
+            if (app["app"]["access_policy"] == fostlib::json{"INVITE_ONLY"}) {
+                throw fostlib::exceptions::not_implemented(
+                        __PRETTY_FUNCTION__, "Forbidden");
+            }
+
+            auto const installation_id = fostlib::coerce<fostlib::string>(body["installation_id"]);
+            if (does_installation_id_has_been_claimed(cnx, app_id, installation_id)) {
+                throw fostlib::exceptions::not_implemented(
+                        __PRETTY_FUNCTION__,
+                        "The installation_id has been "
+                        "claimed already.");
+            }
+            fostlib::mime::mime_headers headers;
+            boost::shared_ptr<fostlib::mime> response(
+                    new fostlib::text_body(
+                            fostlib::utf8_string("SUCCESS"), headers,
+                            L"application/jwt"));
+
+            return std::make_pair(response, 201);
         }
     } c_app_installation;
+
+    const fostlib::jcursor app_installation::apploc("headers", "__app");
 }
 
 
-const fostlib::urlhandler::view &odin::view::app_installation = c_app_installation;
+const fostlib::urlhandler::view &odin::view::app_installation =
+        c_app_installation;

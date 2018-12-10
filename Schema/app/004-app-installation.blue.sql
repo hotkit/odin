@@ -27,12 +27,12 @@ CREATE FUNCTION odin.app_user_installation_id_ledger_insert() RETURNS TRIGGER AS
             VALUES (NEW.app_id, NEW.identity_id, NEW.installation_id)
             ON CONFLICT (app_id, identity_id) DO UPDATE SET
                 installation_id = EXCLUDED.installation_id;
-        RETURN NULL;
+        RETURN NEW;
     END;
     $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
 
 CREATE TRIGGER odin_app_user_installation_id_ledger_insert_trigger
-    AFTER INSERT ON odin.app_user_installation_id_ledger
+    BEFORE INSERT ON odin.app_user_installation_id_ledger
     FOR EACH ROW
     EXECUTE PROCEDURE odin.app_user_installation_id_ledger_insert();
 
