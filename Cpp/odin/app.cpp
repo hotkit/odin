@@ -103,3 +103,18 @@ fostlib::json odin::app::get_app_user(
     }
     return app_user;
 }
+
+
+void odin::app::set_installation_id(
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view app_id,
+        f5::u8view identity_id,
+        f5::u8view installation_id) {
+    fg::json user_values;
+    fostlib::insert(user_values, "reference", reference);
+    fostlib::insert(user_values, "app_id", app_id);
+    fostlib::insert(user_values, "identity_id", identity_id);
+    fostlib::insert(user_values, "installation_id", installation_id);
+    cnx.insert("odin.identity_installation_id_ledger", user_values);
+}

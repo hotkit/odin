@@ -39,6 +39,15 @@ namespace odin {
                 const f5::u8view app_id,
                 const f5::u8view identity_id);
 
+        /// Save installation ID if the given user to datavase, this does not commit
+        /// the transaction
+        void set_installation_id(
+                fostlib::pg::connection &cnx,
+                f5::u8view reference,
+                f5::u8view app_id,
+                f5::u8view identity_id,
+                f5::u8view installation_id);
+
     }
 
 
