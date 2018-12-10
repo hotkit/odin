@@ -45,16 +45,13 @@ fostlib::json odin::app::get_detail(
 
 
 fostlib::jwt::mint odin::app::mint_user_jwt(
-        const fostlib::json &user,
-        const fostlib::json &app,
+        const f5::u8view identity_id,
+        const f5::u8view app_id,
         fostlib::json payload) {
-    static const fostlib::jcursor subject("identity", "id");
-    static const fostlib::jcursor app_id("app", "app_id");
-    const fostlib::string jwt_secret = odin::c_jwt_secret.value()
-            + fostlib::coerce<fostlib::string>(app[app_id]);
+    const fostlib::string jwt_secret = odin::c_jwt_secret.value() + app_id;
     fostlib::jwt::mint jwt{fostlib::sha256, jwt_secret, std::move(payload)};
-    jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
-    jwt.claim("iss", app[app_id]);
+    jwt.subject(identity_id);
+    jwt.claim("iss", app_id);
     return jwt;
 }
 
@@ -116,5 +113,5 @@ void odin::app::set_installation_id(
     fostlib::insert(user_values, "app_id", app_id);
     fostlib::insert(user_values, "identity_id", identity_id);
     fostlib::insert(user_values, "installation_id", installation_id);
-    cnx.insert("odin.identity_installation_id_ledger", user_values);
+    cnx.insert("odin.app_user_installation_id_ledger", user_values);
 }

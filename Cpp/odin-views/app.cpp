@@ -99,7 +99,7 @@ namespace {
                 }
             }
 
-            auto jwt = odin::app::mint_user_jwt(user, app);
+            auto jwt = odin::app::mint_user_jwt(identity_id, app_id);
             fostlib::mime::mime_headers headers;
             auto exp = jwt.expires(
                     fostlib::coerce<fostlib::timediff>(config["expires"]),
