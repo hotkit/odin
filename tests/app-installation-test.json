@@ -1,7 +1,12 @@
 {
     "webserver": {
         "views/test/app/installation": {
-            "view": "odin.app.installation"
+            "view": "odin.app.installation",
+            "configuration": {
+                "expires": {
+                    "hours": 72
+                }
+            }
         }
     }
 }

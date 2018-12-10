@@ -12,12 +12,35 @@
                 "login/": {
                     "view": "odin.app.login",
                     "configuration": {
-                        "expires": {"hours": 72},
+                        "expires": {
+                            "hours": 72
+                        },
                         "static": "usr/share/odin/Static/app/login.html"
                     }
                 },
                 "verify/": {
                     "view": "odin.app.verify"
+                },
+                "handshake/": {
+                    "view": "odin.app.secure",
+                    "configuration": {
+                        "secure": {
+                            "view": "odin.app.installation",
+                            "configuration": {
+                                "expires": {
+                                    "hours": 72
+                                }
+                            }
+                        },
+                        "unsecure": {
+                            "view": "fost.response.401",
+                            "configuration": {
+                                "schemes": {
+                                    "Bearer": {}
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

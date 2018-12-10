@@ -84,13 +84,27 @@ namespace {
             if (does_installation_id_has_been_claimed(cnx, app_id, installation_id)) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
-                        "The installation_id has been "
-                        "claimed already.");
+                        "The installation_id has been claimed.");
             }
+            auto const reference = odin::reference();
+            /// Using reference as an identity_id
+            odin::app::set_installation_id(cnx, reference, app_id,
+                    reference, installation_id);
+            cnx.commit();
+            auto jwt = odin::app::mint_user_jwt(reference, app_id);
             fostlib::mime::mime_headers headers;
+            auto exp = jwt.expires(
+                    fostlib::coerce<fostlib::timediff>(config["expires"]),
+                    false);
+            headers.add(
+                    "Expires",
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
+                            .underlying()
+                            .underlying()
+                            .c_str());
+            const auto jwt_token = fostlib::utf8_string(jwt.token());
             boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(
-                            fostlib::utf8_string("SUCCESS"), headers,
+                    new fostlib::text_body(jwt_token, headers,
                             L"application/jwt"));
 
             return std::make_pair(response, 201);

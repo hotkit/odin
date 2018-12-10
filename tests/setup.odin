@@ -31,7 +31,7 @@ full-name barney "Barney Rubble"
 membership barney testers auditor admin-user
 
 # Create test app
-create-app bowling_app "Bowling Game" INVITE_ONLY ALL "shhhh" "www.bowling-game.com/redirect"
+create-app bowling_app "Bowling Game" OPEN ALL "shhhh" "www.bowling-game.com/redirect"
 
 # Create test roles
 create-app-role bowling_app "player"
