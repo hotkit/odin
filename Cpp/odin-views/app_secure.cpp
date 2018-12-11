@@ -39,7 +39,8 @@ namespace {
             fostlib::pg::connection &cnx,
             fostlib::json jwt_header,
             fostlib::json jwt_body) {
-        const auto app_id = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
+        auto const jwt_iss = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
+        auto const app_id = jwt_iss.substr(odin::c_app_namespace.value().length());
         fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
         if (app.isnull()) {
             throw fostlib::exceptions::not_implemented(
