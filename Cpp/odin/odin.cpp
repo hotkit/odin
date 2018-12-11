@@ -27,6 +27,7 @@ const fostlib::setting<fostlib::string> odin::c_jwt_logout_claim(
         "JWT logout claim",
         "http://odin.felspar.com/lo",
         true);
+
 const fostlib::setting<bool> odin::c_jwt_logout_check(
         "odin/odin.cpp", "odin", "Perform JWT logout check", true, true);
 
@@ -60,6 +61,9 @@ const fostlib::setting<fostlib::string> odin::c_facebook_endpoint(
 
 const fostlib::setting<fostlib::json> odin::c_google_aud(
         "odin/odin.cpp", "odin", "Google", fostlib::null, true);
+
+const fostlib::setting<fostlib::string> odin::c_app_namespace(
+        "odin/odin.cpp", "odin", "Application namespace", "https://odin.hot-now.com/app/", true);
 
 
 bool odin::is_module_enabled(

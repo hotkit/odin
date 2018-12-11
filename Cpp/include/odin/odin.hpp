@@ -55,6 +55,9 @@ namespace odin {
     /// Google AUD
     extern const fostlib::setting<fostlib::json> c_google_aud;
 
+    /// Application namespace
+    extern const fostlib::setting<fostlib::string> c_app_namespace;
+
     /// Check module is enabled in the database, does not commit the transaction
     bool is_module_enabled(fostlib::pg::connection &cnx, f5::u8view module_name);
 }
