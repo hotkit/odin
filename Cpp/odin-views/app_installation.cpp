@@ -19,7 +19,7 @@
 
 namespace {
 
-    bool does_installation_id_has_been_claimed(
+    bool has_installation_id_been_claimed(
         fostlib::pg::connection &cnx,
         fostlib::string const app_id,
         fostlib::string const installation_id
@@ -81,7 +81,7 @@ namespace {
             }
 
             auto const installation_id = fostlib::coerce<fostlib::string>(body["installation_id"]);
-            if (does_installation_id_has_been_claimed(cnx, app_id, installation_id)) {
+            if (has_installation_id_been_claimed(cnx, app_id, installation_id)) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
                         "The installation_id has been claimed.");
