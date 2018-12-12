@@ -38,13 +38,13 @@ sql.insert odin.app_ledger {
 GET test/app/secure / 401
 
 # Mint App jwt
-set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "https://odin.hot-now.com/app/app01"} APP_TOKEN)
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app01"} APP_TOKEN)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure / 200
 GET test/app/secure /test 200
 
 # Wrong App jwt should return 401
-set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "https://odin.hot-now.com/app/app02"} APP_TOKEN)
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app02"} APP_TOKEN)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure / 401
 GET test/app/secure /test 401

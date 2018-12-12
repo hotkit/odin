@@ -63,7 +63,7 @@ const fostlib::setting<fostlib::json> odin::c_google_aud(
         "odin/odin.cpp", "odin", "Google", fostlib::null, true);
 
 const fostlib::setting<fostlib::string> odin::c_app_namespace(
-        "odin/odin.cpp", "odin", "Application namespace", "https://odin.hot-now.com/app/", true);
+        "odin/odin.cpp", "odin", "Application namespace", "http://odin.felspar.com/app/", true);
 
 
 bool odin::is_module_enabled(
