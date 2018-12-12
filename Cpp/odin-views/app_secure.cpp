@@ -40,6 +40,10 @@ namespace {
             fostlib::json jwt_header,
             fostlib::json jwt_body) {
         auto const jwt_iss = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
+        if (jwt_iss.find(odin::c_app_namespace.value()) == std::string::npos) {
+            throw fostlib::exceptions::not_implemented(
+                    __PRETTY_FUNCTION__, "App namespace prefix does not exist");
+        }
         auto const app_id = jwt_iss.substr(odin::c_app_namespace.value().length());
         fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
         if (app.isnull()) {

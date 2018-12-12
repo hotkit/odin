@@ -49,3 +49,9 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure / 401
 GET test/app/secure /test 401
 
+# Should return not implemented if iss doesn't prefix with app namespace
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "app02"} APP_TOKEN)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET test/app/secure / 501
+GET test/app/secure /test 501
+
