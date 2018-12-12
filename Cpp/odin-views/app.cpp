@@ -85,17 +85,17 @@ namespace {
             }
             auto const access_policy = fostlib::coerce<fostlib::string>(
                     app["app"]["access_policy"]);
-            auto const identity_id = fostlib::coerce<f5::u8view>(
-                    user["identity"]["id"]);
-            auto app_user = odin::app::get_app_user(
-                    cnx, app_id, identity_id);
-            if (app_user.isnull()){
+            auto const identity_id =
+                    fostlib::coerce<f5::u8view>(user["identity"]["id"]);
+            auto app_user = odin::app::get_app_user(cnx, app_id, identity_id);
+            if (app_user.isnull()) {
                 if (access_policy == "INVITE_ONLY") {
-                        throw fostlib::exceptions::not_implemented(
-                                __PRETTY_FUNCTION__, "Forbidden");
+                    throw fostlib::exceptions::not_implemented(
+                            __PRETTY_FUNCTION__, "Forbidden");
                 } else if (access_policy == "OPEN") {
-                        odin::app::save_app_user(cnx, odin::reference(), identity_id, app_id);
-                        cnx.commit();
+                    odin::app::save_app_user(
+                            cnx, odin::reference(), identity_id, app_id);
+                    cnx.commit();
                 }
             }
 

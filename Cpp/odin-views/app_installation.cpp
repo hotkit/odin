@@ -20,15 +20,16 @@
 namespace {
 
     bool has_installation_id_been_claimed(
-        fostlib::pg::connection &cnx,
-        fostlib::string const app_id,
-        fostlib::string const installation_id
-    ) {
+            fostlib::pg::connection &cnx,
+            fostlib::string const app_id,
+            fostlib::string const installation_id) {
         static const fostlib::string sql(
-            "SELECT installation_id FROM odin.app_user_installation_id_ledger "
-            "WHERE app_id=$1 AND installation_id=$2");
-        auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{
-                app_id, installation_id});
+                "SELECT installation_id FROM "
+                "odin.app_user_installation_id_ledger "
+                "WHERE app_id=$1 AND installation_id=$2");
+        auto data = fostgres::sql(
+                cnx, sql,
+                std::vector<fostlib::string>{app_id, installation_id});
         auto &rs = data.second;
         return rs.begin() != rs.end();
     }
@@ -61,13 +62,12 @@ namespace {
             }
 
             auto const body_str = fostlib::coerce<fostlib::string>(
-                fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
+                    fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             auto const body = fostlib::json::parse(body_str);
 
             if (!body.has_key("installation_id")) {
                 throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__,
-                        "Must pass installation_id field");
+                        __PRETTY_FUNCTION__, "Must pass installation_id field");
             }
 
             auto const app_id = req.headers()["__app"].value();
@@ -80,7 +80,8 @@ namespace {
                         __PRETTY_FUNCTION__, "Forbidden");
             }
 
-            auto const installation_id = fostlib::coerce<fostlib::string>(body["installation_id"]);
+            auto const installation_id =
+                    fostlib::coerce<fostlib::string>(body["installation_id"]);
             if (has_installation_id_been_claimed(cnx, app_id, installation_id)) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
@@ -88,8 +89,8 @@ namespace {
             }
             auto const reference = odin::reference();
             /// Using reference as an identity_id
-            odin::app::set_installation_id(cnx, reference, app_id,
-                    reference, installation_id);
+            odin::app::set_installation_id(
+                    cnx, reference, app_id, reference, installation_id);
             cnx.commit();
             auto jwt = odin::app::mint_user_jwt(reference, app_id);
             fostlib::mime::mime_headers headers;
@@ -103,9 +104,8 @@ namespace {
                             .underlying()
                             .c_str());
             const auto jwt_token = fostlib::utf8_string(jwt.token());
-            boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(jwt_token, headers,
-                            L"application/jwt"));
+            boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                    jwt_token, headers, L"application/jwt"));
 
             return std::make_pair(response, 201);
         }

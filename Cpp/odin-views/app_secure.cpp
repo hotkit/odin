@@ -44,7 +44,8 @@ namespace {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "App namespace prefix does not match");
         }
-        auto const app_id = jwt_iss.substr(odin::c_app_namespace.value().length());
+        auto const app_id =
+                jwt_iss.substr(odin::c_app_namespace.value().length());
         fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
         if (app.isnull()) {
             throw fostlib::exceptions::not_implemented(
