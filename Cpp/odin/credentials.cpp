@@ -91,7 +91,7 @@ fostlib::jwt::mint
     static const fostlib::jcursor full_name("identity", "full_name");
     static const fostlib::jcursor logout_count("credentials", "logout_count");
 
-    fostlib::jwt::mint jwt{fostlib::sha256, odin::c_jwt_secret.value(),
+    fostlib::jwt::mint jwt{fostlib::jwt::alg::HS256,
                            std::move(payload)};
     jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
 
@@ -111,8 +111,7 @@ fostlib::jwt::mint
 
 
 fostlib::jwt::mint odin::mint_reset_password_jwt(const f5::u8view username) {
-    fostlib::jwt::mint jwt{fostlib::sha256,
-                           odin::c_jwt_reset_forgotten_password_secret.value()};
+    fostlib::jwt::mint jwt{fostlib::jwt::alg::HS256};
     jwt.subject(username);
     return jwt;
 }

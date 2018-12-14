@@ -67,10 +67,12 @@ FSL_TEST_FUNCTION(check_unsecure_04_wrong_token) {
 FSL_TEST_FUNCTION(check_secure) {
     const fostlib::setting<bool> trust_jwt{"odin-views/secure.tests.cpp",
                                            odin::c_jwt_trust, true};
-    fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
+    fostlib::jwt::mint jwt(fostlib::jwt::alg::HS256);
     jwt.subject("test-user");
     fostlib::http::server::request req("GET", "/");
-    req.headers().set("Authorization", ("Bearer " + jwt.token()).c_str());
+    req.headers().set(
+            "Authorization",
+            ("Bearer " + jwt.token(odin::c_jwt_secret.value().data())).c_str());
     auto response =
             odin::view::secure(configuration(), "/", req, fostlib::host());
     FSL_CHECK_EQ(response.second, 404);

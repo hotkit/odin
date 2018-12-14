@@ -35,7 +35,7 @@ namespace {
         return {};
     }
 
-    fostlib::string load_key(
+    std::vector<f5::byte> load_key(
             fostlib::pg::connection &cnx,
             fostlib::json jwt_header,
             fostlib::json jwt_body) {
@@ -51,7 +51,10 @@ namespace {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "App not found");
         }
-        return fostlib::coerce<fostlib::string>(app["app"]["token"]);
+        auto const app_token =
+                fostlib::coerce<fostlib::string>(app["app"]["token"]);
+        return std::vector<f5::byte>(
+                app_token.data().begin(), app_token.data().end());
     }
 
     const class app_secure : public fostlib::urlhandler::view {
@@ -67,10 +70,10 @@ namespace {
             if (jwt_body) {
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
                 auto jwt = fostlib::jwt::token::load(
+                        jwt_body.value(),
                         [&cnx](fostlib::json h, fostlib::json b) {
                             return load_key(cnx, h, b);
-                        },
-                        jwt_body.value());
+                        });
                 if (jwt) {
                     auto iss = fostlib::coerce<fostlib::string>(
                             jwt.value().payload["iss"]);
