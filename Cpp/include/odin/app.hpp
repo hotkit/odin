@@ -17,11 +17,36 @@ namespace odin {
     namespace app {
 
         /// Return the database row for the app
-        fostlib::json get_detail(fostlib::pg::connection &cnx, const f5::u8view app_id);
+        fostlib::json get_detail(
+                fostlib::pg::connection &cnx, const f5::u8view app_id);
 
         /// Mint App specific JWT for this user and set common fields on it
-        fostlib::jwt::mint mint_user_jwt(const fostlib::json &user, const fostlib::json &app,
-            fostlib::json payload = fostlib::json{});
+        fostlib::jwt::mint mint_user_jwt(
+                const f5::u8view identity_id,
+                const f5::u8view app_id,
+                fostlib::json payload = fostlib::json{});
+
+        /// Save the given app user, this does not commit the transaction
+        void save_app_user(
+                fostlib::pg::connection &cnx,
+                f5::u8view reference,
+                const f5::u8view identity_id,
+                const f5::u8view app_id);
+
+        /// Return app user detail
+        fostlib::json get_app_user(
+                fostlib::pg::connection &cnx,
+                const f5::u8view app_id,
+                const f5::u8view identity_id);
+
+        /// Save installation ID if the given user to datavase, this does not
+        /// commit the transaction
+        void set_installation_id(
+                fostlib::pg::connection &cnx,
+                f5::u8view reference,
+                f5::u8view app_id,
+                f5::u8view identity_id,
+                f5::u8view installation_id);
 
     }
 

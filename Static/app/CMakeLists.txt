@@ -1,4 +1,4 @@
 install(FILES
     login.html
     logged_in.html
-DESTINATION usr/share/odin/Static/app)
+DESTINATION share/odin/Static/app)

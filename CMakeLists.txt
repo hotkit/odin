@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 3.7)
+project(odin)
+
 add_subdirectory(Configuration)
 add_subdirectory(Cpp)
 add_subdirectory(Python)

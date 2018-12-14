@@ -1,0 +1,58 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+
+# Set up apps
+sql.insert odin.identity {"id": "invited-only-app"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-installation",
+    "app_id": "invited-only-app",
+    "app_name": "INVITED ONLY APP",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "INVITE_ONLY",
+    "data_sharing_policy": "ALL"
+}
+
+sql.insert odin.identity {"id": "open-app"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-installation",
+    "app_id": "open-app",
+    "app_name": "OPEN APP",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+# Must be POST
+GET test/app/installation / 501
+DELETE test/app/installation / 501
+PUT test/app/installation / {"installation_id": "ins01"} 501
+
+
+# Must be wrapped by odin.app.secure
+POST test/app/installation / {"installation_id": "ins01"} 501
+
+# Support only OPEN access policy
+set-path testserver.headers ["__app"] "invited-only-app"
+POST test/app/installation / {"installation_id": "invited-only-installation"} 501
+
+# Validate payload
+set-path testserver.headers ["__app"] "open-app"
+POST test/app/installation / {} 501
+
+# Cannot claim the same installation_id
+sql.insert odin.app_user_installation_id_ledger {
+    "reference": "test-app-installation",
+    "app_id": "open-app",
+    "identity_id": "claimed-installation",
+    "installation_id": "claimed-installation"
+}
+
+POST test/app/installation / {"installation_id": "claimed-installation"} 501
+
+POST test/app/installation / {"installation_id": "new-installation"} 201

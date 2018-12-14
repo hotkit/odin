@@ -1,3 +1,33 @@
+2018-12-10  Tle Ekkul  <e.aryuth@gmail.com>
+ Added odin.app.installation view
+ Support app OPEN access policy
+
+2018-11-08  Tle Ekkul  <e.aryuth@gmail.com>
+ odin.app.secure doesn't need app_id as a prefix anymore.
+
+2018-11-02  Tle Ekkul  <e.aryuth@gmail.com>
+ Fix table app_user PK order
+ Add table app_role_ledger
+ Add table app_user_role_ledger
+
+2018-10-28  Tle Ekkul  <e.aryuth@gmail.com>
+ Added app user roles
+
+2018-10-07  Kirit Saelensminde  <kirit@felspar.com>
+ Tighten up some APIs in the example configuration.
+
+2018-09-19  Rattanawadi  <deuanz.cpenu@gmail.com>
+ Added module opts/installation-id
+
+2018-09-19  Tle Ekkul  <e.aryuth@gmail.com>
+ Added odin.app.handover view
+
+2018-09-17  Tle Ekkul  <e.aryuth@gmail.com>
+ Added odin.app.verify view
+
+2018-09-12  Tle Ekkul  <e.aryuth@gmail.com>
+ Added odin.app.secure view
+
 2018-08-16  Tle Ekkul  <e.aryuth@gmail.com>
  Returned Unprocessable Entity when user's email already exists in the system.
 
@@ -7,6 +37,9 @@
 2018-08-10  Tle Ekkul  <e.aryuth@gmail.com>
  Added App module
  Added odin.api.login view
+
+2018-08-08 Sem <pumidon@proteus-tech.com>
+ Added Expire user module
 
 2018-08-08  Nut  <tobestupid@gmail.com>
  Added link Facebook module

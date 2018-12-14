@@ -4,7 +4,7 @@ odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 
 
 # For self registration we must be not logged in
-GET odin /api/ 401 {"odin": {"user": "./user/:user-id/"}}
+GET odin /api/ 401 {"odin": {"login": "./login/"}}
 POST odin/register / {"username": "self_register_user", "password": "password1234"} 201
 POST odin/login / {"username": "self_register_user", "password": "password1234"} 200
 
@@ -60,3 +60,4 @@ POST odin/register / {"username": "login_via_gp", "password": "password1234", "e
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 POST odin/test/facebook/login/ok / {"access_token": "login_via_fb"} 200
 POST odin/register / {"username": "login_via_fb", "password": "password1234", "email": "login_via_fb@example.com"} 422 {"message": "This email already exists"}
+

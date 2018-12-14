@@ -22,18 +22,18 @@ namespace odin {
     /// credentials failed to match an empty JSON instance (null) is
     /// returned.
     fostlib::json credentials(
-        fostlib::pg::connection &cnx,
-        const fostlib::string &username,
-        const fostlib::string &password,
-        const fostlib::nullable<fostlib::host> &source = fostlib::null,
-        const fostlib::json &annotation = fostlib::json::object_t());
+            fostlib::pg::connection &cnx,
+            const fostlib::string &username,
+            const fostlib::string &password,
+            const fostlib::nullable<fostlib::host> &source = fostlib::null,
+            const fostlib::json &annotation = fostlib::json::object_t());
 
     /// Mint Login JWT for this user and set common fields on it
-    fostlib::jwt::mint mint_login_jwt(const fostlib::json &user, fostlib::json payload = fostlib::json{});
+    fostlib::jwt::mint mint_login_jwt(
+            const fostlib::json &user, fostlib::json payload = fostlib::json{});
 
     /// Mint Reset Password JWT for this user and set common fields on it
     fostlib::jwt::mint mint_reset_password_jwt(const f5::u8view username);
 
 
 }
-
