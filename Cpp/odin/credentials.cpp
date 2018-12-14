@@ -91,8 +91,7 @@ fostlib::jwt::mint
     static const fostlib::jcursor full_name("identity", "full_name");
     static const fostlib::jcursor logout_count("credentials", "logout_count");
 
-    fostlib::jwt::mint jwt{fostlib::jwt::alg::HS256,
-                           std::move(payload)};
+    fostlib::jwt::mint jwt{fostlib::jwt::alg::HS256, std::move(payload)};
     jwt.subject(fostlib::coerce<fostlib::string>(user[subject]));
 
     if (user.has_key(full_name)) {
