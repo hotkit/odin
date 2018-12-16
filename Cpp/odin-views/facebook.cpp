@@ -143,8 +143,9 @@ namespace {
                             .underlying()
                             .c_str());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    fostlib::utf8_string(jwt.token()), headers,
-                    L"application/jwt"));
+                    fostlib::utf8_string(
+                            jwt.token(odin::c_jwt_secret.value().data())),
+                    headers, L"application/jwt"));
             return std::make_pair(response, 200);
         }
     } c_facebook;
@@ -241,8 +242,9 @@ namespace {
                             .underlying()
                             .c_str());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    fostlib::utf8_string(jwt_response.token()), headers,
-                    L"application/jwt"));
+                    fostlib::utf8_string(jwt_response.token(
+                            odin::c_jwt_secret.value().data())),
+                    headers, L"application/jwt"));
             return std::make_pair(response, 202);
         }
 

@@ -103,7 +103,10 @@ namespace {
                             .underlying()
                             .underlying()
                             .c_str());
-            const auto jwt_token = fostlib::utf8_string(jwt.token());
+            const fostlib::string jwt_secret =
+                    odin::c_jwt_secret.value() + app_id;
+            const auto jwt_token =
+                    fostlib::utf8_string(jwt.token(jwt_secret.data()));
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     jwt_token, headers, L"application/jwt"));
 

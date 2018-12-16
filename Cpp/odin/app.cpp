@@ -48,8 +48,7 @@ fostlib::jwt::mint odin::app::mint_user_jwt(
         const f5::u8view identity_id,
         const f5::u8view app_id,
         fostlib::json payload) {
-    const fostlib::string jwt_secret = odin::c_jwt_secret.value() + app_id;
-    fostlib::jwt::mint jwt{fostlib::sha256, jwt_secret, std::move(payload)};
+    fostlib::jwt::mint jwt{fostlib::jwt::alg::HS256, std::move(payload)};
     jwt.subject(identity_id);
     const fostlib::string jwt_iss = odin::c_app_namespace.value() + app_id;
     jwt.claim("iss", fostlib::json{jwt_iss});

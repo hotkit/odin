@@ -110,8 +110,10 @@ namespace {
                             .underlying()
                             .underlying()
                             .c_str());
-
-            const auto jwt_token = fostlib::utf8_string(jwt.token());
+            const fostlib::string jwt_secret =
+                    odin::c_jwt_secret.value() + app_id;
+            const auto jwt_token =
+                    fostlib::utf8_string(jwt.token(jwt_secret.data()));
             const auto redirect_url = fostlib::coerce<fostlib::string>(
                     app["app"]["redirect_url"]);
 
@@ -243,8 +245,9 @@ namespace {
                             .underlying()
                             .c_str());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    fostlib::utf8_string(jwt.token()), headers,
-                    L"application/jwt"));
+                    fostlib::utf8_string(
+                            jwt.token(odin::c_jwt_secret.value().data())),
+                    headers, L"application/jwt"));
             return std::make_pair(response, 200);
         }
 
