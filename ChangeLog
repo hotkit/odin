@@ -1,3 +1,6 @@
+2018-12-16  Tle Ekkul  <e.aryuth@gmail.com>
+ Remove deprecated warnings
+
 2018-12-10  Tle Ekkul  <e.aryuth@gmail.com>
  Added odin.app.installation view
  Support app OPEN access policy
