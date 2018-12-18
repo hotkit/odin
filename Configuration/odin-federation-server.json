@@ -1,0 +1,48 @@
+{
+    "webserver": {
+        "views/odin/app": {
+            "view": "fost.view.pathprefix",
+            "configuration": {
+                "": {
+                    "view": "fost.static",
+                    "configuration": {
+                        "root": "usr/share/odin/Static/app/"
+                    }
+                },
+                "login/": {
+                    "view": "odin.app.login",
+                    "configuration": {
+                        "expires": {
+                            "hours": 72
+                        },
+                        "static": "usr/share/odin/Static/app/login.html"
+                    }
+                },
+                "verify/": {
+                    "view": "odin.app.verify"
+                },
+                "handshake/": {
+                    "view": "odin.app.secure",
+                    "configuration": {
+                        "secure": {
+                            "view": "odin.app.installation",
+                            "configuration": {
+                                "expires": {
+                                    "hours": 72
+                                }
+                            }
+                        },
+                        "unsecure": {
+                            "view": "fost.response.401",
+                            "configuration": {
+                                "schemes": {
+                                    "Bearer": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

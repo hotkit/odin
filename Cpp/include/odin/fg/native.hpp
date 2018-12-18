@@ -21,10 +21,10 @@ namespace odin {
 
 
     namespace lib {
-        const extern fg::frame::builtin assign, expire, group, hash, mint_login_jwt, mint_jwt,
-            mint_reset_password_jwt, jwt_payload, membership, permission, superuser, user;
+        const extern fg::frame::builtin assign, expire, group, hash,
+                mint_login_jwt, mint_jwt, mint_reset_password_jwt, jwt_payload,
+                membership, permission, superuser, user;
     }
 
 
 }
-

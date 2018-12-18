@@ -23,7 +23,12 @@ setup(name='odin',
             ('share/odin/Schema/opts/forgotten-password', ['Schema/opts/forgotten-password/001-initial.blue.sql']),
             ('share/odin/Schema/opts/facebook', ['Schema/opts/facebook/001-initial.blue.sql']),
             ('share/odin/Schema/opts/google', ['Schema/opts/google/001-initial.blue.sql']),
-            ('share/odin/Schema/app', ['Schema/app/002-initial.blue.sql']),
+            ('share/odin/Schema/opts/installation-id', [
+                'Schema/opts/installation-id/001-initial.blue.sql'
+            ]),
+            ('share/odin/Schema/app', [
+                'Schema/app/002-initial.blue.sql', 'Schema/app/003-app-role.blue.sql', 
+                'Schema/app/004-app-installation.blue.sql']),
             ('share/odin/Schema/opts/logout', [
                 'Schema/opts/logout/002-initial.blue.sql',
                 'Schema/opts/logout/003-fix-logout-count.blue.sql']),

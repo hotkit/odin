@@ -16,18 +16,18 @@ FSL_TEST_SUITE(login);
 
 FSL_TEST_FUNCTION(check_body) {
     fostlib::http::server::request req("POST", "/");
-    FSL_CHECK_EXCEPTION(odin::view::login(
-            fostlib::json(), "/", req, fostlib::host()),
-        fostlib::exceptions::parse_error&);
+    FSL_CHECK_EXCEPTION(
+            odin::view::login(fostlib::json(), "/", req, fostlib::host()),
+            fostlib::exceptions::parse_error &);
 }
 
 
 FSL_TEST_FUNCTION(chacks_args) {
     auto body = std::make_unique<fostlib::binary_body>(
-        fostlib::coerce< std::vector<unsigned char> >(fostlib::utf8_string("{}")));
+            fostlib::coerce<std::vector<unsigned char>>(
+                    fostlib::utf8_string("{}")));
     fostlib::http::server::request req("POST", "/", std::move(body));
-    FSL_CHECK_EXCEPTION(odin::view::login(
-            fostlib::json(), "/", req, fostlib::host()),
-        fostlib::exceptions::not_implemented&);
+    FSL_CHECK_EXCEPTION(
+            odin::view::login(fostlib::json(), "/", req, fostlib::host()),
+            fostlib::exceptions::not_implemented &);
 }
-

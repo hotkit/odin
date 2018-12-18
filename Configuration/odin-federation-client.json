@@ -1,0 +1,12 @@
+{
+    "webserver": {
+        "views/odin/app": {
+            "view": "odin.app.handover",
+            "configuration": {
+                "federation_url": "http://localhost:8001/odin/app/verify/bowling_app/",
+                "app_id": "bowling_app",
+                "expires": {"hours": 72}
+            }
+        }
+    }
+}

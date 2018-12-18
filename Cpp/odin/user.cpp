@@ -16,10 +16,9 @@
 
 
 void odin::create_user(
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view username
-) {
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view username) {
     fg::json user_values;
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", username);
@@ -27,11 +26,10 @@ void odin::create_user(
 }
 
 void odin::logout_user(
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view source_address,
-    f5::u8view identity_id
-) {
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view source_address,
+        f5::u8view identity_id) {
     fostlib::json row;
     fostlib::insert(row, "identity_id", identity_id);
     fostlib::insert(row, "reference", reference);
@@ -41,23 +39,21 @@ void odin::logout_user(
 
 
 void odin::set_password(
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view username,
-    f5::u8view password
-) {
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view username,
+        f5::u8view password) {
     auto hashed = odin::hash_password(password);
     save_hash(cnx, reference, username, hashed.first, hashed.second);
 }
 
 
 void odin::save_hash(
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view username,
-    f5::u8view hash,
-    fostlib::json process
-) {
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view username,
+        f5::u8view hash,
+        fostlib::json process) {
     fg::json user_values;
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", username);
@@ -76,11 +72,10 @@ bool odin::does_user_exist(fostlib::pg::connection &cnx, f5::u8view username) {
 
 
 void odin::set_full_name(
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view username,
-    f5::u8view full_name
-) {
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view username,
+        f5::u8view full_name) {
     fg::json user_values;
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", username);
@@ -90,11 +85,10 @@ void odin::set_full_name(
 
 
 void odin::set_email(
-    fostlib::pg::connection &cnx,
-    f5::u8view reference,
-    f5::u8view username,
-    fostlib::email_address email
-) {
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view username,
+        fostlib::email_address email) {
     fg::json user_values;
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "identity_id", username);
@@ -103,8 +97,22 @@ void odin::set_email(
 }
 
 
+void odin::set_installation_id(
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view identity_id,
+        f5::u8view installation_id) {
+    fg::json user_values;
+    fostlib::insert(user_values, "reference", reference);
+    fostlib::insert(user_values, "identity_id", identity_id);
+    fostlib::insert(user_values, "installation_id", installation_id);
+    cnx.insert("odin.identity_installation_id_ledger", user_values);
+}
+
+
 bool odin::does_email_exist(fostlib::pg::connection &cnx, fostlib::string email) {
-    static const fostlib::string sql("SELECT email FROM odin.identity WHERE email=$1");
+    static const fostlib::string sql(
+            "SELECT email FROM odin.identity WHERE email=$1");
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});
     auto &rs = data.second;
     return rs.begin() != rs.end();

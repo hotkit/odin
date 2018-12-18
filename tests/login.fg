@@ -20,3 +20,24 @@ POST odin/login / {"username": "tester", "password": "password1234"} 401
 # Expire the user and make sure they can't now log in
 odin.user.expire test
 POST odin/login / {"username": "test", "password": "password1234"} 401
+
+# Enable opts/installation-id
+odin.sql.file (module.path.join ../Schema/opts/installation-id/001-initial.blue.sql)
+
+odin.user test-installation password1234
+# Login should save installation_id if user send to
+POST odin/login / {"username": "test-installation", "password": "password1234", "installation_id": "INSTALL01"} 200
+odin.jwt.authorization test-installation password1234
+GET odin/api / 200 {"user": {"installation_id": "INSTALL01"}}
+
+POST odin/login / {"username": "test-installation", "password": "password1234", "installation_id": "INSTALL02"} 200
+GET odin/api / 200 {"user": {"installation_id": "INSTALL02"}}
+
+POST odin/login / {"username": "test-installation", "password": "password1234", "installation_id": null} 501
+GET odin/api / 200 {"user": {"installation_id": "INSTALL02"}}
+
+POST odin/login / {"username": "test-installation", "password": "password1234", "installation_id": ""} 501
+GET odin/api / 200 {"user": {"installation_id": "INSTALL02"}}
+
+POST odin/login / {"username": "test-installation", "password": "password1234", "installation_id": "INSTALL02"} 200
+GET odin/api / 200 {"user": {"installation_id": "INSTALL02"}}

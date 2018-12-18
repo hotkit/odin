@@ -27,7 +27,7 @@
                 "unsecure": {
                     "view": "fost.response.401",
                     "configuration": {
-                        
+
                     }
                 }
             }
@@ -61,6 +61,14 @@
                             "arguments": [
                                 ["request", "headers", "__user"]
                             ]
+                        }
+                    },
+                    {
+                        "return": "object",
+                        "path": ["/user", 1],
+                        "GET": {
+                            "command": "SELECT * FROM odin.identity WHERE id=(SELECT identity_id FROM odin.facebook_credentials_ledger WHERE facebook_user_id=$1 LIMIT 1)",
+                            "arguments": [1]
                         }
                     }
                 ]

@@ -12,7 +12,7 @@ odin.group public "Public access"
 odin.assign public test-perm create-group
 
 # When not logged in get a 403 or 401
-GET odin/api / 401 {"odin": {"my": {"permissions": "./me/permissions"}}}
+GET odin/api / 401 {"odin": {"login": "./login/"}}
 GET odin/api /me/permissions 403
 GET test/permission /not-granted/ 401
 
