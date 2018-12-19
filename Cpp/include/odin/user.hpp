@@ -20,7 +20,7 @@ namespace odin {
     void create_user(
             fostlib::pg::connection &cnx,
             f5::u8view reference,
-            f5::u8view username);
+            f5::u8view identity_id);
 
     /// Logout the given user, this does not commit the transaction
     void logout_user(
@@ -35,14 +35,16 @@ namespace odin {
     void set_password(
             fostlib::pg::connection &cnx,
             f5::u8view reference,
+            f5::u8view identity_id,
             f5::u8view username,
             f5::u8view password);
 
     /// Save a password hash and process to the database. Does not commit
     /// the transaction.
-    void save_hash(
+    void save_credential(
             fostlib::pg::connection &cnx,
             f5::u8view reference,
+            f5::u8view identity_id,
             f5::u8view username,
             f5::u8view hash,
             fostlib::json process);

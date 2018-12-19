@@ -18,10 +18,10 @@
 void odin::create_user(
         fostlib::pg::connection &cnx,
         f5::u8view reference,
-        f5::u8view username) {
+        f5::u8view identity_id) {
     fg::json user_values;
     fostlib::insert(user_values, "reference", reference);
-    fostlib::insert(user_values, "identity_id", username);
+    fostlib::insert(user_values, "identity_id", identity_id);
     cnx.insert("odin.identity_ledger", user_values);
 }
 
@@ -41,22 +41,26 @@ void odin::logout_user(
 void odin::set_password(
         fostlib::pg::connection &cnx,
         f5::u8view reference,
+        f5::u8view identity_id,
         f5::u8view username,
         f5::u8view password) {
     auto hashed = odin::hash_password(password);
-    save_hash(cnx, reference, username, hashed.first, hashed.second);
+    save_credential(
+            cnx, reference, identity_id, username, hashed.first, hashed.second);
 }
 
 
-void odin::save_hash(
+void odin::save_credential(
         fostlib::pg::connection &cnx,
         f5::u8view reference,
+        f5::u8view identity_id,
         f5::u8view username,
         f5::u8view hash,
         fostlib::json process) {
     fg::json user_values;
     fostlib::insert(user_values, "reference", reference);
-    fostlib::insert(user_values, "identity_id", username);
+    fostlib::insert(user_values, "identity_id", identity_id);
+    fostlib::insert(user_values, "login", username);
     fostlib::insert(user_values, "password", hash);
     fostlib::insert(user_values, "process", process);
     cnx.insert("odin.credentials_password_ledger", user_values);
