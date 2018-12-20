@@ -199,7 +199,7 @@ namespace {
                 || !config.has_key("then")) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
-                        "Must supply both hash, verify and then in the "
+                        "Must supply 'hash', 'verify' and 'then' in the "
                         "configuration");
             }
 
@@ -207,9 +207,9 @@ namespace {
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
             auto hash_value = fostgres::datum(
-                    config["hash"], std::vector<fostlib::string>{}, body, req);
+                    config["hash"], {}, body, req);
             auto verify = fostgres::datum(
-                    config["verify"], std::vector<fostlib::string>{}, body,
+                    config["verify"], {}, body,
                     req);
             if (not hash_value || not verify || hash_value != verify) {
                 return respond("Hashing failed", 422);
