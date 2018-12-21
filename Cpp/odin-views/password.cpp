@@ -206,8 +206,10 @@ namespace {
             auto const body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json const body = fostlib::json::parse(body_str);
-            auto const hash_value = fostgres::datum(config["hash"], {}, body, req);
-            auto const verify = fostgres::datum(config["verify"], {}, body, req);
+            auto const hash_value =
+                    fostgres::datum(config["hash"], {}, body, req);
+            auto const verify =
+                    fostgres::datum(config["verify"], {}, body, req);
             if (not hash_value || not verify || hash_value != verify) {
                 return respond("Hashing failed", 422);
             }
