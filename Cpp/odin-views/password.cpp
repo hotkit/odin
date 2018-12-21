@@ -206,11 +206,8 @@ namespace {
             auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
-            auto hash_value = fostgres::datum(
-                    config["hash"], {}, body, req);
-            auto verify = fostgres::datum(
-                    config["verify"], {}, body,
-                    req);
+            auto hash_value = fostgres::datum(config["hash"], {}, body, req);
+            auto verify = fostgres::datum(config["verify"], {}, body, req);
             if (not hash_value || not verify || hash_value != verify) {
                 return respond("Hashing failed", 422);
             }
@@ -219,7 +216,7 @@ namespace {
             req.headers().set("__hash", hash_result.first);
             req.headers().set(
                     "__hash_process",
-                    fostlib::json::unparse(hash_result.second, true));
+                    fostlib::json::unparse(hash_result.second, false));
             return execute(config["then"], path, req, host);
         }
     } c_password_hash;

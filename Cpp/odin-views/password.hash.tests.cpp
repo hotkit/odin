@@ -18,9 +18,35 @@ namespace {
         fostlib::json config;
         fostlib::insert(config, "hash", "password");
         fostlib::insert(config, "verify", "password2");
-        fostlib::insert(config, "then", "fost.response.200");
+        fostlib::insert(config, "then", "odin.test.check_request_header");
         return config;
     }
+    const class check_request_header : public fostlib::urlhandler::view {
+      public:
+        check_request_header() : view("odin.test.check_request_header") {}
+
+        std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
+                const fostlib::json &config,
+                const fostlib::string &path,
+                fostlib::http::server::request &req,
+                const fostlib::host &host) const {
+            FSL_CHECK_EQ(req.headers().exists("__hash"), true);
+            const auto hash = req.headers()["__hash"].value();
+
+            FSL_CHECK_EQ(req.headers().exists("__hash_process"), true);
+            const auto hash_process = fostlib::json::parse(
+                    req.headers()["__hash_process"].value());
+            FSL_CHECK_EQ(hash_process["length"], fostlib::json{32});
+            FSL_CHECK_EQ(hash_process["name"], fostlib::json{"pbkdf2-sha256"});
+            FSL_CHECK_EQ(hash_process["rounds"], fostlib::json{300000});
+
+            fostlib::mime::mime_headers headers;
+            boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                    fostlib::json::unparse(fostlib::json{}, true), headers,
+                    "application/json"));
+            return std::make_pair(response, 200);
+        }
+    } c_check_request_header;
 }
 
 FSL_TEST_FUNCTION(check_config) {
