@@ -1,0 +1,5 @@
+{
+    "webserver": {
+        "views/odin/test/validate-register": {}
+    }
+}

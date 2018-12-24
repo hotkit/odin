@@ -1,0 +1,52 @@
+{
+    "webserver": {
+        "views/odin/register": {
+            "view": "fost.schema.validate",
+            "configuration": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "username": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string",
+                            "minLength": 8
+                        },
+                        "password2": {
+                            "type": "string",
+                            "minLength": 8
+                        },
+                        "full_name": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "username",
+                        "password",
+                        "password2",
+                        "full_name",
+                        "email"
+                    ]
+                },
+                "valid": {
+                    "view": "odin.password.hash",
+                    "configuration": {
+                        "hash": [
+                            "body",
+                            "password"
+                        ],
+                        "verify": [
+                            "body",
+                            "password2"
+                        ],
+                        "then": "fost.response.200"
+                    }
+                }
+            }
+        }
+    }
+}

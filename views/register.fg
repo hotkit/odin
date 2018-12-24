@@ -1,0 +1,29 @@
+# Set up the modules we need
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+
+# Not pass the validation should return 422
+POST odin/register / {
+    "username": "fred", 
+    "password": "bowling", 
+    "full_name": "Fred"
+} 422
+
+# Password must longer than 8 characters
+POST odin/register / {
+    "username": "fred", 
+    "password": "short",
+    "password2": "short", 
+    "full_name": "Fred",
+    "email": "fred@bowling.com"
+} 422
+
+# Successfully register
+POST odin/register / {
+    "username": "fred", 
+    "password": "mercury2",
+    "password2": "mercury2", 
+    "full_name": "Fred",
+    "email": "fred@bowling.com"
+} 200
+
