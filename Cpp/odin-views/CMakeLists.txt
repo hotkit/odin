@@ -19,6 +19,7 @@ install(TARGETS odin-views LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 if(TARGET check)
     add_library(odin-views-smoke STATIC EXCLUDE_FROM_ALL
             login.tests.cpp
+            password.hash.tests.cpp
             secure.tests.cpp
         )
     target_link_libraries(odin-views-smoke odin-views)

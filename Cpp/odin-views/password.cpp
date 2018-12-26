@@ -16,6 +16,7 @@
 #include <fost/insert>
 #include <fost/log>
 #include <fostgres/sql.hpp>
+#include <fostgres/response.hpp>
 
 
 namespace {
@@ -185,5 +186,44 @@ namespace {
         }
     } c_reset_password;
 
+    const class password_hash : public fostlib::urlhandler::view {
+      public:
+        password_hash() : view("odin.password.hash") {}
+
+        std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
+                const fostlib::json &config,
+                const fostlib::string &path,
+                fostlib::http::server::request &req,
+                const fostlib::host &host) const {
+            if (!config.has_key("hash") || !config.has_key("verify")
+                || !config.has_key("then")) {
+                throw fostlib::exceptions::not_implemented(
+                        __PRETTY_FUNCTION__,
+                        "Must supply 'hash', 'verify' and 'then' in the "
+                        "configuration");
+            }
+
+            auto const body_str = fostlib::coerce<fostlib::string>(
+                    fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
+            fostlib::json const body = fostlib::json::parse(body_str);
+            auto const hash_value =
+                    fostgres::datum(config["hash"], {}, body, req);
+            auto const verify =
+                    fostgres::datum(config["verify"], {}, body, req);
+            if (not hash_value || not verify || hash_value != verify) {
+                return respond("Hashing failed", 422);
+            }
+            auto const hash_result = odin::hash_password(
+                    fostlib::coerce<fostlib::string>(hash_value));
+            req.headers().set("__hash", hash_result.first);
+            req.headers().set(
+                    "__hash_process",
+                    fostlib::json::unparse(hash_result.second, false));
+            return execute(config["then"], path, req, host);
+        }
+    } c_password_hash;
+
 
 }
+
+const fostlib::urlhandler::view &odin::view::password_hash = c_password_hash;
