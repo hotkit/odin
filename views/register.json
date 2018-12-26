@@ -43,7 +43,41 @@
                             "body",
                             "password2"
                         ],
-                        "then": "fost.response.200"
+                        "then": {
+                            "view": "fostgres.sql",
+                            "configuration": {
+                                "sql": [
+                                    {
+                                        "path": [],
+                                        "return": "object",
+                                        "POST": [
+                                            {
+                                                "table": "odin.identity",
+                                                "columns": {
+                                                    "id": {
+                                                        "source": [
+                                                            "body",
+                                                            "username"
+                                                        ],
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "table": "odin.credentials_password_ledger",
+                                                "columns": {
+                                                    "id": {
+                                                        "source": [
+                                                            "body",
+                                                            "username"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
                     }
                 }
             }
