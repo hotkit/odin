@@ -1,6 +1,7 @@
 # Set up the modules we need
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 
 
 # For self registration we must be not logged in
@@ -8,10 +9,6 @@ GET odin /api/ 401 {"odin": {"login": "./login/"}}
 POST odin/register / {"username": "self_register_user", "password": "password1234"} 201
 POST odin/login / {"username": "self_register_user", "password": "password1234"} 200
 
-
-# Password is optional when register.
-POST odin/register / {"username": "no_pwd"} 201
-GET odin/secure/sql /user/no_pwd 200 {"user": {"id": "no_pwd", "expires": null}}
 
 # Register with a username works the first time, but then returns an error
 POST odin/register / {"username": "some-user", "password": "password1234"} 201
@@ -36,13 +33,13 @@ PUT odin /api/user/test-user {"password": "1234"} 200
 ## Enable opts/full-name module, then user can register with full-name along with username and password
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 POST odin/register / {"username": "user88", "password": "password1234", "full_name": "John Doe"} 201
-GET odin/secure/sql /user/user88 200 {"user": {"id": "user88", "expires": null, "full_name": "John Doe"}}
+GET odin/secure/sql /user/user88 200 {"user": {"expires": null, "full_name": "John Doe"}, "credentials": {"login": "user88"}}
 
 
 ## Enable opts/email module, then user can register with email
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 POST odin/register / {"username": "user89", "password": "password1234", "email": "admin@example.com"} 201
-GET odin/secure/sql /user/user89 200 {"user": {"id": "user89", "expires": null, "full_name": null, "email": "admin@example.com"}}
+GET odin/secure/sql /user/user89 200 {"user": {"expires": null, "full_name": null, "email": "admin@example.com"}, "credentials": {"login": "user89"}}
 
 
 ## Should throw exception when user input invalid email
