@@ -1,10 +1,10 @@
 INSERT INTO odin.module VALUES('authn') ON CONFLICT (name) DO NOTHING;
 INSERT INTO odin.migration VALUES('authn', '002-fix-login.blue.sql');
 
-ALTER TABLE odin.login_success 
+ALTER TABLE odin.login_success
     DROP CONSTRAINT login_success_username_fkey;
 
-ALTER TABLE odin.credentials 
+ALTER TABLE odin.credentials
     DROP CONSTRAINT credentials_login_pk,
     ADD CONSTRAINT credentials_login_pk PRIMARY KEY (identity_id),
     ADD CONSTRAINT login_uq UNIQUE (login);
@@ -12,7 +12,7 @@ ALTER TABLE odin.credentials
 ALTER TABLE odin.login_success
     ADD CONSTRAINT login_success_username_fkey
         FOREIGN KEY (username)
-        REFERENCES odin.credentials (identity_id) MATCH SIMPLE
+        REFERENCES odin.credentials (login) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE;
 
 ALTER TABLE odin.credentials_password_ledger

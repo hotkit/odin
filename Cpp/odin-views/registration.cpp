@@ -67,7 +67,9 @@ namespace {
             }
 
             const auto ref = odin::reference();
-            odin::create_user(cnx, ref, username.value());
+            // Use reference as identity_id
+            const auto identity_id = ref;
+            odin::create_user(cnx, identity_id);
 
             if (body.has_key("password")) {
                 const auto password =
@@ -76,7 +78,8 @@ namespace {
                     throw fostlib::exceptions::not_implemented(
                             "odin.register", "Invalid password");
                 }
-                odin::set_password(cnx, ref, username.value(), password);
+                odin::set_password(
+                        cnx, ref, identity_id, username.value(), password);
             }
 
             if (body.has_key("full_name")) {
@@ -86,7 +89,7 @@ namespace {
                     throw fostlib::exceptions::not_implemented(
                             "odin.register", "Full name cannot be empty");
                 }
-                odin::set_full_name(cnx, ref, username.value(), full_name);
+                odin::set_full_name(cnx, ref, identity_id, full_name);
             }
 
             if (body.has_key("email")) {
@@ -99,7 +102,7 @@ namespace {
                                         body["email"]))) {
                         return respond("This email already exists", 422);
                     }
-                    odin::set_email(cnx, ref, username.value(), email);
+                    odin::set_email(cnx, ref, identity_id, email);
                 } catch (fostlib::exceptions::parse_error &e) {
                     fostlib::log::error(c_odin_registration)(
                             "", "Email parsing error")(
@@ -113,7 +116,7 @@ namespace {
                             "username",
                             username.value())("e-mail", body["email"]);
                     throw fostlib::exceptions::not_implemented(
-                            "odin.register", "E-mail already exists");
+                            "odin.register", e.what());
                 }
             }
 

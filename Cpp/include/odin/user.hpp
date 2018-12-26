@@ -22,6 +22,9 @@ namespace odin {
             f5::u8view reference,
             f5::u8view identity_id);
 
+    /// Create the given user, this does not commit the new user
+    void create_user(fostlib::pg::connection &cnx, f5::u8view identity_id);
+
     /// Logout the given user, this does not commit the transaction
     void logout_user(
             fostlib::pg::connection &cnx,
