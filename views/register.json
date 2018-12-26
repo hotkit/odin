@@ -44,38 +44,53 @@
                             "password2"
                         ],
                         "then": {
-                            "view": "fostgres.sql",
+                            "view": "odin.middleware.reference",
                             "configuration": {
-                                "sql": [
-                                    {
-                                        "path": [],
-                                        "return": "object",
-                                        "POST": [
+                                "then": {
+                                    "view": "fostgres.sql",
+                                    "configuration": {
+                                        "sql": [
                                             {
-                                                "table": "odin.identity",
-                                                "columns": {
-                                                    "id": {
-                                                        "source": [
-                                                            "body",
-                                                            "username"
-                                                        ],
+                                                "path": [],
+                                                "return": "object",
+                                                "POST": [
+                                                    {
+                                                        "table": "odin.identity",
+                                                        "columns": {
+                                                            "id": {
+                                                                "source": [
+                                                                    "request",
+                                                                    "headers",
+                                                                    "__odin_reference"
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        "table": "odin.credentials_password_ledger",
+                                                        "columns": {
+                                                            "reference": {
+                                                                "source": [
+                                                                    "request",
+                                                                    "headers",
+                                                                    "__odin_reference"
+                                                                ]
+                                                            },
+                                                            "identity_id": {
+                                                                "source": [
+                                                                    "request",
+                                                                    "headers",
+                                                                    "__odin_reference"
+                                                                ]
+                                                            },
+                                                            ""
+                                                        }
                                                     }
-                                                }
-                                            },
-                                            {
-                                                "table": "odin.credentials_password_ledger",
-                                                "columns": {
-                                                    "id": {
-                                                        "source": [
-                                                            "body",
-                                                            "username"
-                                                        ]
-                                                    }
-                                                }
+                                                ]
                                             }
                                         ]
                                     }
-                                ]
+                                }
                             }
                         }
                     }
