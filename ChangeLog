@@ -1,3 +1,6 @@
+2018-12-27  Tle Ekkul  <e.aryuth@gmail.com>
+  Fix AuthN login schema
+
 2018-12-26  Tle Ekkul  <e.aryuth@gmail.com>
   Add odin.middleware.reference view
 
