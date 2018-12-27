@@ -28,7 +28,7 @@
                         "username",
                         "password",
                         "password2",
-                        "full_name",
+                        "full-name",
                         "email"
                     ]
                 },
@@ -83,7 +83,59 @@
                                                                     "__odin_reference"
                                                                 ]
                                                             },
-                                                            ""
+                                                            "login": {
+                                                                "source": ["body", "username"]
+                                                            },
+                                                            "password": {
+                                                                "source": ["request", "headers", "__hash"]
+                                                            },
+                                                            "process": {
+                                                                "source": ["request", "headers", "__hash_process"]
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        "table": "odin.identity_full_name_ledger",
+                                                        "columns": {
+                                                            "reference": {
+                                                                "source": [
+                                                                    "request",
+                                                                    "headers",
+                                                                    "__odin_reference"
+                                                                ]
+                                                            },
+                                                            "identity_id": {
+                                                                "source": [
+                                                                    "request",
+                                                                    "headers",
+                                                                    "__odin_reference"
+                                                                ]
+                                                            },
+                                                            "full_name": {
+                                                                "source": ["body", "full-name"]
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        "table": "odin.identity_email_ledger",
+                                                        "columns": {
+                                                            "reference": {
+                                                                "source": [
+                                                                    "request",
+                                                                    "headers",
+                                                                    "__odin_reference"
+                                                                ]
+                                                            },
+                                                            "identity_id": {
+                                                                "source": [
+                                                                    "request",
+                                                                    "headers",
+                                                                    "__odin_reference"
+                                                                ]
+                                                            },
+                                                            "email": {
+                                                                "source": ["body", "email"]
+                                                            }
                                                         }
                                                     }
                                                 ]
