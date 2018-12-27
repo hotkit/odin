@@ -8,7 +8,6 @@
 #include <fostgres/sql.hpp>
 
 #include <odin/app.hpp>
-#include <odin/fg/native.hpp>
 #include <odin/odin.hpp>
 
 #include <fost/insert>
@@ -61,7 +60,7 @@ void odin::app::save_app_user(
         f5::u8view reference,
         const f5::u8view identity_id,
         const f5::u8view app_id) {
-    fg::json app_user_values;
+    fostlib::json app_user_values;
     fostlib::insert(app_user_values, "reference", reference);
     fostlib::insert(app_user_values, "identity_id", identity_id);
     fostlib::insert(app_user_values, "app_id", app_id);
@@ -108,7 +107,7 @@ void odin::app::set_installation_id(
         f5::u8view app_id,
         f5::u8view identity_id,
         f5::u8view installation_id) {
-    fg::json user_values;
+    fostlib::json user_values;
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "app_id", app_id);
     fostlib::insert(user_values, "identity_id", identity_id);
