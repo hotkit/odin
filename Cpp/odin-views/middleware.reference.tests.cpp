@@ -16,12 +16,14 @@ FSL_TEST_SUITE(password_hash);
 namespace {
     fostlib::json configuration() {
         fostlib::json config;
-        fostlib::insert(config, "then", "odin.test.check_odin_reference_header");
+        fostlib::insert(
+                config, "then", "odin.test.check_odin_reference_header");
         return config;
     }
     const class check_odin_reference_header : public fostlib::urlhandler::view {
       public:
-        check_odin_reference_header() : view("odin.test.check_odin_reference_header") {}
+        check_odin_reference_header()
+        : view("odin.test.check_odin_reference_header") {}
 
         std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
                 const fostlib::json &config,
