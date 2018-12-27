@@ -81,7 +81,7 @@ namespace {
                     odin::facebook::credentials(cnx, facebook_user_id);
             auto identity_id = reference;
             if (facebook_user.isnull()) {
-                odin::create_user(cnx, reference, identity_id);
+                odin::create_user(cnx, identity_id);
                 if (user_detail.has_key("name")) {
                     const auto facebook_user_name =
                             fostlib::coerce<f5::u8view>(user_detail["name"]);
@@ -209,8 +209,8 @@ namespace {
             if (!facebook_user.isnull()) {
                 if (identity_id
                     == fostlib::coerce<fostlib::string>(
-                            facebook_user["facebook_credentials"]
-                                         ["identity_id"])) {
+                               facebook_user["facebook_credentials"]
+                                            ["identity_id"])) {
                     throw fostlib::exceptions::not_implemented(
                             "odin.facebook.link",
                             "This user already linked to this facebook");
