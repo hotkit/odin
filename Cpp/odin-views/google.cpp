@@ -80,7 +80,7 @@ namespace {
             auto google_user = odin::google::credentials(cnx, google_user_id);
             auto identity_id = reference;
             if (google_user.isnull()) {
-                odin::create_user(cnx, reference, identity_id);
+                odin::create_user(cnx, identity_id);
                 if (user_detail.has_key("name")) {
                     const auto google_user_name =
                             fostlib::coerce<f5::u8view>(user_detail["name"]);

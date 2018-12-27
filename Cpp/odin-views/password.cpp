@@ -116,7 +116,10 @@ namespace {
                 if (user.isnull()) return respond("Wrong password");
                 if (new_password.bytes() < 8u)
                     return respond("New password is too short");
-                odin::set_password(cnx, reference, username, new_password);
+                odin::set_password(
+                        cnx, reference,
+                        fostlib::coerce<f5::u8view>(user["identity"]["id"]),
+                        username, new_password);
                 auto logout_claim = req.headers()["__jwt"].subvalue(
                         odin::c_jwt_logout_claim.value());
                 if (logout_claim)
@@ -164,7 +167,7 @@ namespace {
             auto jwt = fostlib::jwt::token::load(
                     odin::c_jwt_reset_forgotten_password_secret.value()
                             + fostlib::coerce<fostlib::string>(
-                                    user["password"]["hash"]),
+                                      user["password"]["hash"]),
                     reset_token);
             if (not jwt) { return respond("Invalid token", 403); }
             auto username =
@@ -173,7 +176,8 @@ namespace {
                 const auto reference = odin::reference();
                 const auto new_password =
                         fostlib::coerce<f5::u8view>(body["new-password"]);
-                odin::set_password(cnx, reference, username, new_password);
+                odin::set_password(
+                        cnx, reference, identity_id, username, new_password);
                 if (odin::is_module_enabled(cnx, "opts/logout"))
                     odin::logout_user(
                             cnx, reference,
