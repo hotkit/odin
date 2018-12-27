@@ -6,6 +6,7 @@ add_library(odin-views
         google.cpp
         login.cpp
         logout.cpp
+        middleware.reference.cpp
         password.cpp
         permission.cpp
         registration.cpp
@@ -19,6 +20,7 @@ install(TARGETS odin-views LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 if(TARGET check)
     add_library(odin-views-smoke STATIC EXCLUDE_FROM_ALL
             login.tests.cpp
+            middleware.reference.tests.cpp
             password.hash.tests.cpp
             secure.tests.cpp
         )
