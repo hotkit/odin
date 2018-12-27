@@ -12,6 +12,7 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../../fost-web/Configuration/log-show-all.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app.register.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app.register.test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app.register.fg
             MAIN_DEPENDENCY app.register.fg
             DEPENDS

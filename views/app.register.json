@@ -143,6 +143,28 @@
                                                                         "source": ["body", "email"]
                                                                     }
                                                                 }
+                                                            },
+                                                            {
+                                                                "table": "odin.app_user_ledger",
+                                                                "columns": {
+                                                                    "reference": {
+                                                                        "source": [
+                                                                            "request",
+                                                                            "headers",
+                                                                            "__odin_reference"
+                                                                        ]
+                                                                    },
+                                                                    "app_id": {
+                                                                        "source": ["request", "headers", "__app"]
+                                                                    },
+                                                                    "identity_id": {
+                                                                        "source": [
+                                                                            "request",
+                                                                            "headers",
+                                                                            "__odin_reference"
+                                                                        ]
+                                                                    }
+                                                                }
                                                             }
                                                         ]
                                                     }

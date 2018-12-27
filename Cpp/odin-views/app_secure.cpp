@@ -88,7 +88,9 @@ namespace {
                     req.headers().set(
                             "__app",
                             fostlib::coerce<fostlib::string>(
-                                    jwt.value().payload["iss"]));
+                                    jwt.value().payload["iss"])
+                                    .substr(odin::c_app_namespace.value()
+                                                    .length()));
                     return execute(config["secure"], path, req, host);
                 }
             }

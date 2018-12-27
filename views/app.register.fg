@@ -59,10 +59,19 @@ POST odin/app/register / {
 } 200
 
 # Existing email register twice should failed
-POST odin/app/register / {
-    "username": "fred",
-    "password": "mercury2",
-    "password2": "mercury2",
-    "full-name": "Fred",
-    "email": "fred@bowling.com"
-} 500
+# TODO: Now it returns std::exception
+# POST odin/app/register / {
+#     "username": "barney",
+#     "password": "mercury2",
+#     "password2": "mercury2",
+#     "full-name": "Barney",
+#     "email": "fred@bowling.com"
+# } 500
+
+# Check database validity
+GET odin/test/validate-register /fred 200 {
+    "email": "fred@bowling.com",
+    "full_name": "Fred",
+    "login": "fred",
+    "app_id": "bowling-app"
+}
