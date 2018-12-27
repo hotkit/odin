@@ -44,7 +44,7 @@ const fg::frame::builtin odin::lib::user = [](fg::frame &stack,
         fostlib::log::warning(c_odin_fg, "Setting password is deprecated");
         auto password =
                 stack.resolve_string(stack.argument("password", pos, end));
-        odin::set_password(cnx, ref, username, password);
+        odin::set_password(cnx, ref, username, username, password);
     }
     cnx.commit();
     return fostlib::json();
@@ -59,7 +59,7 @@ const fg::frame::builtin odin::lib::hash = [](fg::frame &stack,
     auto username = stack.resolve_string(stack.argument("username", pos, end));
     auto hash = stack.resolve_string(stack.argument("hash", pos, end));
     auto process = stack.resolve(stack.argument("process", pos, end));
-    odin::save_hash(cnx, ref, username, hash, process);
+    odin::save_credential(cnx, ref, username, username, hash, process);
     cnx.commit();
     return fostlib::json();
 };
