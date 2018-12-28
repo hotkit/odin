@@ -29,8 +29,15 @@ POST odin/app/register / {
     "email": "fred@bowling.com"
 } 403
 
-# Mint app jwt header that user will have after call the odin.app.installation API
-set app_jwt (odin.jwt.mint {"sub": "fred-mobile", "iss": "http://odin.felspar.com/app/bowling-app"} B0wl1ng)
+# Call the odin.app.installation API
+sql.insert odin.identity {"id": "installation_ref"}
+sql.insert odin.app_user_installation_id_ledger {
+    "reference": "reference1",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref",
+    "installation_id": "fred-mobile"
+}
+set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/bowling-app"} B0wl1ng)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 
 # Not pass the validation should return 422
@@ -56,20 +63,31 @@ POST odin/app/register / {
     "password2": "mercury2",
     "full-name": "Fred",
     "email": "fred@bowling.com"
-} 200
+} 201
 
 # Existing email register twice should failed
 # TODO: Now it returns std::exception
-# POST odin/app/register / {
-#     "username": "barney",
-#     "password": "mercury2",
-#     "password2": "mercury2",
-#     "full-name": "Barney",
-#     "email": "fred@bowling.com"
-# } 500
+POST odin/app/register / {
+    "username": "barney",
+    "password": "mercury2",
+    "password2": "mercury2",
+    "full-name": "Barney",
+    "email": "fred@bowling.com"
+} 500
 
-# Check database validity
+# Existing username register twice should failed
+# TODO: Now it returns std::exception
+POST odin/app/register / {
+    "username": "fred",
+    "password": "mercury2",
+    "password2": "mercury2",
+    "full-name": "Barney",
+    "email": "fred2@bowling.com"
+} 201
+
+# Check database validity, the identity_id should be the identity that installation API generated
 GET odin/test/validate-register /fred 200 {
+    "id": "installation_ref",
     "email": "fred@bowling.com",
     "full_name": "Fred",
     "login": "fred",
