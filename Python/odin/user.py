@@ -1,9 +1,9 @@
 import base64
-from getpass import getpass
 import hashlib
 import os
-from psycopg2.extras import Json
+from getpass import getpass
 
+from psycopg2.extras import Json
 
 INSERT_USER = '''INSERT INTO odin.identity_ledger
         (reference, identity_id)
@@ -12,8 +12,8 @@ SET_FULLNAME = '''INSERT INTO odin.identity_full_name_ledger
         (reference, identity_id, full_name)
     VALUES (%s, %s, %s)'''
 SET_PASSWORD = '''INSERT INTO odin.credentials_password_ledger
-        (reference, identity_id, password, process)
-    VALUES (%s, %s, %s, %s)'''
+        (reference, identity_id, login, password, process)
+    VALUES (%s, %s, %s, %s, %s)'''
 EXPIRE_USER = '''INSERT INTO odin.identity_expiry_ledger
         (reference, identity_id, expires)
     VALUES (%s, %s, %s)'''
@@ -67,7 +67,7 @@ def setpassword(cnx, username, password=None):
     process = dict(name='pbkdf2-sha256', rounds=300000, length=32,
         salt=base64.b64encode(salt).decode('utf8'))
     pwhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf8'), salt, 300000)
-    cnx.execute(SET_PASSWORD, (cnx.reference, username,
+    cnx.execute(SET_PASSWORD, (cnx.reference, username, username,
         base64.b64encode(pwhash).decode('utf8'), Json(process)))
     print(username, "password set")
 
@@ -82,4 +82,3 @@ class User(object):
     def __init__(self, cnx, username):
         self.cnx = cnx
         self.username = username
-
