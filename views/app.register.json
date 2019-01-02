@@ -162,7 +162,12 @@
                                                         ]
                                                     }
                                                 },
-                                                "then": "fost.response.201",
+                                                "then": {
+                                                    "view": "odin.app.mint",
+                                                    "configuration": {
+                                                        "expires": {"hours": 72}
+                                                    }
+                                                },
                                                 "else": "fost.response.500"
                                             }
                                         }
