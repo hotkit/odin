@@ -10,7 +10,6 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/../../fost-web/Configuration/log-show-all.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app.register.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app.register.test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app.register.fg
