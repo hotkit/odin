@@ -76,24 +76,19 @@ namespace {
             }
             auto const identity_id =
                     fostlib::coerce<f5::u8view>(user["identity"]["id"]);
-            auto jwt = odin::app::mint_user_jwt(identity_id, app_id);
+            auto jwt = odin::app::mint_user_jwt(
+                    identity_id, app_id,
+                    fostlib::coerce<fostlib::timediff>(config["expires"]));
             fostlib::mime::mime_headers headers;
-            auto exp = jwt.expires(
-                    fostlib::coerce<fostlib::timediff>(config["expires"]),
-                    false);
             headers.add(
                     "Expires",
-                    fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
                             .underlying()
                             .underlying()
                             .c_str());
-            auto const jwt_secret =
-                    fostlib::coerce<fostlib::string>(app["app"]["token"]);
-            const auto jwt_token =
-                    fostlib::utf8_string(jwt.token(jwt_secret.data()));
 
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    jwt_token, headers, L"application/jwt"));
+                    jwt.first, headers, L"application/jwt"));
 
             return std::make_pair(response, 201);
         }

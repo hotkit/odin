@@ -99,28 +99,22 @@ namespace {
                 }
             }
 
-            auto jwt = odin::app::mint_user_jwt(identity_id, app_id);
+            auto jwt = odin::app::mint_user_jwt(
+                    identity_id, app_id,
+                    fostlib::coerce<fostlib::timediff>(config["expires"]));
+            const auto redirect_url = fostlib::coerce<fostlib::string>(
+                    app["app"]["redirect_url"]);
+            fostlib::json result;
+            fostlib::insert(result, "access_token", jwt.first);
+            fostlib::insert(result, "scheme", "Bearer");
+            fostlib::insert(result, "redirect_url", redirect_url);
             fostlib::mime::mime_headers headers;
-            auto exp = jwt.expires(
-                    fostlib::coerce<fostlib::timediff>(config["expires"]),
-                    false);
             headers.add(
                     "Expires",
-                    fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
                             .underlying()
                             .underlying()
                             .c_str());
-            const fostlib::string jwt_secret =
-                    odin::c_jwt_secret.value() + app_id;
-            const auto jwt_token =
-                    fostlib::utf8_string(jwt.token(jwt_secret.data()));
-            const auto redirect_url = fostlib::coerce<fostlib::string>(
-                    app["app"]["redirect_url"]);
-
-            fostlib::json result;
-            fostlib::insert(result, "access_token", jwt_token);
-            fostlib::insert(result, "scheme", "Bearer");
-            fostlib::insert(result, "redirect_url", redirect_url);
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::json::unparse(result, true), headers,
                     L"application/json"));

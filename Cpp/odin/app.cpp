@@ -43,15 +43,19 @@ fostlib::json odin::app::get_detail(
 }
 
 
-fostlib::jwt::mint odin::app::mint_user_jwt(
+std::pair<fostlib::utf8_string, fostlib::timestamp> odin::app::mint_user_jwt(
         const f5::u8view identity_id,
         const f5::u8view app_id,
+        const fostlib::timediff expires,
         fostlib::json payload) {
     fostlib::jwt::mint jwt{fostlib::jwt::alg::HS256, std::move(payload)};
     jwt.subject(identity_id);
     const fostlib::string jwt_iss = odin::c_app_namespace.value() + app_id;
     jwt.claim("iss", fostlib::json{jwt_iss});
-    return jwt;
+    auto exp = jwt.expires(expires, false);
+    auto const jwt_secret = odin::c_jwt_secret.value() + app_id;
+    const auto jwt_token = fostlib::utf8_string(jwt.token(jwt_secret.data()));
+    return std::make_pair(jwt_token, exp);
 }
 
 
