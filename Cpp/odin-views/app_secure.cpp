@@ -80,15 +80,19 @@ namespace {
                     fostlib::log::debug(odin::c_odin)("", "JWT authenticated")(
                             "header",
                             jwt.value().header)("payload", jwt.value().payload);
-                    req.headers().set("__jwt", jwt.value().payload, "sub");
-                    req.headers().set(
-                            "__user",
-                            fostlib::coerce<fostlib::string>(
-                                    jwt.value().payload["sub"]));
+                    if (jwt.value().payload.has_key("sub")) {
+                        req.headers().set("__jwt", jwt.value().payload, "sub");
+                        req.headers().set(
+                                "__user",
+                                fostlib::coerce<fostlib::string>(
+                                        jwt.value().payload["sub"]));
+                    }
                     req.headers().set(
                             "__app",
                             fostlib::coerce<fostlib::string>(
-                                    jwt.value().payload["iss"]));
+                                    jwt.value().payload["iss"])
+                                    .substr(odin::c_app_namespace.value()
+                                                    .length()));
                     return execute(config["secure"], path, req, host);
                 }
             }

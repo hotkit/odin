@@ -1,0 +1,95 @@
+# Set up the modules we need
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+
+# Setup application
+sql.insert odin.identity {"id": "bowling-app"}
+sql.insert odin.app_ledger {
+    "reference": "bowling-app",
+    "app_id": "bowling-app",
+    "app_name": "Bowling Game",
+    "token": "B0wl1ng",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+# Need user app token
+POST odin/app/register / {
+    "username": "fred",
+    "password": "mercury2",
+    "password2": "mercury2",
+    "full-name": "Fred",
+    "email": "fred@bowling.com"
+} 403
+
+# Call the odin.app.installation API
+sql.insert odin.identity {"id": "installation_ref"}
+sql.insert odin.app_user_installation_id_ledger {
+    "reference": "reference1",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref",
+    "installation_id": "fred-mobile"
+}
+set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/bowling-app"} B0wl1ng)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+
+# Not pass the validation should return 422
+POST odin/app/register / {
+    "username": "fred",
+    "password": "bowling",
+    "full-name": "Fred"
+} 422
+
+# # Password must longer than 8 characters
+POST odin/app/register / {
+    "username": "fred",
+    "password": "short",
+    "password2": "short",
+    "full-name": "Fred",
+    "email": "fred@bowling.com"
+} 422
+
+# Successfully register
+POST odin/app/register / {
+    "username": "fred",
+    "password": "mercury2",
+    "password2": "mercury2",
+    "full-name": "Fred",
+    "email": "fred@bowling.com"
+} 201
+
+# Existing email register twice should failed
+# TODO: Now it returns std::exception
+# POST odin/app/register / {
+#     "username": "barney",
+#     "password": "mercury2",
+#     "password2": "mercury2",
+#     "full-name": "Barney",
+#     "email": "fred@bowling.com"
+# } 500
+
+# Existing username register twice should failed
+# TODO: Now it returns std::exception
+# POST odin/app/register / {
+#     "username": "fred",
+#     "password": "mercury2",
+#     "password2": "mercury2",
+#     "full-name": "Barney",
+#     "email": "fred2@bowling.com"
+# } 201
+
+# Check database validity, the identity_id should be the identity that installation API generated
+GET odin/test/validate-register /fred 200 {
+    "id": "installation_ref",
+    "email": "fred@bowling.com",
+    "full_name": "Fred",
+    "login": "fred",
+    "app_id": "bowling-app"
+}

@@ -21,9 +21,10 @@ namespace odin {
                 fostlib::pg::connection &cnx, const f5::u8view app_id);
 
         /// Mint App specific JWT for this user and set common fields on it
-        fostlib::jwt::mint mint_user_jwt(
+        std::pair<fostlib::utf8_string, fostlib::timestamp> mint_user_jwt(
                 const f5::u8view identity_id,
                 const f5::u8view app_id,
+                const fostlib::timediff,
                 fostlib::json payload = fostlib::json{});
 
         /// Save the given app user, this does not commit the transaction

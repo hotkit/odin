@@ -8,7 +8,6 @@
 #include <fostgres/sql.hpp>
 
 #include <odin/app.hpp>
-#include <odin/fg/native.hpp>
 #include <odin/odin.hpp>
 
 #include <fost/insert>
@@ -44,15 +43,19 @@ fostlib::json odin::app::get_detail(
 }
 
 
-fostlib::jwt::mint odin::app::mint_user_jwt(
+std::pair<fostlib::utf8_string, fostlib::timestamp> odin::app::mint_user_jwt(
         const f5::u8view identity_id,
         const f5::u8view app_id,
+        const fostlib::timediff expires,
         fostlib::json payload) {
     fostlib::jwt::mint jwt{fostlib::jwt::alg::HS256, std::move(payload)};
     jwt.subject(identity_id);
     const fostlib::string jwt_iss = odin::c_app_namespace.value() + app_id;
     jwt.claim("iss", fostlib::json{jwt_iss});
-    return jwt;
+    auto exp = jwt.expires(expires, false);
+    auto const jwt_secret = odin::c_jwt_secret.value() + app_id;
+    const auto jwt_token = fostlib::utf8_string(jwt.token(jwt_secret.data()));
+    return std::make_pair(jwt_token, exp);
 }
 
 
@@ -61,7 +64,7 @@ void odin::app::save_app_user(
         f5::u8view reference,
         const f5::u8view identity_id,
         const f5::u8view app_id) {
-    fg::json app_user_values;
+    fostlib::json app_user_values;
     fostlib::insert(app_user_values, "reference", reference);
     fostlib::insert(app_user_values, "identity_id", identity_id);
     fostlib::insert(app_user_values, "app_id", app_id);
@@ -108,7 +111,7 @@ void odin::app::set_installation_id(
         f5::u8view app_id,
         f5::u8view identity_id,
         f5::u8view installation_id) {
-    fg::json user_values;
+    fostlib::json user_values;
     fostlib::insert(user_values, "reference", reference);
     fostlib::insert(user_values, "app_id", app_id);
     fostlib::insert(user_values, "identity_id", identity_id);
