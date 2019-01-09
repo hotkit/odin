@@ -1,4 +1,7 @@
 {
+    "odin": {
+        "JWT secret": "<JWT_SECRET>"
+    },
     "webserver": {
         "views/odin/test/validate-register": {
             "view": "fostgres.sql",

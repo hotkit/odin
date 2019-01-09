@@ -1,4 +1,7 @@
 {
+    "odin": {
+        "JWT secret": "<JWT_SECRET>"
+    },
     "webserver": {
         "views/test/app/secure": {
             "view": "odin.app.secure",

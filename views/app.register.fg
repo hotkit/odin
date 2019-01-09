@@ -37,7 +37,7 @@ sql.insert odin.app_user_installation_id_ledger {
     "identity_id": "installation_ref",
     "installation_id": "fred-mobile"
 }
-set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/bowling-app"} B0wl1ng)
+set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 
 # Not pass the validation should return 422

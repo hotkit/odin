@@ -51,8 +51,7 @@ namespace {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "App not found");
         }
-        auto const app_token =
-                fostlib::coerce<fostlib::string>(app["app"]["token"]);
+        auto const app_token = odin::c_jwt_secret.value() + app_id;
         return std::vector<f5::byte>(
                 app_token.data().begin(), app_token.data().end());
     }
