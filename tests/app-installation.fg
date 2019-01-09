@@ -57,3 +57,10 @@ sql.insert odin.app_user_installation_id_ledger {
 POST test/app/installation / {"installation_id": "claimed-installation"} 501
 
 POST test/app/installation / {"installation_id": "new-installation"} 201
+
+# odin should accept the JWT that minted by app.installation view
+set-path testserver.headers ["__app"] ""
+
+set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET test/app/installation/validate / 200

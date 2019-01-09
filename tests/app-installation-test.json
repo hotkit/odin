@@ -7,6 +7,20 @@
                     "hours": 72
                 }
             }
+        },
+        "views/test/app/installation/validate": {
+            "view": "odin.app.secure",
+            "configuration": {
+                "secure": "fost.response.200",
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
         }
     }
 }
