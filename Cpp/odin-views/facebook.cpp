@@ -209,8 +209,8 @@ namespace {
             if (!facebook_user.isnull()) {
                 if (identity_id
                     == fostlib::coerce<fostlib::string>(
-                            facebook_user["facebook_credentials"]
-                                         ["identity_id"])) {
+                               facebook_user["facebook_credentials"]
+                                            ["identity_id"])) {
                     throw fostlib::exceptions::not_implemented(
                             "odin.facebook.link",
                             "This user already linked to this facebook");

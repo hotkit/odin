@@ -167,7 +167,7 @@ namespace {
             auto jwt = fostlib::jwt::token::load(
                     odin::c_jwt_reset_forgotten_password_secret.value()
                             + fostlib::coerce<fostlib::string>(
-                                    user["password"]["hash"]),
+                                      user["password"]["hash"]),
                     reset_token);
             if (not jwt) { return respond("Invalid token", 403); }
             auto username =
