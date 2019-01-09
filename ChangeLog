@@ -1,3 +1,6 @@
+2019-01-09  Tle Ekkul  <e.aryuth@gmail.com>
+  Remove usage of app token
+
 2018-12-27  Tle Ekkul  <e.aryuth@gmail.com>
   Fix AuthN login schema
 
