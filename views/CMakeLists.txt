@@ -24,6 +24,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authz/001-initial.blue.sql

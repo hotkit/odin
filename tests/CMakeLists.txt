@@ -15,6 +15,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authz/001-initial.blue.sql
@@ -39,6 +40,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Configuration/odin-views.json
@@ -60,6 +62,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
@@ -84,6 +87,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/opts/logout/002-initial.blue.sql
@@ -124,6 +128,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Configuration/odin-views.json
@@ -146,6 +151,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authz/001-initial.blue.sql
@@ -171,6 +177,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
@@ -197,6 +204,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authz/001-initial.blue.sql
@@ -221,6 +229,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/opts/forgotten-password/001-initial.blue.sql
                 ../Configuration/odin-views.json
                 forgotten-password-test-view.json
@@ -244,6 +253,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
@@ -272,6 +282,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
@@ -300,6 +311,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
@@ -328,6 +340,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
@@ -355,6 +368,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/app/002-initial.blue.sql
@@ -382,6 +396,7 @@ if(TARGET stress OR TARGET pgtest)
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
             ../Schema/app/002-initial.blue.sql
@@ -406,6 +421,7 @@ if(TARGET stress OR TARGET pgtest)
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
             ../Schema/app/002-initial.blue.sql
@@ -431,6 +447,7 @@ if(TARGET stress OR TARGET pgtest)
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
             ../Schema/app/002-initial.blue.sql
@@ -457,6 +474,7 @@ if(TARGET stress OR TARGET pgtest)
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
             ../Schema/authz/001-initial.blue.sql

@@ -1,5 +1,6 @@
 # Set up the modules we need
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
