@@ -30,6 +30,12 @@ subgraph core
 
     identity_expiry_ledger["identity_expiry_ledger(reference, identity_id)"]
     identity_expiry_ledger-->identity
+
+    identity_record["identity_record(id)"]
+    identity-->identity_record
+    merge_record["merge_record(from_identity_id, to_identity_id)"]
+    merge_record-->identity_record
+    merge_record-->identity_record
 end
 
 subgraph app
