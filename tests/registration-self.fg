@@ -34,6 +34,7 @@ PUT odin /api/user/test-user {"password": "1234"} 200
 
 ## Enable opts/full-name module, then user can register with full-name along with username and password
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
 POST odin/register / {"username": "user88", "password": "password1234", "full_name": "John Doe"} 201
 GET odin/secure/sql /user/user88 200 {"user": {"expires": null, "full_name": "John Doe"}, "credentials": {"login": "user88"}}
 

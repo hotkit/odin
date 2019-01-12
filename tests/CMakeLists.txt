@@ -70,6 +70,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
@@ -192,6 +193,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
@@ -277,6 +279,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
@@ -309,6 +312,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
                 link-facebook.fg
@@ -340,6 +344,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
@@ -371,6 +376,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 expire-user.fg
         )
@@ -514,6 +520,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/full-name/003-alter-ledgers.blue.sql
             ../Schema/opts/email/001-initial.blue.sql
             ../Schema/opts/email/003-alter-ledgers.blue.sql
             app-federation-test-client-view.json

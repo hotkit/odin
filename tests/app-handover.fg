@@ -26,6 +26,7 @@ GET test/app/handover/validate /mock_user 200 {"id": "mock_user"}
 
 # Should record identity data if modules are enabled
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
 POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User"}
 
