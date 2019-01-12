@@ -18,6 +18,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Schema/authz/002-view-user_permission.blue.sql
                 ../Configuration/odin-views.json
@@ -43,6 +44,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 db-bypass.fg
         )
@@ -65,6 +67,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
@@ -90,6 +93,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/logout/002-initial.blue.sql
                 ../Configuration/odin-views.json
                 logout.fg
@@ -131,6 +135,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 password.fg
         )
@@ -154,6 +159,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Configuration/odin-views.json
                 permissions.fg
@@ -180,6 +186,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Configuration/odin-views.json
@@ -207,6 +214,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Configuration/odin-views.json
                 session.fg
@@ -256,6 +264,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
@@ -285,6 +294,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
@@ -314,6 +324,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
@@ -343,6 +354,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
@@ -371,6 +383,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/app/002-initial.blue.sql
                 ../Schema/app/003-app-role.blue.sql
                 ../Schema/app/004-app-installation.blue.sql
@@ -399,6 +412,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
@@ -424,6 +438,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
@@ -450,6 +465,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
@@ -477,6 +493,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/authz/001-initial.blue.sql
             ../Schema/authz/002-view-user_permission.blue.sql
             ../Schema/app/002-initial.blue.sql
