@@ -11,6 +11,7 @@ odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 
 # Setup application
 sql.insert odin.identity {"id": "bowling-app"}

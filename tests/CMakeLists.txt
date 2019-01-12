@@ -416,6 +416,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/002-initial.blue.sql
                 ../Schema/app/003-app-role.blue.sql
                 ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 app-installation-test.json
                 app-installation.fg
@@ -445,6 +446,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
             ../Configuration/odin-views.json
             app-login.fg
     )
@@ -471,6 +473,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
             app-secure-test-view.json
             app-secure.fg
     )
@@ -498,6 +501,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
             app-verify.fg
     )
 
@@ -529,6 +533,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/full-name/003-alter-ledgers.blue.sql
             ../Schema/opts/email/001-initial.blue.sql

@@ -7,6 +7,7 @@ odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 
 # Set up apps
 sql.insert odin.identity {"id": "invited-only-app"}
