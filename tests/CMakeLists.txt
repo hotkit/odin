@@ -99,6 +99,8 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/logout/002-initial.blue.sql
+                ../Schema/opts/logout/003-fix-logout-count.blue.sql
+                ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 logout.fg
         )
@@ -140,6 +142,9 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/opts/logout/002-initial.blue.sql
+                ../Schema/opts/logout/003-fix-logout-count.blue.sql
+                ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 password.fg
         )
@@ -309,12 +314,15 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
-                ../Schema/opts/full-name/001-initial.blue.sql
-                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+                ../Schema/opts/logout/002-initial.blue.sql
+                ../Schema/opts/logout/003-fix-logout-count.blue.sql
+                ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
                 link-facebook.fg
@@ -376,12 +384,9 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
-                ../Schema/opts/email/001-initial.blue.sql
-                ../Schema/opts/email/003-alter-ledgers.blue.sql
-                ../Schema/opts/google/001-initial.blue.sql
-                ../Schema/opts/google/003-alter-ledgers.blue.sql
-                ../Schema/opts/full-name/001-initial.blue.sql
-                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+                ../Schema/opts/logout/002-initial.blue.sql
+                ../Schema/opts/logout/003-fix-logout-count.blue.sql
+                ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 expire-user.fg
         )
