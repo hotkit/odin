@@ -37,6 +37,7 @@ POST test/app/handover/empty_full-name / {"token": "mock"} 200
 GET test/app/handover/validate /empty_full-name 200 {"id": "empty_full-name", "full_name": null}
 
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User", "email": "mock_user@email.com"}
 

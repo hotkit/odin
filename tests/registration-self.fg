@@ -40,6 +40,7 @@ GET odin/secure/sql /user/user88 200 {"user": {"expires": null, "full_name": "Jo
 
 ## Enable opts/email module, then user can register with email
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 POST odin/register / {"username": "user89", "password": "password1234", "email": "admin@example.com"} 201
 GET odin/secure/sql /user/user89 200 {"user": {"expires": null, "full_name": null, "email": "admin@example.com"}, "credentials": {"login": "user89"}}
 

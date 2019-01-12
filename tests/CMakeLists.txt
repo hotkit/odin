@@ -71,6 +71,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
                 ../Configuration/odin-views.json
                 login.fg
@@ -192,6 +193,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
                 facebook-test.json
@@ -271,6 +273,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
@@ -301,6 +304,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Configuration/odin-views.json
@@ -331,6 +335,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
@@ -361,6 +366,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Configuration/odin-views.json
@@ -507,6 +513,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/004-app-installation.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/email/001-initial.blue.sql
+            ../Schema/opts/email/003-alter-ledgers.blue.sql
             app-federation-test-client-view.json
             app-handover.fg
     )
