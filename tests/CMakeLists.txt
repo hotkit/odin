@@ -74,6 +74,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
+                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 login.fg
         )
@@ -281,6 +282,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
+                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
                 login-google-test.json
@@ -347,6 +349,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
+                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
                 facebook-test.json
