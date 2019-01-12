@@ -21,6 +21,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 authnz-test-view.json
                 authnz.fg
@@ -161,6 +162,8 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
+                ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 permissions.fg
                 permissions-test-view.json
@@ -216,6 +219,8 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
+                ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 session.fg
                 session-test-view.json
@@ -496,6 +501,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/authz/001-initial.blue.sql
             ../Schema/authz/002-view-user_permission.blue.sql
+            ../Schema/authz/003-alter-ledgers.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql

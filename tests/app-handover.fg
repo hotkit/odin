@@ -51,6 +51,7 @@ GET test/app/handover/validate /empty_email 200 {"id": "empty_email", "email": n
 # Should record user into groups
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
 GET test/app/handover/validate /mock_user/group-membership 200 {"groups": null}
 POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200
