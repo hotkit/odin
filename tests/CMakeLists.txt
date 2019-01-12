@@ -275,6 +275,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
                 ../Configuration/odin-views.json
@@ -306,6 +307,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json

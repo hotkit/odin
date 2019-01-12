@@ -58,6 +58,7 @@ POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
 POST odin/register / {"username": "login_via_gp", "password": "password1234", "email": "login_via_gp@example.com"} 422 {"message": "This email already exists"}
 
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
 POST odin/test/facebook/login/ok / {"access_token": "login_via_fb"} 200
 POST odin/register / {"username": "login_via_fb", "password": "password1234", "email": "login_via_fb@example.com"} 422 {"message": "This email already exists"}
 
