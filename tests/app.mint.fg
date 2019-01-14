@@ -37,5 +37,3 @@ GET test/app/mint/validate /bowling01 200 {
 
 set-path testserver.headers ["__user"] "bowling01"
 POST test/app/mint / {"username": "fred", "password": "password1234"} 200
-
-GET test/app/mint/validate /bowling01 404

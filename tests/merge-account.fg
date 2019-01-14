@@ -1,0 +1,48 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+# odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+# odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+# odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+# odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+
+# Test Core
+odin.user core1
+odin.user core2
+GET test/merge-account/validate /identity/core1 200 {"id": "core1"}
+GET test/merge-account/validate /identity-record/core1 200 {"id": "core1"}
+sql.insert odin.merge_record {"from_identity_id": "core1", "to_identity_id": "core2"}
+GET test/merge-account/validate /identity-record/core1 200 {"id": "core1"}
+GET test/merge-account/validate /identity/core1 404
+
+# Test AuthN
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.user installation1
+odin.user authn2 password123
+GET test/merge-account/validate /identity/installation1 200 {"id": "installation1"}
+GET test/merge-account/validate /identity-record/installation1 200 {"id": "installation1"}
+GET test/merge-account/validate /credentials/installation1 404
+sql.insert odin.merge_record {"from_identity_id": "installation1", "to_identity_id": "authn2"}
+GET test/merge-account/validate /identity/installation1 404
+GET test/merge-account/validate /identity-record/installation1 200 {"id": "installation1"}
+
+# Test AuthZ
+
+# Test app
+
+# Test opts/email
+
+# Test opts/facebook
+
+# Test opts/forgotten-password
+
+# Test opts/full-name
+
+# Test opts/google
+
+# Test opts/installation-id
+
+# Test opts/logout
+

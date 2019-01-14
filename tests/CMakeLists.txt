@@ -105,6 +105,34 @@ if(TARGET stress OR TARGET pgtest)
                 logout.fg
         )
 
+    add_custom_command(OUTPUT test-merge-account
+            COMMAND fostgres-test odin-test-merge-account -o test-merge-account
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/merge-account-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/merge-account.fg
+            MAIN_DEPENDENCY merge-account.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Configuration/odin-views.json
+                merge-account.fg
+        )
+
     add_custom_command(OUTPUT test-no-auth
             COMMAND fostgres-test odin-test-no-auth -o test-no-auth
                 $<TARGET_SONAME_FILE:odin-fg>
@@ -587,6 +615,7 @@ if(TARGET stress OR TARGET pgtest)
             test-db-bypass
             test-login
             test-logout
+            test-merge-account
             test-no-auth
             test-password
             test-permissions

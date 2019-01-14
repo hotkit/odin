@@ -39,8 +39,7 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-            if (!req.headers().exists("__app")
-                || !req.headers().exists("__user")) {
+            if (!req.headers().exists("__app")) {
                 throw fostlib::exceptions::not_implemented(
                         __func__,
                         "The odin.app.mint view must be wrapped by an "
@@ -75,8 +74,6 @@ namespace {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "User not found");
             }
-            if (req.headers()["__app"].value() != user["identity"]["id"]) {}
-
             auto const identity_id =
                     fostlib::coerce<f5::u8view>(user["identity"]["id"]);
             auto jwt = odin::app::mint_user_jwt(
