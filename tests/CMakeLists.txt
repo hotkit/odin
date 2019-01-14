@@ -422,6 +422,37 @@ if(TARGET stress OR TARGET pgtest)
                 app-installation.fg
         )
 
+    add_custom_command(OUTPUT test-app-mint
+            COMMAND fostgres-test odin-test-app-mint -o test-app-mint
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app.mint-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app.mint.fg
+            MAIN_DEPENDENCY app.mint.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Configuration/odin-views.json
+                app.mint-test.json
+                app.mint.fg
+        )
+
     add_custom_command(OUTPUT test-app-login
         COMMAND fostgres-test odin-test-app-login -o test-app-login
             $<TARGET_SONAME_FILE:odin-fg>
@@ -548,6 +579,7 @@ if(TARGET stress OR TARGET pgtest)
     add_custom_target(odin-tests DEPENDS
             test-app-handover
             test-app-installation
+            test-app-mint
             test-app-login
             test-app-secure
             test-app-verify

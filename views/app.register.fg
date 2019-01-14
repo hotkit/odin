@@ -68,7 +68,7 @@ POST odin/app/register / {
     "password2": "mercury2",
     "full-name": "Fred",
     "email": "fred@bowling.com"
-} 201
+} 200
 
 # Existing email register twice should failed
 # TODO: Now it returns std::exception

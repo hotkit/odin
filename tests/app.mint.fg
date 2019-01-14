@@ -1,0 +1,41 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+
+sql.insert odin.identity {"id": "bowling"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-mint",
+    "app_id": "bowling",
+    "app_name": "OPEN APP",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+odin.user fred password1234
+
+sql.insert odin.app_user_installation_id_ledger {
+    "reference": "test-app-mint",
+    "app_id": "bowling",
+    "identity_id": "bowling01",
+    "installation_id": "bowling01"
+}
+set-path testserver.headers ["__app"] "bowling"
+POST test/app/mint / {"username": "fred", "password": "password1234"} 200
+
+# if the user already has account, merge it. This should merge bowling01 -> fred
+GET test/app/mint/validate /bowling01 200 {
+    "id": "bowling01"
+}
+
+set-path testserver.headers ["__user"] "bowling01"
+POST test/app/mint / {"username": "fred", "password": "password1234"} 200
+
+GET test/app/mint/validate /bowling01 404
