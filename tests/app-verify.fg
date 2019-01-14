@@ -56,18 +56,18 @@ POST odin/app /verify/app01/ {"random_key": "player1"} 501
 POST odin/app /verify/random_app/ {} 501
 POST odin/app /verify/app01/ {"token": "player1"} 501
 
-set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "app01"} <JWT_SECRET>app01)
+set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set payload {}
 set-path payload ["token"] (lookup user_jwt)
 POST odin/app /verify/app01/ (lookup payload) 200 {"identity": {"id": "player1"}, "roles": ["pro-player"]}
 
-set user_jwt (odin.jwt.mint {"sub": "player3", "iss": "app01"} <JWT_SECRET>app01)
+set user_jwt (odin.jwt.mint {"sub": "player3", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set payload {}
 set-path payload ["token"] (lookup user_jwt)
 POST odin/app /verify/app01/ (lookup payload) 200 {"identity": {"id": "player3"}, "roles": []}
 
 # Use wrong app
-set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "app02"} <JWT_SECRET>app02)
+set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "http://odin.felspar.com/app/app02"} <JWT_SECRET>app02)
 set payload {}
 set-path payload ["token"] (lookup user_jwt)
 POST odin/app /verify/app01/ (lookup payload) 501

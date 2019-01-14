@@ -292,7 +292,7 @@ namespace {
             }
             auto const iss = fostlib::coerce<fostlib::string>(
                     jwt.value().payload["iss"]);
-            if (iss != app_id) {
+            if (iss != odin::c_app_namespace.value() + app_id) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "app_id mismatch");
             }
