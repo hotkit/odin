@@ -56,110 +56,116 @@
                                             "view": "fost.control.status-condition",
                                             "configuration": {
                                                 "if": {
-                                                    "view": "fostgres.sql",
+                                                    "view": "fostgres.control.pg-error",
                                                     "configuration": {
-                                                        "sql": [
-                                                            {
-                                                                "path": [],
-                                                                "return": "object",
-                                                                "POST": [
+                                                        "execute": {
+                                                            "view": "fostgres.sql",
+                                                            "configuration": {
+                                                                "sql": [
                                                                     {
-                                                                        "table": "odin.credentials_password_ledger",
-                                                                        "columns": {
-                                                                            "reference": {
-                                                                                "source": [
-                                                                                    "request",
-                                                                                    "headers",
-                                                                                    "__odin_reference"
-                                                                                ]
+                                                                        "path": [],
+                                                                        "return": "object",
+                                                                        "POST": [
+                                                                            {
+                                                                                "table": "odin.credentials_password_ledger",
+                                                                                "columns": {
+                                                                                    "reference": {
+                                                                                        "source": [
+                                                                                            "request",
+                                                                                            "headers",
+                                                                                            "__odin_reference"
+                                                                                        ]
+                                                                                    },
+                                                                                    "identity_id": {
+                                                                                        "source": [
+                                                                                            "request",
+                                                                                            "headers",
+                                                                                            "__user"
+                                                                                        ]
+                                                                                    },
+                                                                                    "login": {
+                                                                                        "source": ["body", "username"]
+                                                                                    },
+                                                                                    "password": {
+                                                                                        "source": ["request", "headers", "__hash"]
+                                                                                    },
+                                                                                    "process": {
+                                                                                        "source": ["request", "headers", "__hash_process"]
+                                                                                    }
+                                                                                }
                                                                             },
-                                                                            "identity_id": {
-                                                                                "source": [
-                                                                                    "request",
-                                                                                    "headers",
-                                                                                    "__user"
-                                                                                ]
+                                                                            {
+                                                                                "table": "odin.identity_full_name_ledger",
+                                                                                "columns": {
+                                                                                    "reference": {
+                                                                                        "source": [
+                                                                                            "request",
+                                                                                            "headers",
+                                                                                            "__odin_reference"
+                                                                                        ]
+                                                                                    },
+                                                                                    "identity_id": {
+                                                                                        "source": [
+                                                                                            "request",
+                                                                                            "headers",
+                                                                                            "__user"
+                                                                                        ]
+                                                                                    },
+                                                                                    "full_name": {
+                                                                                        "source": ["body", "full-name"]
+                                                                                    }
+                                                                                }
                                                                             },
-                                                                            "login": {
-                                                                                "source": ["body", "username"]
+                                                                            {
+                                                                                "table": "odin.identity_email_ledger",
+                                                                                "columns": {
+                                                                                    "reference": {
+                                                                                        "source": [
+                                                                                            "request",
+                                                                                            "headers",
+                                                                                            "__odin_reference"
+                                                                                        ]
+                                                                                    },
+                                                                                    "identity_id": {
+                                                                                        "source": [
+                                                                                            "request",
+                                                                                            "headers",
+                                                                                            "__user"
+                                                                                        ]
+                                                                                    },
+                                                                                    "email": {
+                                                                                        "source": ["body", "email"]
+                                                                                    }
+                                                                                }
                                                                             },
-                                                                            "password": {
-                                                                                "source": ["request", "headers", "__hash"]
-                                                                            },
-                                                                            "process": {
-                                                                                "source": ["request", "headers", "__hash_process"]
+                                                                            {
+                                                                                "table": "odin.app_user_ledger",
+                                                                                "columns": {
+                                                                                    "reference": {
+                                                                                        "source": [
+                                                                                            "request",
+                                                                                            "headers",
+                                                                                            "__odin_reference"
+                                                                                        ]
+                                                                                    },
+                                                                                    "app_id": {
+                                                                                        "source": ["request", "headers", "__app"]
+                                                                                    },
+                                                                                    "identity_id": {
+                                                                                        "source": [
+                                                                                            "request",
+                                                                                            "headers",
+                                                                                            "__user"
+                                                                                        ]
+                                                                                    }
+                                                                                }
                                                                             }
-                                                                        }
-                                                                    },
-                                                                    {
-                                                                        "table": "odin.identity_full_name_ledger",
-                                                                        "columns": {
-                                                                            "reference": {
-                                                                                "source": [
-                                                                                    "request",
-                                                                                    "headers",
-                                                                                    "__odin_reference"
-                                                                                ]
-                                                                            },
-                                                                            "identity_id": {
-                                                                                "source": [
-                                                                                    "request",
-                                                                                    "headers",
-                                                                                    "__user"
-                                                                                ]
-                                                                            },
-                                                                            "full_name": {
-                                                                                "source": ["body", "full-name"]
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    {
-                                                                        "table": "odin.identity_email_ledger",
-                                                                        "columns": {
-                                                                            "reference": {
-                                                                                "source": [
-                                                                                    "request",
-                                                                                    "headers",
-                                                                                    "__odin_reference"
-                                                                                ]
-                                                                            },
-                                                                            "identity_id": {
-                                                                                "source": [
-                                                                                    "request",
-                                                                                    "headers",
-                                                                                    "__user"
-                                                                                ]
-                                                                            },
-                                                                            "email": {
-                                                                                "source": ["body", "email"]
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    {
-                                                                        "table": "odin.app_user_ledger",
-                                                                        "columns": {
-                                                                            "reference": {
-                                                                                "source": [
-                                                                                    "request",
-                                                                                    "headers",
-                                                                                    "__odin_reference"
-                                                                                ]
-                                                                            },
-                                                                            "app_id": {
-                                                                                "source": ["request", "headers", "__app"]
-                                                                            },
-                                                                            "identity_id": {
-                                                                                "source": [
-                                                                                    "request",
-                                                                                    "headers",
-                                                                                    "__user"
-                                                                                ]
-                                                                            }
-                                                                        }
+                                                                        ]
                                                                     }
                                                                 ]
                                                             }
-                                                        ]
+                                                        },
+                                                        "": "fost.response.500"
                                                     }
                                                 },
                                                 "then": {
