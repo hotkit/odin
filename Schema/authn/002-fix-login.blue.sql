@@ -27,7 +27,7 @@ CREATE FUNCTION odin.credentials_ledger_insert() RETURNS TRIGGER AS $body$
             INTO odin.credentials
                 (identity_id, login, password__hash, password__process, password__reference)
             VALUES (NEW.identity_id, NEW.login, NEW.password, NEW.process, NEW.reference)
-            ON CONFLICT (login) DO UPDATE SET
+            ON CONFLICT (identity_id) DO UPDATE SET
                 password__hash = EXCLUDED.password__hash,
                 password__process = EXCLUDED.password__process,
                 password__reference = EXCLUDED.password__reference;
