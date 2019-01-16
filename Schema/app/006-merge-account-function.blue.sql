@@ -18,8 +18,6 @@ DECLARE
   merge_to_installation_id TEXT;
   reference_val TEXT = 'merge:'||merge_from||':'||merge_to;
   annotation JSON = json_build_object('merge_from', merge_from,'merge_to', merge_to);
-  app_user RECORD;
-  app_user_role RECORD;
 BEGIN
   SELECT installation_id INTO merge_to_installation_id FROM odin.app_user WHERE identity_id = merge_to LIMIT 1;
 

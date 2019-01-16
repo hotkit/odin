@@ -38,7 +38,7 @@ DECLARE
     mods RECORD;
 BEGIN
     FOR mods IN
-        SELECT REPLACE(name, '/', '_') AS name
+        SELECT REGEXP_REPLACE(name, '[/-]', '_', 'g') AS name
         FROM odin.module
         WHERE name != 'core'
     LOOP

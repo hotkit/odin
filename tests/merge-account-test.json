@@ -59,6 +59,20 @@
                       "command": "SELECT * FROM odin.app_user_installation_id_ledger WHERE identity_id=$1 AND app_id=$2 AND installation_id=$3 LIMIT 1",
                       "arguments": [1, 2, 3]
                     }
+                }, {
+                    "return": "object",
+                    "path": ["/group-membership-ledger", 1],
+                    "GET": {
+                      "command": "SELECT COUNT(*) AS count FROM odin.group_membership_ledger WHERE identity_id=$1",
+                      "arguments": [1]
+                    }
+                }, {
+                    "return": "object",
+                    "path": ["/group-membership", 1, 2],
+                    "GET": {
+                      "command": "SELECT * FROM odin.group_membership WHERE identity_id=$1 AND group_slug=$2",
+                      "arguments": [1, 2]
+                    }
                 }
               ]
             }

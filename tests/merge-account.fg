@@ -28,13 +28,77 @@ GET test/merge-account/validate /identity-record/installation1 200 {"id": "insta
 
 
 # Test AuthZ
-# odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
-# odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
-# odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
-# odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
-# odin.user authz1
-# odin.user authz2
-# sql.insert odin.merge_record {"from_identity_id": "authz1", "to_identity_id": "authz2"}
+odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
+odin.user authz1
+odin.user authz2
+odin.user authz3
+odin.user authz4
+odin.user authz5
+odin.user authz6
+odin.user authz7
+odin.user authz8
+# from superuser is false to superuser is true
+sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz1", "superuser": false}
+sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz2", "superuser": true}
+# from superuser is true to superuser is false
+sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz3", "superuser": true}
+sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz4", "superuser": false}
+# from superuser is false to superuser is false
+sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz5", "superuser": false}
+sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz6", "superuser": false}
+# from superuser is true to superuser is true
+sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz7", "superuser": true}
+sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz8", "superuser": true}
+sql.insert odin.group_ledger {"reference": "ref2", "group_slug": "group1"}
+sql.insert odin.group_ledger {"reference": "ref2", "group_slug": "group2"}
+sql.insert odin.group_ledger {"reference": "ref2", "group_slug": "group3"}
+sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group1", "identity_id": "authz1", "member": true}
+sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group3", "identity_id": "authz1", "member": true}
+sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group2", "identity_id": "authz2", "member": true}
+sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group3", "identity_id": "authz2", "member": true}
+
+GET test/merge-account/validate /identity/authz1 200 {"id": "authz1", "is_superuser": false}
+GET test/merge-account/validate /identity/authz2 200 {"id": "authz2", "is_superuser": true}
+GET test/merge-account/validate /identity/authz3 200 {"id": "authz3", "is_superuser": true}
+GET test/merge-account/validate /identity/authz4 200 {"id": "authz4", "is_superuser": false}
+GET test/merge-account/validate /identity/authz5 200 {"id": "authz5", "is_superuser": false}
+GET test/merge-account/validate /identity/authz6 200 {"id": "authz6", "is_superuser": false}
+GET test/merge-account/validate /identity/authz7 200 {"id": "authz7", "is_superuser": true}
+GET test/merge-account/validate /identity/authz8 200 {"id": "authz8", "is_superuser": true}
+
+GET test/merge-account/validate /group-membership-ledger/authz1 200 {"count": 2}
+GET test/merge-account/validate /group-membership-ledger/authz2 200 {"count": 2}
+
+#GET test/merge-account/validate /group-membership/authz1/group1 200 {"group_slug": "group1", "identity_id": "authz1", "member": true}
+#GET test/merge-account/validate /group-membership/authz1/group3 200 {"group_slug": "group3", "identity_id": "authz1", "member": true}
+#GET test/merge-account/validate /group-membership/authz2/group2 200 {"group_slug": "group2", "identity_id": "authz2", "member": true}
+#GET test/merge-account/validate /group-membership/authz2/group3 200 {"group_slug": "group3", "identity_id": "authz2", "member": true}
+
+sql.insert odin.merge_record {"from_identity_id": "authz1", "to_identity_id": "authz2"}
+sql.insert odin.merge_record {"from_identity_id": "authz3", "to_identity_id": "authz4"}
+sql.insert odin.merge_record {"from_identity_id": "authz5", "to_identity_id": "authz6"}
+sql.insert odin.merge_record {"from_identity_id": "authz7", "to_identity_id": "authz8"}
+
+GET test/merge-account/validate /identity/authz1 404
+GET test/merge-account/validate /identity/authz2 200 {"id": "authz2", "is_superuser": true}
+GET test/merge-account/validate /identity/authz3 404
+GET test/merge-account/validate /identity/authz4 200 {"id": "authz4", "is_superuser": true}
+GET test/merge-account/validate /identity/authz5 404
+GET test/merge-account/validate /identity/authz6 200 {"id": "authz6", "is_superuser": false}
+GET test/merge-account/validate /identity/authz7 404
+GET test/merge-account/validate /identity/authz8 200 {"id": "authz8", "is_superuser": true}
+
+#GET test/merge-account/validate /group-membership-ledger/authz1 200 {"count": 2}
+GET test/merge-account/validate /group-membership-ledger/authz2 200 {"count": 4}
+
+GET test/merge-account/validate /group-membership/authz1/group1 404
+GET test/merge-account/validate /group-membership/authz1/group3 404
+GET test/merge-account/validate /group-membership/authz2/group1 200 {"group_slug": "group1", "identity_id": "authz2"}
+GET test/merge-account/validate /group-membership/authz2/group2 200 {"group_slug": "group2", "identity_id": "authz2"}
+GET test/merge-account/validate /group-membership/authz2/group3 200 {"group_slug": "group3", "identity_id": "authz2"}
 
 
 # Test app
@@ -81,9 +145,7 @@ sql.insert odin.app_user_installation_id_ledger {"reference": "ref5", "app_id": 
 sql.insert odin.app_user_installation_id_ledger {"reference": "ref5", "app_id": "app4", "identity_id": "app_user2", "installation_id": "il2"}
 
 GET test/merge-account/validate /identity/app_user1 200 {"id": "app_user1"}
-GET test/merge-account/validate /identity-record/app_user1 200 {"id": "app_user1"}
 GET test/merge-account/validate /identity/app_user2 200 {"id": "app_user2"}
-GET test/merge-account/validate /identity-record/app_user2 200 {"id": "app_user2"}
 
 GET test/merge-account/validate /app-user-ledger/app_user1 200 {"count": 3}
 GET test/merge-account/validate /app-user-ledger/app_user2 200 {"count": 3}
@@ -115,9 +177,7 @@ GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app4/
 sql.insert odin.merge_record {"from_identity_id": "app_user1", "to_identity_id": "app_user2"}
 
 GET test/merge-account/validate /identity/app_user1 404
-GET test/merge-account/validate /identity-record/app_user1 200 {"id": "app_user1"}
 GET test/merge-account/validate /identity/app_user2 200 {"id": "app_user2"}
-GET test/merge-account/validate /identity-record/app_user2 200 {"id": "app_user2"}
 
 GET test/merge-account/validate /app-user-ledger/app_user1 200 {"count": 3}
 GET test/merge-account/validate /app-user-ledger/app_user2 200 {"count": 6}
@@ -155,23 +215,47 @@ GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app3/
 GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app4/il2 200 {"identity_id": "app_user2", "app_id": "app4", "installation_id": "il2"}
 
 
-
-
-
-
-
-
 # Test opts/email
-
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 
 # Test opts/facebook
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
 
 # Test opts/forgotten-password
+odin.sql.file (module.path.join ../Schema/opts/forgotten-password/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/forgotten-password/002-merge-account-function.blue.sql)
 
 # Test opts/full-name
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
 
 # Test opts/google
+odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
 
 # Test opts/installation-id
+odin.sql.file (module.path.join ../Schema/opts/installation-id/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/installation-id/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/installation-id/004-merge-account-function.blue.sql)
 
 # Test opts/logout
+odin.sql.file (module.path.join ../Schema/opts/logout/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/logout/003-fix-logout-count.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/logout/004-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/logout/005-merge-account-function.blue.sql)
+
+odin.user opts1
+odin.user opts2
+GET test/merge-account/validate /identity/opts1 200 {"id": "opts1"}
+GET test/merge-account/validate /identity/opts2 200 {"id": "opts2"}
+
+sql.insert odin.merge_record {"from_identity_id": "opts1", "to_identity_id": "opts2"}
+
+GET test/merge-account/validate /identity/opts1 404
+GET test/merge-account/validate /identity/opts2 200 {"id": "opts2"}
