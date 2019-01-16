@@ -6,8 +6,9 @@ ALTER TABLE odin.login_success
 
 ALTER TABLE odin.credentials
     DROP CONSTRAINT credentials_login_pk,
-    ADD CONSTRAINT credentials_login_pk PRIMARY KEY (identity_id),
-    ADD CONSTRAINT login_uq UNIQUE (login);
+    ADD CONSTRAINT credentials_login_pk PRIMARY KEY (identity_id, login),
+    ADD CONSTRAINT login_uq UNIQUE (login),
+    ADD CONSTRAINT identity_id_uq UNIQUE (identity_id);
 
 ALTER TABLE odin.login_success
     ADD CONSTRAINT login_success_username_fkey
@@ -27,7 +28,7 @@ CREATE FUNCTION odin.credentials_ledger_insert() RETURNS TRIGGER AS $body$
             INTO odin.credentials
                 (identity_id, login, password__hash, password__process, password__reference)
             VALUES (NEW.identity_id, NEW.login, NEW.password, NEW.process, NEW.reference)
-            ON CONFLICT (identity_id) DO UPDATE SET
+            ON CONFLICT (identity_id, login) DO UPDATE SET
                 password__hash = EXCLUDED.password__hash,
                 password__process = EXCLUDED.password__process,
                 password__reference = EXCLUDED.password__reference;
