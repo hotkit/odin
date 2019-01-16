@@ -1,10 +1,7 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
-# odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
-# odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
-# odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
-# odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+
 
 # Test Core
 odin.user core1
@@ -14,6 +11,7 @@ GET test/merge-account/validate /identity-record/core1 200 {"id": "core1"}
 sql.insert odin.merge_record {"from_identity_id": "core1", "to_identity_id": "core2"}
 GET test/merge-account/validate /identity-record/core1 200 {"id": "core1"}
 GET test/merge-account/validate /identity/core1 404
+
 
 # Test AuthN
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
@@ -28,11 +26,143 @@ sql.insert odin.merge_record {"from_identity_id": "installation1", "to_identity_
 GET test/merge-account/validate /identity/installation1 404
 GET test/merge-account/validate /identity-record/installation1 200 {"id": "installation1"}
 
+
 # Test AuthZ
+# odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+# odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+# odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
+# odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
+# odin.user authz1
+# odin.user authz2
+# sql.insert odin.merge_record {"from_identity_id": "authz1", "to_identity_id": "authz2"}
+
 
 # Test app
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.user app1
+odin.user app2
+odin.user app3
+odin.user app4
+odin.user app_user1
+odin.user app_user2
+sql.insert odin.app_ledger {"reference": "ref1", "app_id": "app1", "app_name": "app1", "access_policy": "INVITE_ONLY", "data_sharing_policy": "ALL"}
+sql.insert odin.app_ledger {"reference": "ref1", "app_id": "app2", "app_name": "app2", "access_policy": "INVITE_ONLY", "data_sharing_policy": "ALL"}
+sql.insert odin.app_ledger {"reference": "ref1", "app_id": "app3", "app_name": "app3", "access_policy": "INVITE_ONLY", "data_sharing_policy": "ALL"}
+sql.insert odin.app_ledger {"reference": "ref1", "app_id": "app4", "app_name": "app4", "access_policy": "INVITE_ONLY", "data_sharing_policy": "ALL"}
+sql.insert odin.app_role_ledger {"reference": "ref2", "app_id": "app1", "role": "role1"}
+sql.insert odin.app_role_ledger {"reference": "ref2", "app_id": "app2", "role": "role2"}
+sql.insert odin.app_role_ledger {"reference": "ref2", "app_id": "app3", "role": "role3_1"}
+sql.insert odin.app_role_ledger {"reference": "ref2", "app_id": "app3", "role": "role3_2"}
+sql.insert odin.app_role_ledger {"reference": "ref2", "app_id": "app4", "role": "role4"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app1", "identity_id": "app_user1"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app3", "identity_id": "app_user1"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app4", "identity_id": "app_user1"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app2", "identity_id": "app_user2"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app3", "identity_id": "app_user2"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app4", "identity_id": "app_user2"}
+# when user has different app
+sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app1", "identity_id": "app_user1", "role": "role1"}
+sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app2", "identity_id": "app_user2", "role": "role2"}
+# when user has same app with different user
+sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app3", "identity_id": "app_user1", "role": "role3_1"}
+sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app3", "identity_id": "app_user2", "role": "role3_2"}
+# when user has same app with same user
+sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app4", "identity_id": "app_user1", "role": "role4"}
+sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app4", "identity_id": "app_user2", "role": "role4"}
+sql.insert odin.app_user_installation_id_ledger {"reference": "ref5", "app_id": "app1", "identity_id": "app_user1", "installation_id": "il1"}
+sql.insert odin.app_user_installation_id_ledger {"reference": "ref5", "app_id": "app3", "identity_id": "app_user1", "installation_id": "il1"}
+sql.insert odin.app_user_installation_id_ledger {"reference": "ref5", "app_id": "app4", "identity_id": "app_user1", "installation_id": "il1"}
+sql.insert odin.app_user_installation_id_ledger {"reference": "ref5", "app_id": "app2", "identity_id": "app_user2", "installation_id": "il2"}
+sql.insert odin.app_user_installation_id_ledger {"reference": "ref5", "app_id": "app3", "identity_id": "app_user2", "installation_id": "il2"}
+sql.insert odin.app_user_installation_id_ledger {"reference": "ref5", "app_id": "app4", "identity_id": "app_user2", "installation_id": "il2"}
+
+GET test/merge-account/validate /identity/app_user1 200 {"id": "app_user1"}
+GET test/merge-account/validate /identity-record/app_user1 200 {"id": "app_user1"}
+GET test/merge-account/validate /identity/app_user2 200 {"id": "app_user2"}
+GET test/merge-account/validate /identity-record/app_user2 200 {"id": "app_user2"}
+
+GET test/merge-account/validate /app-user-ledger/app_user1 200 {"count": 3}
+GET test/merge-account/validate /app-user-ledger/app_user2 200 {"count": 3}
+
+GET test/merge-account/validate /app-user/app_user1/app1 200 {"identity_id": "app_user1", "app_id": "app1"}
+GET test/merge-account/validate /app-user/app_user1/app3 200 {"identity_id": "app_user1", "app_id": "app3"}
+GET test/merge-account/validate /app-user/app_user1/app4 200 {"identity_id": "app_user1", "app_id": "app4"}
+GET test/merge-account/validate /app-user/app_user2/app2 200 {"identity_id": "app_user2", "app_id": "app2"}
+GET test/merge-account/validate /app-user/app_user2/app3 200 {"identity_id": "app_user2", "app_id": "app3"}
+GET test/merge-account/validate /app-user/app_user2/app4 200 {"identity_id": "app_user2", "app_id": "app4"}
+
+GET test/merge-account/validate /app-user-role-ledger/app_user1 200 {"count": 3}
+GET test/merge-account/validate /app-user-role-ledger/app_user2 200 {"count": 3}
+
+GET test/merge-account/validate /app-user-role/app_user1/app1/role1 200 {"identity_id": "app_user1", "app_id": "app1", "role": "role1"}
+GET test/merge-account/validate /app-user-role/app_user1/app3/role3_1 200 {"identity_id": "app_user1", "app_id": "app3", "role": "role3_1"}
+GET test/merge-account/validate /app-user-role/app_user1/app4/role4 200 {"identity_id": "app_user1", "app_id": "app4", "role": "role4"}
+GET test/merge-account/validate /app-user-role/app_user2/app2/role2 200 {"identity_id": "app_user2", "app_id": "app2", "role": "role2"}
+GET test/merge-account/validate /app-user-role/app_user2/app3/role3_2 200 {"identity_id": "app_user2", "app_id": "app3", "role": "role3_2"}
+GET test/merge-account/validate /app-user-role/app_user2/app4/role4 200 {"identity_id": "app_user2", "app_id": "app4", "role": "role4"}
+
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user1/app1/il1 200 {"identity_id": "app_user1", "app_id": "app1", "installation_id": "il1"}
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user1/app3/il1 200 {"identity_id": "app_user1", "app_id": "app3", "installation_id": "il1"}
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user1/app4/il1 200 {"identity_id": "app_user1", "app_id": "app4", "installation_id": "il1"}
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app2/il2 200 {"identity_id": "app_user2", "app_id": "app2", "installation_id": "il2"}
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app3/il2 200 {"identity_id": "app_user2", "app_id": "app3", "installation_id": "il2"}
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app4/il2 200 {"identity_id": "app_user2", "app_id": "app4", "installation_id": "il2"}
+
+sql.insert odin.merge_record {"from_identity_id": "app_user1", "to_identity_id": "app_user2"}
+
+GET test/merge-account/validate /identity/app_user1 404
+GET test/merge-account/validate /identity-record/app_user1 200 {"id": "app_user1"}
+GET test/merge-account/validate /identity/app_user2 200 {"id": "app_user2"}
+GET test/merge-account/validate /identity-record/app_user2 200 {"id": "app_user2"}
+
+GET test/merge-account/validate /app-user-ledger/app_user1 200 {"count": 3}
+GET test/merge-account/validate /app-user-ledger/app_user2 200 {"count": 6}
+
+GET test/merge-account/validate /app-user/app_user1/app1 404
+GET test/merge-account/validate /app-user/app_user1/app3 404
+GET test/merge-account/validate /app-user/app_user1/app4 404
+# add app from merge_from user
+GET test/merge-account/validate /app-user/app_user2/app1 200 {"identity_id": "app_user2", "app_id": "app1"}
+GET test/merge-account/validate /app-user/app_user2/app2 200 {"identity_id": "app_user2", "app_id": "app2"}
+GET test/merge-account/validate /app-user/app_user2/app3 200 {"identity_id": "app_user2", "app_id": "app3"}
+GET test/merge-account/validate /app-user/app_user2/app4 200 {"identity_id": "app_user2", "app_id": "app4"}
+
+GET test/merge-account/validate /app-user-role-ledger/app_user1 200 {"count": 3}
+GET test/merge-account/validate /app-user-role-ledger/app_user2 200 {"count": 6}
+
+GET test/merge-account/validate /app-user-role/app_user1/app1/role1 404
+GET test/merge-account/validate /app-user-role/app_user1/app3/role3_1 404
+GET test/merge-account/validate /app-user-role/app_user1/app4/role4 404
+# add role from merge_from user
+GET test/merge-account/validate /app-user-role/app_user2/app1/role1 200 {"identity_id": "app_user2", "app_id": "app1", "role": "role1"}
+GET test/merge-account/validate /app-user-role/app_user2/app2/role2 200 {"identity_id": "app_user2", "app_id": "app2", "role": "role2"}
+# add role from merge_from user
+GET test/merge-account/validate /app-user-role/app_user2/app3/role3_1 200 {"identity_id": "app_user2", "app_id": "app3", "role": "role3_1"}
+GET test/merge-account/validate /app-user-role/app_user2/app3/role3_2 200 {"identity_id": "app_user2", "app_id": "app3", "role": "role3_2"}
+GET test/merge-account/validate /app-user-role/app_user2/app4/role4 200 {"identity_id": "app_user2", "app_id": "app4", "role": "role4"}
+
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user1/app1/il1 404
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user1/app3/il1 404
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user1/app4/il1 404
+# change installation_id to merge_to app_user
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app1/il2 200 {"identity_id": "app_user2", "app_id": "app1", "installation_id": "il2"}
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app2/il2 200 {"identity_id": "app_user2", "app_id": "app2", "installation_id": "il2"}
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app3/il2 200 {"identity_id": "app_user2", "app_id": "app3", "installation_id": "il2"}
+GET test/merge-account/validate /app-user-installation-id-ledger/app_user2/app4/il2 200 {"identity_id": "app_user2", "app_id": "app4", "installation_id": "il2"}
+
+
+
+
+
+
+
 
 # Test opts/email
+
 
 # Test opts/facebook
 
@@ -45,4 +175,3 @@ GET test/merge-account/validate /identity-record/installation1 200 {"id": "insta
 # Test opts/installation-id
 
 # Test opts/logout
-

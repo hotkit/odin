@@ -1,6 +1,5 @@
 INSERT INTO odin.migration VALUES('authn', '003-alter-ledgers.blue.sql');
 
-
 ALTER TABLE odin.credentials_password_ledger
     DROP CONSTRAINT credentials_password_ledger_identity_fkey,
     ADD CONSTRAINT credentials_password_ledger_identity_fkey
@@ -9,13 +8,12 @@ ALTER TABLE odin.credentials_password_ledger
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE;
 
 CREATE FUNCTION odin.merge_account_authn(merge_from TEXT, merge_to TEXT)
-RETURNS BOOLEAN AS
+RETURNS VOID AS
 $body$
 BEGIN
     UPDATE odin.credentials
-    SET identity_id=$merge_to
-    WHERE identity_id=$merge_from;
-    RETURN TRUE;
+    SET identity_id=merge_to
+    WHERE identity_id=merge_from;
 END;
 $body$
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;

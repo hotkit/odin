@@ -24,7 +24,43 @@
                         "command": "SELECT * FROM odin.credentials WHERE identity_id=$1",
                         "arguments": [1]
                     }
-                }]
+                }, {
+                    "return": "object",
+                    "path": ["/app-user-ledger", 1],
+                    "GET": {
+                      "command": "SELECT COUNT(*) AS count FROM odin.app_user_ledger WHERE identity_id=$1",
+                      "arguments": [1]
+                    }
+                }, {
+                    "return": "object",
+                    "path": ["/app-user", 1, 2],
+                    "GET": {
+                      "command": "SELECT * FROM odin.app_user WHERE identity_id=$1 AND app_id=$2",
+                      "arguments": [1, 2]
+                    }
+                }, {
+                    "return": "object",
+                    "path": ["/app-user-role-ledger", 1],
+                    "GET": {
+                      "command": "SELECT COUNT(*) AS count FROM odin.app_user_role_ledger WHERE identity_id=$1",
+                      "arguments": [1]
+                    }
+                }, {
+                    "return": "object",
+                    "path": ["/app-user-role", 1, 2, 3],
+                    "GET": {
+                      "command": "SELECT * FROM odin.app_user_role WHERE identity_id=$1 AND app_id=$2 AND role=$3",
+                      "arguments": [1, 2, 3]
+                    }
+                }, {
+                    "return": "object",
+                    "path": ["/app-user-installation-id-ledger", 1, 2, 3],
+                    "GET": {
+                      "command": "SELECT * FROM odin.app_user_installation_id_ledger WHERE identity_id=$1 AND app_id=$2 AND installation_id=$3 LIMIT 1",
+                      "arguments": [1, 2, 3]
+                    }
+                }
+              ]
             }
         }
     }
