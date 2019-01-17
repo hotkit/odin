@@ -42,6 +42,7 @@ sql.insert odin.app_user_installation_id_ledger {
     "identity_id": "installation_ref",
     "installation_id": "fred-mobile"
 }
+
 set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 
@@ -52,7 +53,7 @@ POST odin/app/register / {
     "full-name": "Fred"
 } 422
 
-# # Password must longer than 8 characters
+# Password must longer than 8 characters
 POST odin/app/register / {
     "username": "fred",
     "password": "short",
@@ -60,6 +61,34 @@ POST odin/app/register / {
     "full-name": "Fred",
     "email": "fred@bowling.com"
 } 422
+
+# Username cannot be empty string
+POST odin/app/register / {
+    "username": "",
+    "password": "password1234",
+    "password2": "password1234",
+    "full-name": "Fred",
+    "email": "fred@bowling.com"
+} 422
+
+# Username cannot be null
+POST odin/app/register / {
+    "username": null,
+    "password": "password1234",
+    "password2": "password1234",
+    "full-name": "Fred",
+    "email": "fred@bowling.com"
+} 422
+
+# Email cannot be null
+POST odin/app/register / {
+    "username": "fred",
+    "password": "password1234",
+    "password2": "password1234",
+    "full-name": "Fred",
+    "email": null
+} 422
+
 
 # Successfully register
 POST odin/app/register / {
@@ -70,25 +99,42 @@ POST odin/app/register / {
     "email": "fred@bowling.com"
 } 200
 
-# Existing email register twice should failed
-# TODO: Now it returns std::exception
-# POST odin/app/register / {
-#     "username": "barney",
-#     "password": "mercury2",
-#     "password2": "mercury2",
-#     "full-name": "Barney",
-#     "email": "fred@bowling.com"
-# } 500
-
-# Existing username register twice should failed
-# TODO: Now it returns std::exception
+# TODO: Register second time should return error
 # POST odin/app/register / {
 #     "username": "fred",
 #     "password": "mercury2",
 #     "password2": "mercury2",
-#     "full-name": "Barney",
-#     "email": "fred2@bowling.com"
-# } 201
+#     "full-name": "Fred",
+#     "email": "fred@bowling.com"
+# } 500
+
+# The same installation_id try to register 2 username should return error
+POST odin/app/register / {
+    "username": "brian",
+    "password": "mercury22",
+    "password2": "mercury22",
+    "full-name": "Brian",
+    "email": "brian@bowling.com"
+} 500
+
+
+# Existing username register twice should failed
+sql.insert odin.identity {"id": "installation_ref2"}
+sql.insert odin.app_user_installation_id_ledger {
+    "reference": "reference2",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref2",
+    "installation_id": "fred-mobile2"
+}
+set app_jwt (odin.jwt.mint {"sub": "installation_ref2", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+POST odin/app/register / {
+    "username": "fred",
+    "password": "mercury2",
+    "password2": "mercury2",
+    "full-name": "Barney",
+    "email": "fred2@bowling.com"
+} 500
 
 # Check database validity, the identity_id should be the identity that installation API generated
 GET odin/test/validate-register /fred 200 {
