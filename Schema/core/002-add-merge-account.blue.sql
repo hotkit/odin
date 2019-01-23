@@ -38,11 +38,11 @@ DECLARE
     mods RECORD;
 BEGIN
     FOR mods IN
-        SELECT REGEXP_REPLACE(name, '[/-]', '_', 'g') AS name
+        SELECT name
         FROM odin.module
         WHERE name != 'core'
     LOOP
-        EXECUTE FORMAT('SELECT odin.merge_account_%I($1, $2)', mods.name)
+        EXECUTE FORMAT('SELECT odin."merge_account_%s"($1, $2)', mods.name)
             USING NEW.from_identity_id, NEW.to_identity_id;
     END LOOP;
     EXECUTE 'DELETE FROM odin.identity WHERE id=$1' USING NEW.from_identity_id;

@@ -1,80 +1,126 @@
 {
     "webserver": {
         "views/test/merge-account/validate": {
-            "view": "fostgres.sql",
+            "view": "fostgres.control.pg-error",
             "configuration": {
-                "sql": [{
-                    "return": "object",
-                    "path": ["/identity", 1],
-                    "GET": {
-                        "command": "SELECT * FROM odin.identity WHERE id=$1",
-                        "arguments": [1]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/identity-record", 1],
-                    "GET": {
-                        "command": "SELECT * FROM odin.identity_record WHERE id=$1",
-                        "arguments": [1]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/credentials", 1],
-                    "GET": {
-                        "command": "SELECT * FROM odin.credentials WHERE identity_id=$1",
-                        "arguments": [1]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/app-user-ledger", 1],
-                    "GET": {
-                      "command": "SELECT COUNT(*) AS count FROM odin.app_user_ledger WHERE identity_id=$1",
-                      "arguments": [1]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/app-user", 1, 2],
-                    "GET": {
-                      "command": "SELECT * FROM odin.app_user WHERE identity_id=$1 AND app_id=$2",
-                      "arguments": [1, 2]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/app-user-role-ledger", 1],
-                    "GET": {
-                      "command": "SELECT COUNT(*) AS count FROM odin.app_user_role_ledger WHERE identity_id=$1",
-                      "arguments": [1]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/app-user-role", 1, 2, 3],
-                    "GET": {
-                      "command": "SELECT * FROM odin.app_user_role WHERE identity_id=$1 AND app_id=$2 AND role=$3",
-                      "arguments": [1, 2, 3]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/app-user-installation-id-ledger", 1, 2, 3],
-                    "GET": {
-                      "command": "SELECT * FROM odin.app_user_installation_id_ledger WHERE identity_id=$1 AND app_id=$2 AND installation_id=$3 LIMIT 1",
-                      "arguments": [1, 2, 3]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/group-membership-ledger", 1],
-                    "GET": {
-                      "command": "SELECT COUNT(*) AS count FROM odin.group_membership_ledger WHERE identity_id=$1",
-                      "arguments": [1]
-                    }
-                }, {
-                    "return": "object",
-                    "path": ["/group-membership", 1, 2],
-                    "GET": {
-                      "command": "SELECT * FROM odin.group_membership WHERE identity_id=$1 AND group_slug=$2",
-                      "arguments": [1, 2]
-                    }
-                }
-              ]
+                "execute": {
+                    "view": "fostgres.sql",
+                    "configuration": {
+                        "sql": [{
+                            "return": "object",
+                            "path": ["/merge_record", 1, 2],
+                            "GET": {
+                                "command": "SELECt * FROM odin.merge_record WHERE from_identity_id=$1 AND to_identity_id=$2;",
+                                "arguments": [1 ,2]
+                            },
+                            "PUT": {
+                                "table": "odin.merge_record",
+                                "columns": {
+                                    "from_identity_id": {
+                                        "key": true,
+                                        "source": 1
+                                    },
+                                    "to_identity_id": {
+                                        "key": true,
+                                        "source": 2
+                                    }                        
+                                }
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/identity", 1],
+                            "GET": {
+                                "command": "SELECT * FROM odin.identity WHERE id=$1",
+                                "arguments": [1]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/identity-record", 1],
+                            "GET": {
+                                "command": "SELECT * FROM odin.identity_record WHERE id=$1",
+                                "arguments": [1]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/credentials", 1],
+                            "GET": {
+                                "command": "SELECT * FROM odin.credentials WHERE identity_id=$1",
+                                "arguments": [1]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/credentials_password_ledger", 1],
+                            "GET": {
+                                "command": "SELECT * FROM odin.credentials_password_ledger WHERE identity_id=$1",
+                                "arguments": [1]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/app-user-ledger", 1],
+                            "GET": {
+                                "command": "SELECT COUNT(*) AS count FROM odin.app_user_ledger WHERE identity_id=$1",
+                                "arguments": [1]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/app-user", 1, 2],
+                            "GET": {
+                                "command": "SELECT * FROM odin.app_user WHERE identity_id=$1 AND app_id=$2",
+                                "arguments": [1, 2]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/app-user-role-ledger", 1],
+                            "GET": {
+                                "command": "SELECT COUNT(*) AS count FROM odin.app_user_role_ledger WHERE identity_id=$1",
+                                "arguments": [1]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/app-user-role", 1, 2, 3],
+                            "GET": {
+                                "command": "SELECT * FROM odin.app_user_role WHERE identity_id=$1 AND app_id=$2 AND role=$3",
+                                "arguments": [1, 2, 3]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/app-user-installation-id-ledger", 1, 2, 3],
+                            "GET": {
+                                "command": "SELECT * FROM odin.app_user_installation_id_ledger WHERE identity_id=$1 AND app_id=$2 AND installation_id=$3 LIMIT 1",
+                                "arguments": [1, 2, 3]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/group-membership-ledger", 1],
+                            "GET": {
+                                "command": "SELECT COUNT(*) AS count FROM odin.group_membership_ledger WHERE identity_id=$1",
+                                "arguments": [1]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/group-membership", 1, 2],
+                            "GET": {
+                                "command": "SELECT * FROM odin.group_membership WHERE identity_id=$1 AND group_slug=$2",
+                                "arguments": [1, 2]
+                            }
+                        }, {
+                            "return": "object",
+                            "path": ["/facebook_credentials", 1, 2],
+                            "GET": {
+                                "command": "SELECT * FROM odin.facebook_credentials WHERE identity_id=$1 AND facebook_user_id=$2;",
+                                "arguments": [1, 2]
+                            }
+                        },  {
+                            "return": "object",
+                            "path": ["/google_credentials", 1, 2],
+                            "GET": {
+                                "command": "SELECT * FROM odin.google_credentials WHERE identity_id=$1 AND google_user_id=$2;",
+                                "arguments": [1, 2]
+                            }                          
+                        }]
+                    }                            
+                },
+                "": "fost.response.500"
             }
         }
     }
