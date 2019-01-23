@@ -172,6 +172,8 @@ GET test/merge-account/validate /app-user-role/app_user4/app1/role1 200 {"identi
 GET test/merge-account/validate /app-user-role/app_user4/app2/role2 200 {"identity_id": "app_user4", "app_id": "app2", "role": "role2"}
 
 # Test module opts/email
+
+# Test module opts/facebook
 # Case user can has multiple facebook_id
 odin.user facebook1
 odin.user facebook2
