@@ -205,12 +205,18 @@ sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "forg
 sql.insert odin.request_reset_password_ledger {"reference": "ref2", "email": "forgot1@mail.com"}
 sql.insert odin.request_reset_password_ledger {"reference": "ref3", "email": "forgot2@mail.com"}
 GET test/merge-account/validate /credentials/forgot1 404
+GET test/merge-account/validate /credentials_password_ledger/forgot2 200 {
+    "columns": ["identity_id"], "rows": [["forgot2"]]
+}
 GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot1@mail.com 200
 GET test/merge-account/validate /request_reset_password_ledger/ref3/forgot2@mail.com 200
 PUT test/merge-account/validate /merge_record/forgot1/forgot2 {} 200
 GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot1@mail.com 200
 GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot2@mail.com 404
 GET test/merge-account/validate /request_reset_password_ledger/ref3/forgot2@mail.com 200
+GET test/merge-account/validate /credentials_password_ledger/forgot2 200 {
+    "columns": ["identity_id"], "rows": [["forgot2"]]
+}
 
 # Test module opts/full-name
 # Case full-name of merged to user must no be affect from another user 

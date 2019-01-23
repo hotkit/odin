@@ -48,7 +48,6 @@
                                 "arguments": [1]
                             }
                         }, {
-                            "return": "object",
                             "path": ["/credentials_password_ledger", 1],
                             "GET": {
                                 "command": "SELECT * FROM odin.credentials_password_ledger WHERE identity_id=$1",
