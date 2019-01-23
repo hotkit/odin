@@ -1,9 +1,12 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
 setting odin "Trust JWT" true
 
 # Set up test permissions and group

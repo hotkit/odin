@@ -15,10 +15,13 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 authnz-test-view.json
                 authnz.fg
@@ -39,8 +42,10 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 db-bypass.fg
         )
@@ -60,11 +65,16 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
+                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 login.fg
         )
@@ -84,11 +94,43 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/logout/002-initial.blue.sql
+                ../Schema/opts/logout/003-fix-logout-count.blue.sql
+                ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 logout.fg
+        )
+
+    add_custom_command(OUTPUT test-merge-account
+            COMMAND fostgres-test odin-test-merge-account -o test-merge-account
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/merge-account-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/merge-account.fg
+            MAIN_DEPENDENCY merge-account.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Configuration/odin-views.json
+                merge-account.fg
         )
 
     add_custom_command(OUTPUT test-no-auth
@@ -124,8 +166,13 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/opts/logout/002-initial.blue.sql
+                ../Schema/opts/logout/003-fix-logout-count.blue.sql
+                ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 password.fg
         )
@@ -146,9 +193,13 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
+                ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 permissions.fg
                 permissions-test-view.json
@@ -171,10 +222,14 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
                 facebook-test.json
@@ -197,9 +252,13 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/authz/001-initial.blue.sql
+                ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 session.fg
                 session-test-view.json
@@ -221,6 +280,7 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/opts/forgotten-password/001-initial.blue.sql
                 ../Configuration/odin-views.json
                 forgotten-password-test-view.json
@@ -244,12 +304,18 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
+                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
                 login-google-test.json
@@ -272,11 +338,19 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
-                ../Schema/opts/email/001-initial.blue.sql
-                ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+                ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
+                ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+                ../Schema/opts/logout/002-initial.blue.sql
+                ../Schema/opts/logout/003-fix-logout-count.blue.sql
+                ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
                 link-facebook.fg
@@ -300,12 +374,18 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
+                ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
+                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
                 facebook-test.json
@@ -328,11 +408,13 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
-                ../Schema/opts/email/001-initial.blue.sql
-                ../Schema/opts/google/001-initial.blue.sql
-                ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/opts/logout/002-initial.blue.sql
+                ../Schema/opts/logout/003-fix-logout-count.blue.sql
+                ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 expire-user.fg
         )
@@ -355,14 +437,48 @@ if(TARGET stress OR TARGET pgtest)
                 odin-views
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
                 ../Schema/app/002-initial.blue.sql
                 ../Schema/app/003-app-role.blue.sql
                 ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
                 ../Configuration/odin-views.json
                 app-installation-test.json
                 app-installation.fg
+        )
+
+    add_custom_command(OUTPUT test-app-mint
+            COMMAND fostgres-test odin-test-app-mint -o test-app-mint
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app.mint-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app.mint.fg
+            MAIN_DEPENDENCY app.mint.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Configuration/odin-views.json
+                app.mint-test.json
+                app.mint.fg
         )
 
     add_custom_command(OUTPUT test-app-login
@@ -382,11 +498,14 @@ if(TARGET stress OR TARGET pgtest)
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
             ../Configuration/odin-views.json
             app-login.fg
     )
@@ -406,11 +525,14 @@ if(TARGET stress OR TARGET pgtest)
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
             app-secure-test-view.json
             app-secure.fg
     )
@@ -431,11 +553,14 @@ if(TARGET stress OR TARGET pgtest)
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
             app-verify.fg
     )
 
@@ -457,15 +582,21 @@ if(TARGET stress OR TARGET pgtest)
             odin-views
             ../Schema/bootstrap.sql
             ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
             ../Schema/authz/001-initial.blue.sql
             ../Schema/authz/002-view-user_permission.blue.sql
+            ../Schema/authz/003-alter-ledgers.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/full-name/003-alter-ledgers.blue.sql
             ../Schema/opts/email/001-initial.blue.sql
+            ../Schema/opts/email/003-alter-ledgers.blue.sql
             app-federation-test-client-view.json
             app-handover.fg
     )
@@ -476,6 +607,7 @@ if(TARGET stress OR TARGET pgtest)
     add_custom_target(odin-tests DEPENDS
             test-app-handover
             test-app-installation
+            test-app-mint
             test-app-login
             test-app-secure
             test-app-verify
@@ -483,6 +615,7 @@ if(TARGET stress OR TARGET pgtest)
             test-db-bypass
             test-login
             test-logout
+            test-merge-account
             test-no-auth
             test-password
             test-permissions

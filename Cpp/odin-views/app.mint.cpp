@@ -45,7 +45,7 @@ namespace {
                         "The odin.app.mint view must be wrapped by an "
                         "odin.app.secure "
                         "view on the secure path so that there is a valid JWT "
-                        "to find the App ID in");
+                        "to find App ID and User ID in");
             }
 
             if (req.method() != "POST")
@@ -90,7 +90,7 @@ namespace {
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     jwt.first, headers, L"application/jwt"));
 
-            return std::make_pair(response, 201);
+            return std::make_pair(response, 200);
         }
 
     } c_app_mint;

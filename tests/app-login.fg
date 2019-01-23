@@ -1,7 +1,9 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 
@@ -49,6 +51,7 @@ POST odin/app /login/invite-only-app/ {"username": "player2", "password": "passw
 
 # Enable OPEN app access policy + app installation ID
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 
 sql.insert odin.identity {"id": "open-app"}
 sql.insert odin.app_ledger {

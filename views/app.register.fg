@@ -1,12 +1,17 @@
 # Set up the modules we need
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 
 # Setup application
 sql.insert odin.identity {"id": "bowling-app"}
@@ -92,7 +97,7 @@ POST odin/app/register / {
     "password2": "mercury2",
     "full-name": "Fred",
     "email": "fred@bowling.com"
-} 201
+} 200
 
 # TODO: Register second time should return error
 # POST odin/app/register / {

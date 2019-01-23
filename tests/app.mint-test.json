@@ -1,0 +1,25 @@
+{
+    "webserver": {
+        "views/test/app/mint": {
+            "view": "odin.app.mint",
+            "configuration": {
+                "expires": {
+                    "hours": 72
+                }
+            }
+        },
+        "views/test/app/mint/validate": {
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [{
+                    "return": "object",
+                    "path": [1],
+                    "GET": {
+                        "command": "SELECT * FROM odin.identity WHERE id=$1",
+                        "arguments": [1]
+                    }
+                }]
+            }
+        }
+    }
+}

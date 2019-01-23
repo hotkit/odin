@@ -24,10 +24,17 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema
                 ../Schema/bootstrap.sql
                 ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
-                ../Schema/authz/001-initial.blue.sql
-                ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+                ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
                 app.register.json
                 app.register.fg
         )

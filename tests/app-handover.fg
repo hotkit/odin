@@ -1,7 +1,9 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 
@@ -24,6 +26,7 @@ GET test/app/handover/validate /mock_user 200 {"id": "mock_user"}
 
 # Should record identity data if modules are enabled
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
 POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User"}
 
@@ -35,6 +38,7 @@ POST test/app/handover/empty_full-name / {"token": "mock"} 200
 GET test/app/handover/validate /empty_full-name 200 {"id": "empty_full-name", "full_name": null}
 
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200 {"id": "mock_user", "full_name": "Mock User", "email": "mock_user@email.com"}
 
@@ -49,6 +53,7 @@ GET test/app/handover/validate /empty_email 200 {"id": "empty_email", "email": n
 # Should record user into groups
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
 GET test/app/handover/validate /mock_user/group-membership 200 {"groups": null}
 POST test/app/handover/mock_user / {"token": "mock"} 200
 GET test/app/handover/validate /mock_user 200
