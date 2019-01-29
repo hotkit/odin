@@ -51,7 +51,7 @@ odin.user core1
 odin.user core2
 GET test/merge-account/validate /identity/core1 200 {"id": "core1"}
 GET test/merge-account/validate /identity-record/core1 200 {"id": "core1"}
-PUT test/merge-account/validate /merge_record/core1/core2 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "core1", "to_identity_id": "core2"}
 GET test/merge-account/validate /identity/core1 404
 GET test/merge-account/validate /identity-record/core1 200 {"id": "core1"}
 
@@ -63,7 +63,7 @@ GET test/merge-account/validate /credentials/authn1 404
 GET test/merge-account/validate /credentials/authn2 200
 GET test/merge-account/validate /identity/authn1 200 {"id": "authn1"}
 GET test/merge-account/validate /identity-record/authn1 200 {"id": "authn1"}
-PUT test/merge-account/validate /merge_record/authn1/authn2 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "authn1", "to_identity_id": "authn2"}
 GET test/merge-account/validate /identity/authn1 404
 # Case merge registered user with registered user
 odin.user authn3 password123
@@ -72,7 +72,7 @@ GET test/merge-account/validate /credentials/authn3 200
 GET test/merge-account/validate /credentials/authn4 200
 GET test/merge-account/validate /identity/authn3 200 {"id": "authn3"}
 GET test/merge-account/validate /identity-record/authn3 200 {"id": "authn3"}
-PUT test/merge-account/validate /merge_record/authn3/authn4 {} 500
+sql.insert odin.merge_ledger {"from_identity_id": "authn3", "to_identity_id": "authn4"}
 GET test/merge-account/validate /identity/authn3 200
 
 # Test module AuthZ
