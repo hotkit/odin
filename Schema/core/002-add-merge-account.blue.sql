@@ -26,8 +26,8 @@ CREATE TRIGGER identity_insert_trigger
     FOR EACH ROW
     EXECUTE PROCEDURE identity_insert();
 
---- For each ID records those records that have been merged to it. The
---- DAG for the merges is flattened it out. If `A -> B -> C` there will be
+--- For each ID record those records that have been merged to it. The
+--- DAG for the merges is flattened. If `A -> B -> C` there will be
 --- records for `A -> B`, `B -> C` and for `A -> C`.
 CREATE TABLE odin.merge_record(
     from_identity_id TEXT NOT NULL,
