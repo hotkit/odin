@@ -66,6 +66,10 @@ BEGIN
     DELETE FROM odin.identity WHERE id=NEW.from_identity_id;
     INSERT INTO odin.merge_record
         VALUES (NEW.from_identity_id, NEW.to_identity_id);
+    INSERT INTO odin.merge_record
+        SELECT from_identity_id, NEW.to_identity_id
+            FROM odin.merge_record
+            WHERE odin.merge_record.to_identity_id=NEW.from_identity_id;
     RETURN NEW;
 END;
 $body$

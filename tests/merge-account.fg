@@ -55,6 +55,31 @@ sql.insert odin.merge_ledger {"from_identity_id": "core1", "to_identity_id": "co
 GET test/merge-account/validate /identity/core1 404
 GET test/merge-account/validate /identity-record/core1 200 {"id": "core1"}
 
+## Check that we get all merge records
+##      core1 -> core2
+##      core3 -> core4
+##      core4 -> core2
+odin.user core3
+odin.user core4
+sql.insert odin.merge_ledger {"from_identity_id": "core3", "to_identity_id": "core4"}
+sql.insert odin.merge_ledger {"from_identity_id": "core4", "to_identity_id": "core2"}
+GET test/merge-account/validate /merge_record/core1/core2 200
+GET test/merge-account/validate /merge_record/core3/core4 200
+GET test/merge-account/validate /merge_record/core4/core2 200
+## This should also mean that we have a record of `core3 -> core2`
+GET test/merge-account/validate /merge_record/core3/core2 200
+## Add a final merge and we should get a ton of new records
+odin.user core5
+sql.insert odin.merge_ledger {"from_identity_id": "core2", "to_identity_id": "core5"}
+## First the one for the merge we just did
+GET test/merge-account/validate /merge_record/core2/core5 200
+## And one for each of the previous merges
+GET test/merge-account/validate /merge_record/core1/core5 200
+GET test/merge-account/validate /merge_record/core3/core5 200
+GET test/merge-account/validate /merge_record/core4/core5 200
+GET test/merge-account/validate /merge_record/core3/core5 200
+
+
 # Test module AuthN
 # Case merge unregistered user with registered user
 odin.user authn1
