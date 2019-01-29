@@ -74,6 +74,14 @@ namespace {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "User not found");
             }
+            if (user["identity"]["id"] != req.headers()["__user"].value()) {
+                // identity_id mismatch, triggering merge account
+                fostlib::json merge_value;
+                fostlib::insert(merge_value, "from_identity_id", req.headers()["__user"].value());
+                fostlib::insert(merge_value, "to_identity_id", user["identity"]["id"]);
+                cnx.insert("odin.merge_ledger", merge_value);
+                cnx.commit();
+            }
             auto const identity_id =
                     fostlib::coerce<f5::u8view>(user["identity"]["id"]);
             auto jwt = odin::app::mint_user_jwt(
