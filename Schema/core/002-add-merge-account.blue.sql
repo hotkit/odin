@@ -28,8 +28,20 @@ CREATE TABLE odin.merge_record(
     FOREIGN KEY (from_identity_id) REFERENCES odin.identity_record(id),
     to_identity_id TEXT NOT NULL,
     FOREIGN KEY (to_identity_id) REFERENCES odin.identity_record(id),
-    PRIMARY KEY (from_identity_id, to_identity_id),
-    merged TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    PRIMARY KEY (from_identity_id, to_identity_id)
+);
+
+CREATE TABLE odin.merge_ledger(
+    from_identity_id TEXT NOT NULL,
+    FOREIGN KEY (from_identity_id) REFERENCES odin.identity_record(id),
+    to_identity_id TEXT NOT NULL,
+    FOREIGN KEY (to_identity_id) REFERENCES odin.identity_record(id),
+    instructed TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (from_identity_id, to_identity_id, instructed),
+
+    created timestamp with time zone NOT NULL DEFAULT now(),
+    pg_user text NOT NULL DEFAULT current_user,
+    annotation jsonb NOT NULL DEFAULT '{}'
 );
 
 CREATE FUNCTION odin.merge_account()
@@ -51,7 +63,7 @@ END;
 $body$
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
 
-CREATE TRIGGER insert_merge_record
-    AFTER INSERT ON odin.merge_record
+CREATE TRIGGER insert_merge_instruction
+    AFTER INSERT ON odin.merge_ledger
     FOR EACH ROW
     EXECUTE PROCEDURE odin.merge_account();
