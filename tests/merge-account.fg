@@ -72,12 +72,14 @@ GET test/merge-account/validate /credentials/authn3 200
 GET test/merge-account/validate /credentials/authn4 200
 GET test/merge-account/validate /identity/authn3 200 {"id": "authn3"}
 GET test/merge-account/validate /identity-record/authn3 200 {"id": "authn3"}
-sql.insert odin.merge_ledger {"from_identity_id": "authn3", "to_identity_id": "authn4"}
+# TODO: Ideally we'd do this insert and catch the error rather than with the PUT
+# sql.insert odin.merge_ledger {"from_identity_id": "authn3", "to_identity_id": "authn4"}
+PUT test/merge-account/validate /merge_ledger/authn3/authn4 {} 500
 GET test/merge-account/validate /identity/authn3 200
 
 # Test module AuthZ
 
-# Test superuser metrix 
+# Test superuser matrix
 #                   superuser   non superuser
 #   superuser           500         500
 #   non superuser       500         200
@@ -87,25 +89,25 @@ odin.user authz1
 odin.user authz2
 sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz1", "superuser": false}
 sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz2", "superuser": true}
-PUT test/merge-account/validate /merge_record/authz1/authz2 {} 500
+PUT test/merge-account/validate /merge_ledger/authz1/authz2 {} 500
 # Case from superuser to non superuser
 odin.user authz3
 odin.user authz4
 sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz3", "superuser": true}
 sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz4", "superuser": false}
-PUT test/merge-account/validate /merge_record/authz3/authz4 {} 500
+PUT test/merge-account/validate /merge_ledger/authz3/authz4 {} 500
 # Case from non superuser to superuser
 odin.user authz5
 odin.user authz6
 sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz5", "superuser": true}
 sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz6", "superuser": true}
-PUT test/merge-account/validate /merge_record/authz5/authz6 {} 500
+PUT test/merge-account/validate /merge_ledger/authz5/authz6 {} 500
 # Case from superuser to superuser
 odin.user authz7
 odin.user authz8
 sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz7", "superuser": false}
 sql.insert odin.identity_superuser_ledger {"reference": "ref1", "identity_id": "authz8", "superuser": false}
-PUT test/merge-account/validate /merge_record/authz7/authz8 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "authz7", "to_identity_id": "authz8"}
 GET test/merge-account/validate /identity/authz7 404
 
 # Insert group
@@ -119,13 +121,13 @@ sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "gro
 sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group3", "identity_id": "authz9", "member": true}
 sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group2", "identity_id": "authz10", "member": true}
 sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group3", "identity_id": "authz10", "member": true}
-PUT test/merge-account/validate /merge_record/authz9/authz10 {} 500
+PUT test/merge-account/validate /merge_ledger/authz9/authz10 {} 500
 # Case user has no duplicate group
 odin.user authz11
 odin.user authz12
 sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group1", "identity_id": "authz11", "member": true}
 sql.insert odin.group_membership_ledger {"reference": "ref3", "group_slug": "group2", "identity_id": "authz12", "member": true}
-PUT test/merge-account/validate /merge_record/authz11/authz12 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "authz11", "to_identity_id": "authz12"}
 GET test/merge-account/validate /identity/authz7 404
 GET test/merge-account/validate /group-membership/authz11/group1 404
 GET test/merge-account/validate /group-membership/authz12/group1 200 {"group_slug": "group1", "identity_id": "authz12"}
@@ -151,7 +153,7 @@ sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app1", "identit
 sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app3", "identity_id": "app_user1"}
 sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app2", "identity_id": "app_user2"}
 sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app3", "identity_id": "app_user2"}
-PUT test/merge-account/validate /merge_record/app_user1/app_user2 {} 500
+PUT test/merge-account/validate /merge_ledger/app_user1/app_user2 {} 500
 # Case user has no duplicate app
 odin.user app_user3
 odin.user app_user4
@@ -159,7 +161,7 @@ sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app1", "identit
 sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app2", "identity_id": "app_user4"}
 sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app1", "identity_id": "app_user3", "role": "role1"}
 sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app2", "identity_id": "app_user4", "role": "role2"}
-PUT test/merge-account/validate /merge_record/app_user3/app_user4 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "app_user3", "to_identity_id": "app_user4"}
 GET test/merge-account/validate /identity/app_user3 404
 GET test/merge-account/validate /app-user/app_user3/app1 404 
 GET test/merge-account/validate /app-user-role/app_user3/app1/role1 404 
@@ -175,7 +177,7 @@ odin.user t_email2
 sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "t_email1", "email": "t_email1@mail.com"}
 sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "t_email2", "email": "t_email2@mail.com"}
 GET test/merge-account/validate /identity/t_email2 200 {"id": "t_email2", "email": "t_email2@mail.com"}
-PUT test/merge-account/validate /merge_record/t_email1/t_email2 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "t_email1", "to_identity_id": "t_email2"}
 GET test/merge-account/validate /identity/t_email1 404
 GET test/merge-account/validate /identity/t_email2 200 {"id": "t_email2", "email": "t_email2@mail.com"}
 
@@ -190,7 +192,7 @@ odin.user facebook3
 odin.user facebook4
 sql.insert odin.facebook_credentials_ledger {"reference": "ref2", "identity_id": "facebook3", "facebook_user_id": "fu3"}
 sql.insert odin.facebook_credentials_ledger {"reference": "ref2", "identity_id": "facebook4", "facebook_user_id": "fu4"}
-PUT test/merge-account/validate /merge_record/facebook3/facebook4 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "facebook3", "to_identity_id": "facebook4"}
 GET test/merge-account/validate /identity/facebook3 404
 GET test/merge-account/validate /facebook_credentials/facebook3/fu3 404
 GET test/merge-account/validate /facebook_credentials/facebook4/fu3 200 {"identity_id": "facebook4", "facebook_user_id": "fu3"}
@@ -210,7 +212,7 @@ GET test/merge-account/validate /credentials_password_ledger/forgot2 200 {
 }
 GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot1@mail.com 200
 GET test/merge-account/validate /request_reset_password_ledger/ref3/forgot2@mail.com 200
-PUT test/merge-account/validate /merge_record/forgot1/forgot2 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "forgot1", "to_identity_id": "forgot2"}
 GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot1@mail.com 200
 GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot2@mail.com 404
 GET test/merge-account/validate /request_reset_password_ledger/ref3/forgot2@mail.com 200
@@ -225,7 +227,7 @@ odin.user f_name2
 sql.insert odin.identity_full_name_ledger {"reference": "ref1", "identity_id": "f_name1", "full_name": "f1 l1"}
 sql.insert odin.identity_full_name_ledger {"reference": "ref1", "identity_id": "f_name2", "full_name": "f2 l2"}
 GET test/merge-account/validate /identity/f_name2 200 {"id": "f_name2", "full_name": "f2 l2"}
-PUT test/merge-account/validate /merge_record/f_name1/f_name2 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "f_name1", "to_identity_id": "f_name2"}
 GET test/merge-account/validate /identity/f_name1 404
 GET test/merge-account/validate /identity/f_name2 200 {"id": "f_name2", "full_name": "f2 l2"}
 
@@ -240,7 +242,7 @@ odin.user google3
 odin.user google4
 sql.insert odin.google_credentials_ledger {"reference": "ref2", "identity_id": "google3", "google_user_id": "go3"}
 sql.insert odin.google_credentials_ledger {"reference": "ref2", "identity_id": "google4", "google_user_id": "go4"}
-PUT test/merge-account/validate /merge_record/google3/google4 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "google3", "to_identity_id": "google4"}
 GET test/merge-account/validate /identity/google3 404
 GET test/merge-account/validate /google_credentials/google3/go3 404
 GET test/merge-account/validate /google_credentials/google4/go3 200 {"identity_id": "google4", "google_user_id": "go3"}
@@ -253,7 +255,7 @@ odin.user install2
 sql.insert odin.identity_installation_id_ledger {"reference": "ref1", "identity_id": "install1", "installation_id": "il001"}
 sql.insert odin.identity_installation_id_ledger {"reference": "ref1", "identity_id": "install2", "installation_id": "il002"}
 GET test/merge-account/validate /identity/install2 200 {"id": "install2", "installation_id": "il002"}
-PUT test/merge-account/validate /merge_record/install1/install2 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "install1", "to_identity_id": "install2"}
 GET test/merge-account/validate /identity/install1 404
 GET test/merge-account/validate /identity/install2 200 {"id": "install2", "installation_id": "il002"}
 
@@ -265,6 +267,6 @@ sql.insert odin.logout_ledger {"reference": "ref1", "identity_id": "logout1"}
 sql.insert odin.logout_ledger {"reference": "ref1", "identity_id": "logout2"}
 sql.insert odin.logout_ledger {"reference": "ref2", "identity_id": "logout2"}
 GET test/merge-account/validate /credentials/logout2 200 {"identity_id": "logout2", "logout_count": 2}
-PUT test/merge-account/validate /merge_record/logout1/logout2 {} 200
+sql.insert odin.merge_ledger {"from_identity_id": "logout1", "to_identity_id": "logout2"}
 GET test/merge-account/validate /identity/logout1 404
 GET test/merge-account/validate /credentials/logout2 200 {"identity_id": "logout2", "logout_count": 2}

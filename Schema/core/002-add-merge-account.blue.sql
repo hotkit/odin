@@ -1,5 +1,8 @@
 INSERT INTO odin.migration VALUES('core', '002-add-merge-account.blue.sql');
 
+--- Stores the set of all IDs that have ever been issued. This gives other tables
+--- something to use as a foreign key even where the identities might later
+--- be altered or even deleted.
 CREATE TABLE odin.identity_record(
     id text NOT NULL CHECK (odin.url_safe(id)),
     PRIMARY KEY (id)
@@ -23,6 +26,9 @@ CREATE TRIGGER identity_insert_trigger
     FOR EACH ROW
     EXECUTE PROCEDURE identity_insert();
 
+--- For each ID records those records that have been merged to it. The
+--- DAG for the merges is flattened it out. If `A -> B -> C` there will be
+--- records for `A -> B`, `B -> C` and for `A -> C`.
 CREATE TABLE odin.merge_record(
     from_identity_id TEXT NOT NULL,
     FOREIGN KEY (from_identity_id) REFERENCES odin.identity_record(id),
@@ -57,7 +63,9 @@ BEGIN
         EXECUTE FORMAT('SELECT odin."merge_account_%s"($1, $2)', mods.name)
             USING NEW.from_identity_id, NEW.to_identity_id;
     END LOOP;
-    EXECUTE 'DELETE FROM odin.identity WHERE id=$1' USING NEW.from_identity_id;
+    DELETE FROM odin.identity WHERE id=NEW.from_identity_id;
+    INSERT INTO odin.merge_record
+        VALUES (NEW.from_identity_id, NEW.to_identity_id);
     RETURN NEW;
 END;
 $body$
