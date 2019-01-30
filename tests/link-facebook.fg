@@ -6,13 +6,18 @@ odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/logout/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/logout/003-fix-logout-count.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/logout/004-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/logout/005-merge-account-function.blue.sql)
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 0}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
@@ -30,9 +35,9 @@ PUT odin/test/facebook/link/ok / {"access_token": "user_token_1"} 202
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 
-# Change facebook token should work
+# Add facebook token should work
 PUT odin/test/facebook/link/ok / {"access_token": "user_token_2"} 202
-GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 
 # Same user link facebook more than one time should not work
@@ -44,7 +49,7 @@ setting odin "Trust JWT" false
 # Other user link same facebook should not work
 odin.user tester password1234
 set jwt_user2 (POST odin/login / {"username": "tester", "password": "password1234"} 200)
-GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup jwt_user2))
 GET odin/api / 200
@@ -55,11 +60,18 @@ POST odin/login / {"username": "test", "password": "password1234"} 200
 odin.jwt.authorization test password1234
 POST odin/api /logout/ {} 200
 GET odin/api / 401
-PUT odin/test/facebook/link/ok / {"access_token": "user_token_2"} 501
+PUT odin/test/facebook/link/ok / {"access_token": "user_token_3"} 501
 
-# User log in with facebook should work
+# User log in with first facebook token should work
+set jwt_user1 (POST odin/test/facebook/login/ok / {"access_token": "user_token_1"} 200)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup jwt_user1))
+GET odin/api / 200
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
+
+# User log in with second facebook token should work
 set jwt_user1 (POST odin/test/facebook/login/ok / {"access_token": "user_token_2"} 200)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup jwt_user1))
 GET odin/api / 200
-GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}

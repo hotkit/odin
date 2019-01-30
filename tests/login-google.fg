@@ -6,10 +6,14 @@ odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
 
 
 GET odin/test/google/login/ok / 501
