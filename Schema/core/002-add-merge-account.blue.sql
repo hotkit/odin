@@ -8,6 +8,9 @@ CREATE TABLE odin.identity_record(
     PRIMARY KEY (id)
 );
 
+-- Migrate all identity into identity_record
+INSERT INTO odin.identity_record(id) SELECT id FROM odin.identity;
+
 ALTER TABLE odin.identity
     ADD CONSTRAINT identity_id_fkey FOREIGN KEY (id) REFERENCES odin.identity_record(id);
 
