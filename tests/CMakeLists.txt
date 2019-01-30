@@ -476,6 +476,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/003-app-role.blue.sql
                 ../Schema/app/004-app-installation.blue.sql
                 ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
                 app.mint-test.json
                 app.mint.fg

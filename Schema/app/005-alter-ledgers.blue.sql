@@ -11,3 +11,14 @@ ALTER TABLE odin.app_user_ledger
         FOREIGN KEY (identity_id)
         REFERENCES odin.identity_record (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE;
+
+ALTER TABLE odin.app_user_installation_id_ledger
+    DROP CONSTRAINT installation_id_ledger_app_user_fkey,
+    ADD CONSTRAINT installation_id_ledger_app_id_fkey
+        FOREIGN KEY (app_id)
+        REFERENCES odin.app (app_id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
+    ADD CONSTRAINT installation_id_ledger_identity_id_fkey
+        FOREIGN KEY (identity_id)
+        REFERENCES odin.identity_record (id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE;

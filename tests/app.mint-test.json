@@ -13,10 +13,17 @@
             "configuration": {
                 "sql": [{
                     "return": "object",
-                    "path": [1],
+                    "path": ["/identity", 1],
                     "GET": {
                         "command": "SELECT * FROM odin.identity WHERE id=$1",
                         "arguments": [1]
+                    }
+                }, {
+                    "return": "object",
+                    "path": ["/merge_record", 1, 2],
+                    "GET": {
+                        "command": "SELECT * FROM odin.merge_record WHERE from_identity_id=$1 AND to_identity_id=$2",
+                        "arguments": [1, 2]
                     }
                 }]
             }

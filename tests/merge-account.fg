@@ -186,6 +186,7 @@ sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app1", "identit
 sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app2", "identity_id": "app_user4"}
 sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app1", "identity_id": "app_user3", "role": "role1"}
 sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app2", "identity_id": "app_user4", "role": "role2"}
+sql.insert odin.app_user_installation_id_ledger {"reference": "ref4", "app_id": "app1", "identity_id": "app_user3", "installation_id": "install01"}
 sql.insert odin.merge_ledger {"from_identity_id": "app_user3", "to_identity_id": "app_user4"}
 GET test/merge-account/validate /identity/app_user3 404
 GET test/merge-account/validate /app-user/app_user3/app1 404 
