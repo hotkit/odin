@@ -6,10 +6,15 @@ odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 0}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
@@ -36,6 +41,7 @@ POST odin/test/facebook/login/ok / {"access_token": "exist_user"} 422 {"message"
 
 odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
 POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
 POST odin/test/facebook/login/ok / {"access_token": "login_via_gp"} 422 {"message": "This email already exists"}
 

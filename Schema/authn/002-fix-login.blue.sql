@@ -17,7 +17,7 @@ ALTER TABLE odin.login_success
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE;
 
 ALTER TABLE odin.credentials_password_ledger
-  ADD COLUMN login TEXT NOT NULL;
+  ADD COLUMN login TEXT;
 
 DROP TRIGGER odin_credentials_ledger_insert_trigger ON odin.credentials_password_ledger;
 DROP FUNCTION odin.credentials_ledger_insert();

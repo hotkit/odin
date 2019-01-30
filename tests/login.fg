@@ -27,6 +27,7 @@ POST odin/login / {"username": "test", "password": "password1234"} 401
 # Enable opts/installation-id
 odin.sql.file (module.path.join ../Schema/opts/installation-id/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/installation-id/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/installation-id/004-merge-account-function.blue.sql)
 
 odin.user test-installation password1234
 # Login should save installation_id if user send to

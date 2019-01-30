@@ -35,6 +35,7 @@ PUT odin /api/user/test-user {"password": "1234"} 200
 ## Enable opts/full-name module, then user can register with full-name along with username and password
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
 POST odin/register / {"username": "user88", "password": "password1234", "full_name": "John Doe"} 201
 GET odin/secure/sql /user/user88 200 {"user": {"expires": null, "full_name": "John Doe"}, "credentials": {"login": "user88"}}
 
@@ -42,6 +43,7 @@ GET odin/secure/sql /user/user88 200 {"user": {"expires": null, "full_name": "Jo
 ## Enable opts/email module, then user can register with email
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 POST odin/register / {"username": "user89", "password": "password1234", "email": "admin@example.com"} 201
 GET odin/secure/sql /user/user89 200 {"user": {"expires": null, "full_name": null, "email": "admin@example.com"}, "credentials": {"login": "user89"}}
 
@@ -56,11 +58,15 @@ POST odin/register / {"username": "user90", "password": "password1234", "email":
 # If user already registered with Odin, return 422 with error message
 odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
 POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
 POST odin/register / {"username": "login_via_gp", "password": "password1234", "email": "login_via_gp@example.com"} 422 {"message": "This email already exists"}
 
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
 POST odin/test/facebook/login/ok / {"access_token": "login_via_fb"} 200
 POST odin/register / {"username": "login_via_fb", "password": "password1234", "email": "login_via_fb@example.com"} 422 {"message": "This email already exists"}
 
