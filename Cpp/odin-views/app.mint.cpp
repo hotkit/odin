@@ -13,6 +13,7 @@
 #include <odin/user.hpp>
 #include <odin/views.hpp>
 
+#include <pqxx/except>
 #include <fost/exception/parse_error.hpp>
 #include <fost/insert>
 #include <fost/json>
@@ -74,16 +75,23 @@ namespace {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "User not found");
             }
-            if (user["identity"]["id"] != req.headers()["__user"].value()) {
+            const auto jwt_user = req.headers()["__user"].value();
+            if (user["identity"]["id"] != jwt_user) {
                 // identity_id mismatch, triggering merge account
                 fostlib::json merge_value;
-                fostlib::insert(
-                        merge_value, "from_identity_id",
-                        req.headers()["__user"].value());
+                fostlib::insert(merge_value, "from_identity_id", jwt_user);
                 fostlib::insert(
                         merge_value, "to_identity_id", user["identity"]["id"]);
-                cnx.insert("odin.merge_ledger", merge_value);
-                cnx.commit();
+                try {
+                    cnx.insert("odin.merge_ledger", merge_value);
+                    cnx.commit();
+                } catch (const pqxx::unique_violation &e) {
+                    // Cannot merge, abandon the unregistered identity.
+                    fostlib::log::info(odin::c_odin)(
+                            "", "Merge account failed")("from", jwt_user)(
+                            "to",
+                            user["identity"]["id"])("abandoned", jwt_user);
+                }
             }
             auto const identity_id =
                     fostlib::coerce<f5::u8view>(user["identity"]["id"]);

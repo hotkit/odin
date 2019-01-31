@@ -34,3 +34,6 @@ set-path testserver.headers ["__user"] "bowling01"
 POST test/app/mint / {"username": "fred", "password": "password1234"} 200
 GET test/app/mint/validate /identity/bowling01 404
 GET test/app/mint/validate /merge_record/bowling01/fred 200
+
+# If the merge failed, just returns the identity_id that corresponse with the credentials
+POST test/app/mint / {"username": "fred", "password": "password1234"} 200
