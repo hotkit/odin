@@ -572,6 +572,93 @@ if(TARGET stress OR TARGET pgtest)
             app-login.fg
     )
 
+    add_custom_command(OUTPUT odin-test-app-login-facebook
+            COMMAND fostgres-test odin-test-app-login-facebook -o odin-test-app-login-facebook
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app-login-facebook.fg
+            MAIN_DEPENDENCY app-login-facebook.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
+                ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+                ../Schema/opts/facebook/004-merge-account-function.blue.sql
+                ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+                ../Schema/opts/full-name/004-merge-account-function.blue.sql
+                ../Schema/opts/installation-id/001-initial.blue.sql
+                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
+                ../Schema/opts/google/001-initial.blue.sql
+                ../Schema/opts/google/003-alter-ledgers.blue.sql
+                ../Schema/opts/google/004-merge-account-function.blue.sql
+                ../Configuration/odin-views.json
+                facebook-test.json
+                login-google-test.json
+                app-login-facebook.fg
+        )
+
+    add_custom_command(OUTPUT odin-test-app-login-google
+            COMMAND fostgres-test odin-test-app-login-google -o odin-test-app-login-google
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/app-login-google.fg
+            MAIN_DEPENDENCY app-login-google.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/opts/email/001-initial.blue.sql
+                ../Schema/opts/email/003-alter-ledgers.blue.sql
+                ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/google/001-initial.blue.sql
+                ../Schema/opts/google/003-alter-ledgers.blue.sql
+                ../Schema/opts/google/004-merge-account-function.blue.sql
+                ../Schema/opts/google/005-google-credentials-insert.blue.sql
+                ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+                ../Schema/opts/full-name/004-merge-account-function.blue.sql
+                ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+                ../Schema/opts/facebook/004-merge-account-function.blue.sql
+                ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/installation-id/001-initial.blue.sql
+                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
+                ../Schema/opts/installation-id/004-merge-account-function.blue.sql
+                ../Configuration/odin-views.json
+                login-google-test.json
+                facebook-test.json
+                app-login-google.fg
+        )
+
     add_custom_command(OUTPUT test-app-secure
         COMMAND fostgres-test odin-test-app-secure -o test-app-secure
             $<TARGET_SONAME_FILE:odin-fg>
@@ -677,6 +764,8 @@ if(TARGET stress OR TARGET pgtest)
             test-app-installation
             test-app-mint
             test-app-login
+            odin-test-app-login-facebook
+            odin-test-app-login-google
             test-app-secure
             test-app-verify
             test-authnz

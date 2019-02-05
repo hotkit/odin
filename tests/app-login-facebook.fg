@@ -1,0 +1,67 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+
+
+GET odin/test/facebook/validate_login /count-users 200 {"count": 0}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
+
+POST odin/test/facebook/login/ok / {"access_token": "user_1"} 200
+POST odin/test/facebook/login/error / {"access_token": "WRONG_ACCESS_TOKEN"} 501
+
+GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+
+# Login with the same facebook user id should not create new identity
+POST odin/test/facebook/login/ok / {"access_token": "user_1"} 200
+GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+
+
+POST odin/test/facebook/login/ok / {"access_token": "user_2"} 200
+GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
+
+# If user already registered with Odin, return 422 with error message
+POST odin/register / {"username": "exist_user", "password": "password1234", "email": "exist_user@example.com"} 201
+POST odin/test/facebook/login/ok / {"access_token": "exist_user"} 422 {"message": "This email already exists"}
+
+odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
+POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
+POST odin/test/facebook/login/ok / {"access_token": "login_via_gp"} 422 {"message": "This email already exists"}
+
+
+# Enable opts/installation-id
+odin.sql.file (module.path.join ../Schema/opts/installation-id/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/installation-id/003-alter-ledgers.blue.sql)
+POST odin/test/facebook/login/ok / {"access_token": "test-installation", "installation_id": "INSTALL01"} 200
+GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL01"}
+
+POST odin/test/facebook/login/ok / {"access_token": "test-installation", "installation_id": "INSTALL02"} 200
+GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
+
+POST odin/test/facebook/login/ok / {"access_token": "test-installation", "installation_id": null} 501
+GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
+
+POST odin/test/facebook/login/ok / {"access_token": "test-installation", "installation_id": ""} 501
+GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
