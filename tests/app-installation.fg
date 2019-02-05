@@ -61,7 +61,7 @@ setting webserver views/test/sec/installation {
     }
 
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
-#set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 201))
+POST test/sec/installation / {"installation_id": "ins01"} 201
 
 # Support only OPEN access policy
 set-path testserver.headers ["__app"] "invited-only-app"
