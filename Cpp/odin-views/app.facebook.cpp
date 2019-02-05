@@ -6,6 +6,7 @@
 */
 
 
+#include <odin/app.hpp>
 #include <odin/facebook.hpp>
 #include <odin/nonce.hpp>
 #include <odin/user.hpp>
@@ -46,6 +47,15 @@ namespace {
                 fostlib::push_back(config, "configuration", "allow", "POST");
                 return execute(config, path, req, host);
             }
+            if (not req.headers().exists("__app")
+                || not req.headers().exists("__user")) {
+                throw fostlib::exceptions::not_implemented(
+                        __PRETTY_FUNCTION__,
+                        "The odin.app.installation view must be wrapped by an "
+                        "odin.app.secure view on the secure path so that there "
+                        "is a valid JWT to find the App ID in");
+            }
+
             auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
@@ -89,7 +99,7 @@ namespace {
                     odin::facebook::credentials(cnx, facebook_user_id);
             fostlib::string identity_id;
             if (facebook_user.isnull()) {
-                identity_id = installation_id;
+                identity_id = req.headers()["__user"].value();
                 if (user_detail.has_key("name")) {
                     auto const facebook_user_name =
                             fostlib::coerce<f5::u8view>(user_detail["name"]);
@@ -118,7 +128,20 @@ namespace {
 
             cnx.commit();
 
-            return execute(fostlib::json{"fost.response.200"}, path, req, host);
+            auto jwt = odin::app::mint_user_jwt(
+                    identity_id, req.headers()["__app"].value(),
+                    fostlib::coerce<fostlib::timediff>(config["expires"]));
+            fostlib::mime::mime_headers headers;
+            headers.add(
+                    "Expires",
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
+                            .underlying()
+                            .underlying()
+                            .c_str());
+            boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                    jwt.first, headers, L"application/jwt"));
+
+            return std::make_pair(response, 200);
         }
     } c_fb_login;
 
