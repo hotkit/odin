@@ -20,6 +20,8 @@ odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 
+setting odin "JWT secret" <JWT_SECRET>
+
 ## Register app
 sql.insert odin.identity {"id": "open-app"}
 sql.insert odin.app_ledger {
@@ -32,21 +34,56 @@ sql.insert odin.app_ledger {
     "data_sharing_policy": "ALL"
 }
 
-
 ## The application counts as a user
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
-POST odin/test/facebook/login/ok / {"access_token": "user_1"} 200
-POST odin/test/facebook/login/error / {"access_token": "WRONG_ACCESS_TOKEN"} 501
+## Set up a new installation
+setting webserver views/test/app/installation {
+            "view": "odin.app.installation",
+            "configuration": {"expires": {"hours": 72}}
+        }
+setting webserver views/test/sec/installation {
+        "view": "odin.app.secure",
+        "configuration": {
+            "secure": "test/app/installation",
+            "unsecure": "fost.response.403"
+        }
+    }
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 201))
 
-GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
-GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+setting webserver views/odin/test/sec/facebook/login/ok {
+        "view": "odin.app.secure",
+        "configuration": {
+            "secure": {
+                "view": "odin.app.facebook.login",
+                "configuration": {
+                    "expires": {"hours": 72},
+                    "facebook-mock": "OK"
+                }
+            },
+            "unsecure": "fost.response.403"
+        }
+    }
 
-# Login with the same facebook user id should not create new identity
-POST odin/test/facebook/login/ok / {"access_token": "user_1"} 200
+## The installation counts as an extra user
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
-GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
+
+## Disallowed methods return a 405
+GET odin/test/sec/facebook/login/ok / 405
+PUT odin/test/sec/facebook/login/ok / {"installation_id": "ins01", "access_token": "user_1"} 405
+
+
+## Need required fields
+POST odin/test/sec/facebook/login/ok / {"installation_id": "ins01"} 501
+POST odin/test/sec/facebook/login/ok / {"access_token": "user_1"} 501
+
+# Login with Facebook ID that has not been seen before
+#set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"installation_id": "ins01", "access_token": "user_1"} 200))
+GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
+#GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
 
 #POST odin/test/facebook/login/ok / {"access_token": "user_2"} 200
