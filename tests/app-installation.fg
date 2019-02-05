@@ -33,6 +33,15 @@ sql.insert odin.app_ledger {
     "data_sharing_policy": "ALL"
 }
 
+setting webserver views/test/app/installation {
+            "view": "odin.app.installation",
+            "configuration": {
+                "expires": {
+                    "hours": 72
+                }
+            }
+        }
+
 # Must be POST
 GET test/app/installation / 501
 DELETE test/app/installation / 501
@@ -64,6 +73,21 @@ POST test/app/installation / {"installation_id": "new-installation"} 201
 
 # odin should accept the JWT that minted by app.installation view
 set-path testserver.headers ["__app"] ""
+
+setting webserver views/test/app/installation/validate {
+            "view": "odin.app.secure",
+            "configuration": {
+                "secure": "fost.response.200",
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        }
 
 set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))

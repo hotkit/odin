@@ -486,7 +486,6 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/app-installation-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app-installation.fg
             MAIN_DEPENDENCY app-installation.fg
             DEPENDS
@@ -506,7 +505,6 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/005-alter-ledgers.blue.sql
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
-                app-installation-test.json
                 app-installation.fg
         )
 
