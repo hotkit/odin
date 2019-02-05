@@ -1,3 +1,5 @@
+INSERT INTO odin.migration VALUES('opts/facebook', '005-facebook-credentials-insert.blue.sql');
+
 DROP TRIGGER odin_facebook_credentials_ledger_insert_trigger ON odin.facebook_credentials_ledger;
 
 CREATE OR REPLACE FUNCTION odin.facebook_credentials_ledger_insert() RETURNS TRIGGER AS $body$
