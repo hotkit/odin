@@ -76,12 +76,6 @@ namespace {
                         "Must pass access_token field");
             auto const access_token =
                     fostlib::coerce<fostlib::string>(body["access_token"]);
-            if (not body.has_key("installation_id"))
-                throw fostlib::exceptions::not_implemented(
-                        "odin.app.facebook.login",
-                        "Must pass installation_id field");
-            auto const installation_id =
-                    fostlib::coerce<fostlib::string>(body["installation_id"]);
 
             fostlib::json user_detail;
             if (config.has_key("facebook-mock")) {
