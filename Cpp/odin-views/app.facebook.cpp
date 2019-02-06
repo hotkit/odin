@@ -94,7 +94,7 @@ namespace {
             logger("user_detail", user_detail);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
-                        "odin.facebook.login", "User not authenticated");
+                        "odin.app.facebook.login", "User not authenticated");
 
             auto const facebook_user_id =
                     fostlib::coerce<f5::u8view>(user_detail["id"]);
