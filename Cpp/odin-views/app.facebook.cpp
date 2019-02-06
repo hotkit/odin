@@ -58,9 +58,9 @@ namespace {
                 || not req.headers().exists("__user")) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
-                        "The odin.app.installation view must be wrapped by an "
-                        "odin.app.secure view on the secure path so that there "
-                        "is a valid JWT to find the App ID in");
+                        "The odin.app.facebook.login view must be wrapped by "
+                        "an odin.app.secure view on the secure path so that "
+                        "there is a valid JWT to find the App ID in");
             }
             logger("__app", req.headers()["__app"]);
             logger("__user", req.headers()["__user"]);
