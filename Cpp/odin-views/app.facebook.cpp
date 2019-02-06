@@ -159,9 +159,6 @@ namespace {
                     /// Case 1 above
                     cnx.insert("odin.merge_ledger", merge);
                     cnx.commit();
-                    throw fostlib::exceptions::not_implemented(
-                            __PRETTY_FUNCTION__, "Try merge",
-                            fostlib::json::unparse(facebook_user, false));
                 } catch (const pqxx::unique_violation &e) {
                     /// We replace the identity with the new one -- case 2 above
                 } catch ( ... ) {

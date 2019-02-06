@@ -579,6 +579,7 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app-login-facebook.fg
+                /home/kirit/Projects/felspar/fost-meta/fost-web/Configuration/log-show-all.json
             MAIN_DEPENDENCY app-login-facebook.fg
             DEPENDS
                 fostgres-test
