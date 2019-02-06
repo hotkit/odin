@@ -79,3 +79,8 @@ PUT odin/test/sec/google/login/ok / {"installation_id": "ins01", "access_token":
 
 ## Need required fields
 POST odin/test/sec/google/login/ok / {} 501
+
+## Login with Google ID that has not been seen before
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
+GET odin/test/google/validate_login /count-users 200 {"count": 2}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 1}

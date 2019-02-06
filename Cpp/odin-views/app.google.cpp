@@ -7,15 +7,35 @@
 
 
 #include <odin/app.hpp>
+#include <odin/google.hpp>
+#include <odin/nonce.hpp>
+#include <odin/user.hpp>
 #include <odin/views.hpp>
 
+#include <fost/insert>
 #include <fost/log>
+#include <fost/push_back>
+#include <fostgres/sql.hpp>
+
+#include <pqxx/except>
 
 
 namespace {
 
 
     fostlib::module const c_odin_app_google{odin::c_odin_app, "google"};
+
+
+    inline std::pair<boost::shared_ptr<fostlib::mime>, int>
+            respond(fostlib::string message, int code = 403) {
+        fostlib::json ret;
+        if (not message.empty())
+            fostlib::insert(ret, "message", std::move(message));
+        fostlib::mime::mime_headers headers;
+        boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                fostlib::json::unparse(ret, true), headers, "application/json"));
+        return std::make_pair(response, code);
+    }
 
 
     const class g_login : public fostlib::urlhandler::view {
@@ -44,9 +64,95 @@ namespace {
             }
             logger("__app", req.headers()["__app"]);
             logger("__user", req.headers()["__user"]);
-            throw fostlib::exceptions::not_implemented(__PRETTY_FUNCTION__);
-        }
 
+            auto body_str = fostlib::coerce<fostlib::string>(
+                    fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
+            fostlib::json body = fostlib::json::parse(body_str);
+            logger("body", body);
+
+            if (not body.has_key("access_token"))
+                throw fostlib::exceptions::not_implemented(
+                        "odin.app.facebook.login",
+                        "Must pass access_token field");
+            auto const access_token =
+                    fostlib::coerce<fostlib::string>(body["access_token"]);
+
+            fostlib::json user_detail;
+            if (config.has_key("google-mock")) {
+                if (fostlib::coerce<fostlib::string>(config["google-mock"])
+                    == "OK") {
+                    // Use access token as google ID
+                    fostlib::insert(user_detail, "sub", access_token);
+                    fostlib::insert(user_detail, "name", "Test User");
+                    fostlib::insert(
+                            user_detail, "email",
+                            access_token + "@example.com");
+                }
+            } else {
+                user_detail = odin::google::get_user_detail(access_token);
+            }
+            logger("user_detail", user_detail);
+            if (user_detail.isnull())
+                throw fostlib::exceptions::not_implemented(
+                        "odin.app.google.login", "User not authenticated");
+
+            auto const google_user_id =
+                    fostlib::coerce<f5::u8view>(user_detail["sub"]);
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
+            auto const reference = odin::reference();
+            auto google_user = odin::google::credentials(cnx, google_user_id);
+            logger("google_user", google_user);
+
+            fostlib::string identity_id;
+            if (google_user.isnull()) {
+                /// We've never seen this Google identity before,
+                /// we take as a new user registration. If this is a new
+                /// installation then this is a new user registration, if
+                /// the JWT represents an existing user then this links
+                /// their Google a/c to their pre-existing identity.
+                identity_id = req.headers()["__user"].value();
+                if (user_detail.has_key("name")) {
+                    const auto google_user_name =
+                            fostlib::coerce<f5::u8view>(user_detail["name"]);
+                    odin::set_full_name(
+                            cnx, reference, identity_id, google_user_name);
+                }
+                if (user_detail.has_key("email")) {
+                    const auto google_user_email =
+                            fostlib::coerce<fostlib::email_address>(
+                                    user_detail["email"]);
+                    if (odin::does_email_exist(
+                                cnx,
+                                fostlib::coerce<fostlib::string>(
+                                        user_detail["email"]))) {
+                        return respond("This email already exists", 422);
+                    }
+                    odin::set_email(
+                            cnx, reference, identity_id, google_user_email);
+                }
+            } else {
+                throw fostlib::exceptions::not_implemented(
+                        __PRETTY_FUNCTION__, "Google user found");
+            }
+            odin::google::set_google_credentials(
+                    cnx, reference, identity_id, google_user_id);
+            google_user = odin::google::credentials(cnx, google_user_id);
+            cnx.commit();
+            auto jwt = odin::app::mint_user_jwt(
+                    identity_id, req.headers()["__app"].value(),
+                    fostlib::coerce<fostlib::timediff>(config["expires"]));
+            fostlib::mime::mime_headers headers;
+            headers.add(
+                    "Expires",
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
+                            .underlying()
+                            .underlying()
+                            .c_str());
+            boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                    jwt.first, headers, L"application/jwt"));
+
+            return std::make_pair(response, 200);
+        }
     } c_g_login;
 
 
