@@ -137,6 +137,10 @@ namespace {
                 /// Not sure what to do here. Certainly OK for now.
                 /// Probably should allow updates of email and name
             } else {
+                /// An existing user has logged in to a new device. Probably
+                /// there are two cases here:
+                /// 1. The user doesn't already have an account on this app.
+                /// 2. The user does already have an account on this app.
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "Already exists",
                         fostlib::json::unparse(facebook_user, false));

@@ -22,7 +22,7 @@ odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sq
 
 setting odin "JWT secret" <JWT_SECRET>
 
-## Register app
+## ## Register app
 sql.insert odin.identity {"id": "open-app"}
 sql.insert odin.app_ledger {
     "reference": "ref1",
@@ -50,6 +50,8 @@ setting webserver views/test/sec/installation {
             "unsecure": "fost.response.403"
         }
     }
+
+## ## Registration of new user
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 201))
 
@@ -75,7 +77,6 @@ GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 GET odin/test/sec/facebook/login/ok / 405
 PUT odin/test/sec/facebook/login/ok / {"installation_id": "ins01", "access_token": "user_1"} 405
 
-
 ## Need required fields
 POST odin/test/sec/facebook/login/ok / {"installation_id": "ins01"} 501
 POST odin/test/sec/facebook/login/ok / {"access_token": "user_1"} 501
@@ -85,10 +86,23 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
-
 ## Login again later on should be just fine
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"installation_id": "ins01", "access_token": "user_1"} 200))
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
 
+## ## Change of device
+##
+## Create a new installation ID. This should simulate our existing FB
+## user switching to a new device. Go back to the application JWT
+## and then use that to register the new device.
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins02"} 201))
+
+## The installation counts as an extra user
+GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+
+## Login with Facebook ID that *has* been seen before
+#set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"installation_id": "ins02", "access_token": "user_1"} 200))
