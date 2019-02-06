@@ -84,3 +84,8 @@ POST odin/test/sec/google/login/ok / {} 501
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
+
+## Login again later on should be just fine
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
+GET odin/test/google/validate_login /count-users 200 {"count": 2}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 1}

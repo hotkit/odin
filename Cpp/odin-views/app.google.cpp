@@ -130,14 +130,19 @@ namespace {
                     odin::set_email(
                             cnx, reference, identity_id, google_user_email);
                 }
+                odin::google::set_google_credentials(
+                        cnx, reference, identity_id, google_user_id);
+                google_user = odin::google::credentials(cnx, google_user_id);
+                cnx.commit();
+            } else if (google_user["identity"]["id"] == req.headers()["__user"].value()) {
+                /// Not sure what to do here. Certainly OK for now.
+                /// Probably should allow updates of email and name
+                identity_id = google_user_id;
             } else {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "Google user found");
             }
-            odin::google::set_google_credentials(
-                    cnx, reference, identity_id, google_user_id);
-            google_user = odin::google::credentials(cnx, google_user_id);
-            cnx.commit();
+
             auto jwt = odin::app::mint_user_jwt(
                     identity_id, req.headers()["__app"].value(),
                     fostlib::coerce<fostlib::timediff>(config["expires"]));
