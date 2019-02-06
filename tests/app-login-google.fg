@@ -89,3 +89,60 @@ GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
+
+
+## ## Change of device
+##
+## Create a new installation ID. This should simulate our existing FB
+## user switching to a new device. Go back to the application JWT
+## and then use that to register the new device.
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins02"} 201))
+
+## The installation counts as an extra user
+GET odin/test/google/validate_login /count-users 200 {"count": 3}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
+
+## Login with Google ID that *has* been seen before
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
+
+## There is no new Google user
+GET odin/test/google/validate_login /count-users 200 {"count": 3}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
+
+
+## ## Pre-registered user
+##
+## This case comes up when a user who is already on our systems with
+## a Google a/c starts to use another application. In this case we need
+## to perform a successful merge of the installation ID into the old
+## user account.
+
+sql.insert odin.identity {"id": "new-app"}
+sql.insert odin.app_ledger {
+    "reference": "ref2",
+    "app_id": "new-app",
+    "app_name": "MyNewApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com/new",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+## As before, we set up an application JWT to be used to bootstrap
+## the process, and our user then starts to use it (anonymously).
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "new-app", "iss": "http://odin.felspar.com/app/new-app"} <JWT_SECRET>new-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins03"} 201))
+
+## This leads to two new users (one for the application, one for the
+## new installation.
+GET odin/test/google/validate_login /count-users 200 {"count": 5}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
+
+## A Google login now merges the new installation with the old user
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
+
+## There is no new Google user, but the new installation ID has
+## been merged to the old identity so there is one fewer user.
+GET odin/test/google/validate_login /count-users 200 {"count": 4}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
