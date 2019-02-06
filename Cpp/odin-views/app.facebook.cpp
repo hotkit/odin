@@ -144,26 +144,34 @@ namespace {
                     == req.headers()["__user"].value()) {
                 /// Not sure what to do here. Certainly OK for now.
                 /// Probably should allow updates of email and name
-                identity_id = fostlib::coerce<fostlib::string>(facebook_user["identity"]["id"]);
+                identity_id = fostlib::coerce<fostlib::string>(
+                        facebook_user["identity"]["id"]);
             } else {
                 /// An existing user has logged in to a new device. Probably
                 /// there are two cases here:
                 /// 1. The user doesn't already have an account on this app.
                 /// 2. The user does already have an account on this app.
-                identity_id = fostlib::coerce<fostlib::string>(facebook_user["identity"]["id"]);
+                identity_id = fostlib::coerce<fostlib::string>(
+                        facebook_user["identity"]["id"]);
                 fostlib::json merge;
-                fostlib::insert(merge, "from_identity_id", req.headers()["__user"].value());
-                fostlib::insert(merge, "to_identity_id", facebook_user["identity"]["id"]);
-                fostlib::insert(merge, "annotation", "app", req.headers()["__app"]);
+                fostlib::insert(
+                        merge, "from_identity_id",
+                        req.headers()["__user"].value());
+                fostlib::insert(
+                        merge, "to_identity_id",
+                        facebook_user["identity"]["id"]);
+                fostlib::insert(
+                        merge, "annotation", "app", req.headers()["__app"]);
                 try {
                     /// Case 1 above
                     cnx.insert("odin.merge_ledger", merge);
                     cnx.commit();
                 } catch (const pqxx::unique_violation &e) {
                     /// We replace the identity with the new one -- case 2 above
-                } catch ( ... ) {
+                } catch (...) {
                     throw fostlib::exceptions::not_implemented(
-                            __PRETTY_FUNCTION__, "Cannot merge - unknown exception",
+                            __PRETTY_FUNCTION__,
+                            "Cannot merge - unknown exception",
                             fostlib::json::unparse(facebook_user, false));
                 }
             }
