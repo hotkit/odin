@@ -106,3 +106,7 @@ GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
 ## Login with Facebook ID that *has* been seen before
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"installation_id": "ins02", "access_token": "user_1"} 200))
+
+## There is no new Facebook user
+GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
