@@ -80,8 +80,15 @@ PUT odin/test/sec/facebook/login/ok / {"installation_id": "ins01", "access_token
 POST odin/test/sec/facebook/login/ok / {"installation_id": "ins01"} 501
 POST odin/test/sec/facebook/login/ok / {"access_token": "user_1"} 501
 
-# Login with Facebook ID that has not been seen before
+## Login with Facebook ID that has not been seen before
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"installation_id": "ins01", "access_token": "user_1"} 200))
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+
+
+## Login again later on should be just fine
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"installation_id": "ins01", "access_token": "user_1"} 200))
+GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+
 

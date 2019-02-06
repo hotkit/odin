@@ -13,11 +13,15 @@
 #include <odin/views.hpp>
 
 #include <fost/insert>
+#include <fost/log>
 #include <fost/push_back>
 #include <fostgres/sql.hpp>
 
 
 namespace {
+
+
+    fostlib::module const c_odin_app_facebook{odin::c_odin_app, "facebook"};
 
 
     inline std::pair<boost::shared_ptr<fostlib::mime>, int>
@@ -41,6 +45,7 @@ namespace {
                 const fostlib::string &path,
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
+            auto logger{fostlib::log::debug(c_odin_app_facebook)};
             if (req.method() != "POST") {
                 fostlib::json config;
                 fostlib::insert(config, "view", "fost.response.405");
@@ -55,10 +60,13 @@ namespace {
                         "odin.app.secure view on the secure path so that there "
                         "is a valid JWT to find the App ID in");
             }
+            logger("__app", req.headers()["__app"]);
+            logger("__user", req.headers()["__user"]);
 
             auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
+            logger("body", body);
 
             if (not body.has_key("access_token"))
                 throw fostlib::exceptions::not_implemented(
@@ -87,6 +95,7 @@ namespace {
             } else {
                 user_detail = odin::facebook::get_user_detail(access_token);
             }
+            logger("user_detail", user_detail);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
                         "odin.facebook.login", "User not authenticated");
@@ -97,6 +106,7 @@ namespace {
             auto const reference = odin::reference();
             auto facebook_user =
                     odin::facebook::credentials(cnx, facebook_user_id);
+            logger("facebook_user", facebook_user);
             fostlib::string identity_id;
             if (facebook_user.isnull()) {
                 identity_id = req.headers()["__user"].value();
@@ -119,12 +129,18 @@ namespace {
                     odin::set_email(
                             cnx, reference, identity_id, facebook_user_email);
                 }
+                odin::facebook::set_facebook_credentials(
+                        cnx, reference, identity_id, facebook_user_id);
+            } else if (
+                    facebook_user["identity"]["id"]
+                    == req.headers()["__user"].value()) {
+                /// Not sure what to do here. Certainly OK for now.
+                /// Probably should allow updates of email and name
             } else {
                 throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__, "Already exists");
+                        __PRETTY_FUNCTION__, "Already exists",
+                        fostlib::json::unparse(facebook_user, false));
             }
-            odin::facebook::set_facebook_credentials(
-                    cnx, reference, identity_id, facebook_user_id);
 
             cnx.commit();
 

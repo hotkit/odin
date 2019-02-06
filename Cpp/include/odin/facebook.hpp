@@ -1,5 +1,5 @@
 /**
-    Copyright 2018 Felspar Co Ltd. <http://odin.felspar.com/>
+    Copyright 2018-2019 Felspar Co Ltd. <http://odin.felspar.com/>
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -10,6 +10,7 @@
 
 #include <fost/core>
 #include <fost/postgres>
+
 
 namespace odin {
 
@@ -33,13 +34,14 @@ namespace odin {
                 fostlib::pg::connection &cnx,
                 const f5::u8view &facebook_user_id);
 
-        /// Save facebook credential of the given user to database, this does
+        /// Insert Facebook credential of the given user to database, this does
         /// not commit the transaction
         void set_facebook_credentials(
                 fostlib::pg::connection &cnx,
                 f5::u8view reference,
                 f5::u8view identity_id,
                 f5::u8view facebook_user_id);
+
 
     }
 
