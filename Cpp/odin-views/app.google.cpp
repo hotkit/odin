@@ -72,7 +72,7 @@ namespace {
 
             if (not body.has_key("access_token"))
                 throw fostlib::exceptions::not_implemented(
-                        "odin.app.facebook.login",
+                        "odin.app.google.login",
                         "Must pass access_token field");
             auto const access_token =
                     fostlib::coerce<fostlib::string>(body["access_token"]);
