@@ -162,10 +162,7 @@ namespace {
                 } catch (const pqxx::unique_violation &e) {
                     /// We replace the identity with the new one -- case 2 above
                 } catch (...) {
-                    throw fostlib::exceptions::not_implemented(
-                            __PRETTY_FUNCTION__,
-                            "Cannot merge - unknown exception",
-                            fostlib::json::unparse(google_user, false));
+                    throw;
                 }
             }
 
