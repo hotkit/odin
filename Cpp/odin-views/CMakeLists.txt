@@ -2,6 +2,8 @@ add_library(odin-views
         app_installation.cpp
         app_secure.cpp
         app.cpp
+        app.facebook.cpp
+        app.google.cpp
         app.mint.cpp
         facebook.cpp
         google.cpp

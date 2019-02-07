@@ -1,5 +1,5 @@
 /**
-    Copyright 2018 Felspar Co Ltd. <http://odin.felspar.com/>
+    Copyright 2018-2019 Felspar Co Ltd. <http://odin.felspar.com/>
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -20,10 +20,11 @@
 #include <fostgres/sql.hpp>
 
 
+const fostlib::module odin::c_odin_app(odin::c_odin, "app");
+
+
 namespace {
 
-
-    const fostlib::module c_odin_app(odin::c_odin, "app.cpp");
 
     fostlib::json parse_payload(fostlib::http::server::request &req) {
         // TODO: Support multiple ContentType
