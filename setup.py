@@ -2,9 +2,8 @@
 import os
 from distutils.core import setup
 
-datadir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'Schema')
-datafiles = [(os.path.join('share', 'odin', d), [os.path.join(d,f) for f in files])
-    for d, folders, files in os.walk(datadir) if [f for f in files if f.endswith('.sql')]]
+datafiles = [(os.path.join('share', 'odin', d), [os.path.join(d,f) for f in files if f.endswith('.sql')])
+    for d, folders, files in os.walk('Schema')]
 
 setup(name='odin',
         version='0.1.6.3',
