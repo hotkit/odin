@@ -162,9 +162,7 @@ namespace {
                     cnx.commit();
                 } catch (const pqxx::unique_violation &e) {
                     /// We replace the identity with the new one -- case 2 above
-                } catch (...) {
-                    throw;
-                }
+                } catch (...) { throw; }
             }
 
             auto jwt = odin::app::mint_user_jwt(
