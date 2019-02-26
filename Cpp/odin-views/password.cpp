@@ -179,7 +179,7 @@ namespace {
             if (odin::is_module_enabled(cnx, "opts/logout"))
                 odin::logout_user(
                         cnx, reference,
-                        req.headers()["__remote_addr"].value(), username);
+                        req.headers()["__remote_addr"].value(), identity_id);
             cnx.commit();
             return respond("Success", 200);
         }
