@@ -85,7 +85,7 @@ std::pair<fostlib::string, fostlib::json>
     auto salt = fostlib::crypto_bytes<24>();
     fostlib::json process;
     fostlib::insert(process, "name", "pbkdf2-sha256");
-    fostlib::insert(process, "rounds", 300000);
+    fostlib::insert(process, "rounds", c_hash_rounds.value());
     fostlib::insert(process, "length", 32);
     fostlib::insert(
             process, "salt",

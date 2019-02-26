@@ -1,11 +1,12 @@
-/*
-    Copyright 2018 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2018-2019 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
+#include <odin/pwhashproc.hpp>
 #include <odin/views.hpp>
 #include <fost/test>
 #include <fost/exception/parse_error.hpp>
@@ -38,7 +39,9 @@ namespace {
                     req.headers()["__hash_process"].value());
             FSL_CHECK_EQ(hash_process["length"], fostlib::json{32});
             FSL_CHECK_EQ(hash_process["name"], fostlib::json{"pbkdf2-sha256"});
-            FSL_CHECK_EQ(hash_process["rounds"], fostlib::json{300000});
+            FSL_CHECK_EQ(
+                    hash_process["rounds"],
+                    fostlib::json{odin::c_hash_rounds.value()});
 
             fostlib::mime::mime_headers headers;
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(

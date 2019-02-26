@@ -1,12 +1,13 @@
-/*
-    Copyright 2016-2017 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2016-2019 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 #include <odin/odin.hpp>
 #include <odin/nonce.hpp>
+#include <odin/pwhashproc.hpp>
 
 #include <fostgres/callback.hpp>
 #include <fostgres/sql.hpp>
@@ -37,6 +38,9 @@ const fostlib::setting<fostlib::string> odin::c_jwt_permissions_claim(
         "JWT permissions claim",
         "http://odin.felspar.com/p",
         true);
+
+const fostlib::setting<int64_t> odin::c_hash_rounds(
+        "odin/odin.cpp", "odin", "Password hash rounds", 300000, true);
 
 const fostlib::setting<fostlib::string>
         odin::c_jwt_reset_forgotten_password_secret(
