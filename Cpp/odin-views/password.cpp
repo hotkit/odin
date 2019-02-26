@@ -170,23 +170,18 @@ namespace {
                                       user["password"]["hash"]),
                     reset_token);
             if (not jwt) { return respond("Invalid token", 403); }
-            auto username =
-                    fostlib::coerce<f5::u8view>(jwt.value().payload["sub"]);
-            if (odin::does_user_exist(cnx, username)) {
-                const auto reference = odin::reference();
-                const auto new_password =
-                        fostlib::coerce<f5::u8view>(body["new-password"]);
-                odin::set_password(
-                        cnx, reference, identity_id, username, new_password);
-                if (odin::is_module_enabled(cnx, "opts/logout"))
-                    odin::logout_user(
-                            cnx, reference,
-                            req.headers()["__remote_addr"].value(), username);
-                cnx.commit();
-                return respond("Success", 200);
-            }
-            throw fostlib::exceptions::not_implemented(
-                    __func__, "Invalid reset-password-token.");
+            auto username = fostlib::coerce<f5::u8view>(user["login"]);
+            const auto reference = odin::reference();
+            const auto new_password =
+                    fostlib::coerce<f5::u8view>(body["new-password"]);
+            odin::set_password(
+                    cnx, reference, identity_id, username, new_password);
+            if (odin::is_module_enabled(cnx, "opts/logout"))
+                odin::logout_user(
+                        cnx, reference,
+                        req.headers()["__remote_addr"].value(), username);
+            cnx.commit();
+            return respond("Success", 200);
         }
     } c_reset_password;
 
