@@ -70,3 +70,4 @@ odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials
 POST odin/test/facebook/login/ok / {"access_token": "login_via_fb"} 200
 POST odin/register / {"username": "login_via_fb", "password": "password1234", "email": "login_via_fb@example.com"} 422 {"message": "This email already exists"}
 
+odin.sql.file (module.path.join ../Schema/opts/phone-number/001-initial.blue.sql)
