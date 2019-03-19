@@ -63,6 +63,14 @@ namespace odin {
             f5::u8view username,
             f5::u8view full_name);
 
+    /// Save phone number of the given user to database, this does not commit the
+    /// transaction
+    void set_phone_number(
+            fostlib::pg::connection &cnx,
+            f5::u8view reference,
+            f5::u8view username,
+            f5::u8view phone_nummber);
+
     /// Save email of the given user to database, this does not commit the
     /// transaction
     void set_email(

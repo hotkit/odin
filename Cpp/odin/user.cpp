@@ -93,6 +93,19 @@ void odin::set_full_name(
 }
 
 
+void odin::set_phone_number(
+        fostlib::pg::connection &cnx,
+        f5::u8view reference,
+        f5::u8view identity_id,
+        f5::u8view phone_number) {
+    fg::json user_values;
+    fostlib::insert(user_values, "reference", reference);
+    fostlib::insert(user_values, "identity_id", identity_id);
+    fostlib::insert(user_values, "phone_number", phone_number);
+    cnx.insert("odin.identity_phone_number_ledger", user_values);
+}
+
+
 void odin::set_email(
         fostlib::pg::connection &cnx,
         f5::u8view reference,

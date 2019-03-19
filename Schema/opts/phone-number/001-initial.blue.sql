@@ -11,7 +11,7 @@ CREATE TABLE odin.identity_phone_number_ledger (
     CONSTRAINT odin_identity_phone_number_ledger_identity_fkey
         FOREIGN KEY (identity_id)
         REFERENCES odin.identity_record (id) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE;
+        ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
     CONSTRAINT odin_identity_phone_number_ledger_pk PRIMARY KEY (reference, identity_id),
 
     changed timestamp with time zone NOT NULL DEFAULT now(),
