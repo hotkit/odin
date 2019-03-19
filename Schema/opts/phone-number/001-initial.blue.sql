@@ -19,6 +19,9 @@ CREATE TABLE odin.identity_phone_number_ledger (
 
     phone_number text NOT NULL,
 
+    verified boolean DEFAULT False,
+    verified_timestamp timestamp with time zone,
+
     annotation json NOT NULL DEFAULT '{}'
 );
 CREATE FUNCTION odin.identity_phone_number_ledger_insert() RETURNS TRIGGER AS $body$
