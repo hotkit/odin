@@ -111,9 +111,10 @@ namespace {
                 const auto new_password =
                         fostlib::coerce<f5::u8view>(body["new-password"]);
                 fostlib::json user_row = fetch_user_row(cnx, identity_id);
-                const auto username = fostlib::coerce<f5::u8view>(user_row["login"]);
+                const auto username =
+                        fostlib::coerce<f5::u8view>(user_row["login"]);
                 fostlib::log::warning(c_odin_reset_forgotten_password)(
-                    "", user_row);
+                        "", user_row);
                 auto user = odin::credentials(
                         cnx, username, old_password, req.remote_address());
                 cnx.commit();
@@ -129,7 +130,8 @@ namespace {
                 if (logout_claim)
                     odin::logout_user(
                             cnx, reference,
-                            req.headers()["__remote_addr"].value(), identity_id);
+                            req.headers()["__remote_addr"].value(),
+                            identity_id);
                 cnx.commit();
                 return respond("", 200);
             }
@@ -182,8 +184,8 @@ namespace {
                     cnx, reference, identity_id, username, new_password);
             if (odin::is_module_enabled(cnx, "opts/logout"))
                 odin::logout_user(
-                        cnx, reference,
-                        req.headers()["__remote_addr"].value(), identity_id);
+                        cnx, reference, req.headers()["__remote_addr"].value(),
+                        identity_id);
             cnx.commit();
             return respond("Success", 200);
         }

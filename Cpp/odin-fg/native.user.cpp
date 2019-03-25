@@ -37,7 +37,8 @@ const fg::frame::builtin odin::lib::user = [](fg::frame &stack,
                                               fg::json::const_iterator pos,
                                               fg::json::const_iterator end) {
     auto cnx = connect(stack);
-    auto identity_id = stack.resolve_string(stack.argument("identity_id", pos, end));
+    auto identity_id =
+            stack.resolve_string(stack.argument("identity_id", pos, end));
     auto username = stack.resolve_string(stack.argument("username", pos, end));
     auto ref = odin::reference();
     odin::create_user(cnx, ref, identity_id);
@@ -57,7 +58,8 @@ const fg::frame::builtin odin::lib::hash = [](fg::frame &stack,
                                               fg::json::const_iterator end) {
     auto cnx = connect(stack);
     auto ref = odin::reference();
-    auto identity_id = stack.resolve_string(stack.argument("identity_id", pos, end));
+    auto identity_id =
+            stack.resolve_string(stack.argument("identity_id", pos, end));
     auto username = stack.resolve_string(stack.argument("username", pos, end));
     auto hash = stack.resolve_string(stack.argument("hash", pos, end));
     auto process = stack.resolve(stack.argument("process", pos, end));
