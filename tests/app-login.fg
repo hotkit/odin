@@ -12,9 +12,9 @@ odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 # GET odin/app /login/invite-only-app/ 200
 
 # Set up new users
-odin.user owner password1234
-odin.user invited1 password1234
-odin.user player2 password1234
+odin.user owner owner password1234
+odin.user invited1 invited1 password1234
+odin.user player2 player2 password1234
 
 # Register invite-only-app
 sql.insert odin.identity {"id": "invite-only-app"}
@@ -65,5 +65,5 @@ sql.insert odin.app_ledger {
     "data_sharing_policy": "ALL"
 }
 
-odin.user random-player password1234
+odin.user random-player random-player password1234
 POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200

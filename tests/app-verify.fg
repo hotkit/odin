@@ -11,10 +11,10 @@ odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 
 # Set up new users and apps
-odin.user owner password1234
-odin.user player1 password1234
-odin.user player2 password1234
-odin.user player3 password1234
+odin.user owner owner password1234
+odin.user player1 player1 password1234
+odin.user player2 player2 password1234
+odin.user player3 player3 password1234
 # Register app01
 sql.insert odin.identity {"id": "app01"}
 sql.insert odin.app_ledger {

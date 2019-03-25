@@ -13,7 +13,7 @@ odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
-odin.user test password1234
+odin.user test test password1234
 
 # Check that logging in works
 POST odin/login / {"username": "test", "password": "password1234"} 200
@@ -29,7 +29,7 @@ odin.sql.file (module.path.join ../Schema/opts/installation-id/001-initial.blue.
 odin.sql.file (module.path.join ../Schema/opts/installation-id/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/installation-id/004-merge-account-function.blue.sql)
 
-odin.user test-installation password1234
+odin.user test-installation test-installation password1234
 # Login should save installation_id if user send to
 POST odin/login / {"username": "test-installation", "password": "password1234", "installation_id": "INSTALL01"} 200
 odin.jwt.authorization test-installation password1234
