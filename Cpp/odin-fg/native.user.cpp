@@ -37,14 +37,15 @@ const fg::frame::builtin odin::lib::user = [](fg::frame &stack,
                                               fg::json::const_iterator pos,
                                               fg::json::const_iterator end) {
     auto cnx = connect(stack);
+    auto identity_id = stack.resolve_string(stack.argument("identity_id", pos, end));
     auto username = stack.resolve_string(stack.argument("username", pos, end));
     auto ref = odin::reference();
-    odin::create_user(cnx, ref, username);
+    odin::create_user(cnx, ref, identity_id);
     if (pos != end) {
         fostlib::log::warning(c_odin_fg, "Setting password is deprecated");
         auto password =
                 stack.resolve_string(stack.argument("password", pos, end));
-        odin::set_password(cnx, ref, username, username, password);
+        odin::set_password(cnx, ref, identity_id, username, password);
     }
     cnx.commit();
     return fostlib::json();
@@ -56,10 +57,11 @@ const fg::frame::builtin odin::lib::hash = [](fg::frame &stack,
                                               fg::json::const_iterator end) {
     auto cnx = connect(stack);
     auto ref = odin::reference();
+    auto identity_id = stack.resolve_string(stack.argument("identity_id", pos, end));
     auto username = stack.resolve_string(stack.argument("username", pos, end));
     auto hash = stack.resolve_string(stack.argument("hash", pos, end));
     auto process = stack.resolve(stack.argument("process", pos, end));
-    odin::save_credential(cnx, ref, username, username, hash, process);
+    odin::save_credential(cnx, ref, identity_id, username, hash, process);
     cnx.commit();
     return fostlib::json();
 };
