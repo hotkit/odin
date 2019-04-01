@@ -9,7 +9,7 @@ odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sq
 odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
 setting odin "Trust JWT" true
-odin.user test password1234
+odin.user test test password1234
 odin.permission p1
 odin.permission p2
 odin.permission p3

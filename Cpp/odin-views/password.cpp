@@ -101,7 +101,7 @@ namespace {
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto reference = req.headers()["__odin_reference"].value();
             if (req.headers().exists("__user")) {
-                const auto username = req.headers()["__user"].value();
+                const auto identity_id = req.headers()["__user"].value();
                 if (!body.has_key("new-password")
                     || !body.has_key("old-password")) {
                     return respond("Must supply both old and new password");
@@ -110,6 +110,9 @@ namespace {
                         fostlib::coerce<f5::u8view>(body["old-password"]);
                 const auto new_password =
                         fostlib::coerce<f5::u8view>(body["new-password"]);
+                fostlib::json user_row = fetch_user_row(cnx, identity_id);
+                const auto username =
+                        fostlib::coerce<f5::u8view>(user_row["login"]);
                 auto user = odin::credentials(
                         cnx, username, old_password, req.remote_address());
                 cnx.commit();
@@ -125,7 +128,8 @@ namespace {
                 if (logout_claim)
                     odin::logout_user(
                             cnx, reference,
-                            req.headers()["__remote_addr"].value(), username);
+                            req.headers()["__remote_addr"].value(),
+                            identity_id);
                 cnx.commit();
                 return respond("", 200);
             }
@@ -178,8 +182,8 @@ namespace {
                     cnx, reference, identity_id, username, new_password);
             if (odin::is_module_enabled(cnx, "opts/logout"))
                 odin::logout_user(
-                        cnx, reference,
-                        req.headers()["__remote_addr"].value(), identity_id);
+                        cnx, reference, req.headers()["__remote_addr"].value(),
+                        identity_id);
             cnx.commit();
             return respond("Success", 200);
         }

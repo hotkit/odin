@@ -20,7 +20,7 @@ sql.insert odin.app_ledger {
     "access_policy": "OPEN",
     "data_sharing_policy": "ALL"
 }
-odin.user fred password1234
+odin.user fred fred password1234
 
 sql.insert odin.app_user_installation_id_ledger {
     "reference": "test-app-mint",
