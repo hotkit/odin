@@ -1,3 +1,6 @@
+2019-04-01  Tle Ekkul  <e.aryuth@gmail.com>
+ Fix view odin.password.me
+
 2019-02-06  Kirit Saelensminde  <kirit@felspar.com>
  Add executable for timing password hashing rounds and configuration item for round count.
 

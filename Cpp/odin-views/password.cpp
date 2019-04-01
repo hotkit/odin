@@ -113,8 +113,6 @@ namespace {
                 fostlib::json user_row = fetch_user_row(cnx, identity_id);
                 const auto username =
                         fostlib::coerce<f5::u8view>(user_row["login"]);
-                fostlib::log::warning(c_odin_reset_forgotten_password)(
-                        "", user_row);
                 auto user = odin::credentials(
                         cnx, username, old_password, req.remote_address());
                 cnx.commit();
