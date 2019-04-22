@@ -2,23 +2,30 @@
     "odin": {
         "JWT secret": "<JWT_SECRET>",
         "JWT reset forgotten password secret": "<JWT_RESET_FORGOTTEN_PASSWORD_SECRET>",
+        "Facebook": [
+            {
+                "app_id": "<FACEBOOK_APP_ID>",
+                "app_secret": "<FACEBOOK_SECRET>"
+            }
+        ],
         "Facebook AppID": "<FACEBOOK_APP_ID>",
         "Facebook Secret": "<FACEBOOK_SECRET>",
         "Facebook API Endpoint": "<FACEBOOK_API_ENDPOINT>",
         "Google": {
-            "Client_ID" : [
+            "Client_ID": [
                 "<GOOGLE_CLIENT_ID_1>",
                 "<GOOGLE_CLIENT_ID_2>"
             ]
         }
     },
     "webserver": {
-        "Load": ["fostgres", "odin-views"],
-
+        "Load": [
+            "fostgres",
+            "odin-views"
+        ],
         "hosts": {
             "": "root"
         },
-
         "views": {
             "root": {
                 "view": "fost.middleware.logging",
@@ -26,7 +33,9 @@
                     "view": "fost.middleware.request",
                     "configuration": {
                         "headers": {
-                            "__pgdsn": {"dbname": "odin-test"}
+                            "__pgdsn": {
+                                "dbname": "odin-test"
+                            }
                         },
                         "view": "fost.view.pathprefix",
                         "configuration": {
@@ -46,4 +55,3 @@
         }
     }
 }
-

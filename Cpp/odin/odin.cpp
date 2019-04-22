@@ -50,11 +50,8 @@ const fostlib::setting<fostlib::string>
                 odin::nonce(),
                 true);
 
-const fostlib::setting<fostlib::string> odin::c_facebook_app_id(
-        "odin/odin.cpp", "odin", "Facebook AppID", "", true);
-
-const fostlib::setting<fostlib::string> odin::c_facebook_secret(
-        "odin/odin.cpp", "odin", "Facebook Secret", "", true);
+const fostlib::setting<fostlib::json> odin::c_facebook_apps(
+        "odin/odin.cpp", "odin", "Facebook", fostlib::json{}, true);
 
 const fostlib::setting<fostlib::string> odin::c_facebook_endpoint(
         "odin/odin.cpp",

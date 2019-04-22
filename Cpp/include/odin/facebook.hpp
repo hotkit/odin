@@ -19,7 +19,8 @@ namespace odin {
 
 
         /// Return facebook app token
-        fostlib::string get_app_token();
+        f5::u8string get_app_token(
+                const f5::u8string &app_id, const f5::u8string &app_secret);
 
         /// Check user does authenticated with Facebook
         bool is_user_authenticated(f5::u8view app_token, f5::u8view user_token);
