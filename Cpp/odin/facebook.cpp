@@ -16,13 +16,14 @@
 #include <fost/insert>
 
 
-fostlib::string odin::facebook::get_app_token() {
+f5::u8string odin::facebook::get_app_token(
+        const f5::u8string &app_id, const f5::u8string &app_secret) {
     fostlib::url base_url(odin::c_facebook_endpoint.value());
     fostlib::url::filepath_string api{"/oauth/access_token"};
     fostlib::url::query_string qs{};
     fostlib::url fb_url(base_url, api);
-    qs.append("client_id", odin::c_facebook_app_id.value());
-    qs.append("client_secret", odin::c_facebook_secret.value());
+    qs.append("client_id", app_id);
+    qs.append("client_secret", app_secret);
     qs.append("grant_type", "client_credentials");
     fb_url.query(qs);
     fostlib::http::user_agent ua(fb_url);
@@ -30,7 +31,7 @@ fostlib::string odin::facebook::get_app_token() {
     auto response_data = fostlib::coerce<fostlib::string>(
             fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
     fostlib::json body = fostlib::json::parse(response_data);
-    return fostlib::coerce<fostlib::string>(body["access_token"]);
+    return fostlib::coerce<f5::u8string>(body["access_token"]);
 }
 
 
@@ -53,22 +54,28 @@ bool odin::facebook::is_user_authenticated(
 
 
 fostlib::json odin::facebook::get_user_detail(f5::u8view user_token) {
-    const auto app_token = get_app_token();
-    if (!is_user_authenticated(app_token, user_token)) {
-        return fostlib::json{};
-    }
     fostlib::url base_url(odin::c_facebook_endpoint.value());
     fostlib::url::filepath_string api{"/me"};
-    fostlib::url fb_url(base_url, api);
-    fostlib::url::query_string qs{};
-    qs.append("access_token", user_token);
-    qs.append("fields", "id,name,email");
-    fb_url.query(qs);
-    fostlib::http::user_agent ua(fb_url);
-    auto response = ua.get(fb_url);
-    auto response_data = fostlib::coerce<fostlib::string>(
-            fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
-    return fostlib::json::parse(response_data);
+    auto fb_apps = odin::c_facebook_apps.value()["Client_ID"];
+    for (const auto fb_app : fb_apps) {
+        const auto app_token = get_app_token(
+                fostlib::coerce<f5::u8string>(fb_app["app_id"]),
+                fostlib::coerce<f5::u8string>(fb_app["app_secret"]));
+        if (is_user_authenticated(app_token, user_token)) {
+            fostlib::url fb_url(base_url, api);
+            fostlib::url::query_string qs{};
+            qs.append("access_token", user_token);
+            qs.append("fields", "id,name,email");
+            fb_url.query(qs);
+            fostlib::http::user_agent ua(fb_url);
+            auto response = ua.get(fb_url);
+            auto response_data = fostlib::coerce<fostlib::string>(
+                    fostlib::coerce<fostlib::utf8_string>(
+                            response->body()->data()));
+            return fostlib::json::parse(response_data);
+        }
+    }
+    return fostlib::json{};
 }
 
 

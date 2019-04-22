@@ -43,11 +43,8 @@ namespace odin {
     extern const fostlib::setting<fostlib::string>
             c_jwt_reset_forgotten_password_secret;
 
-    /// Facebook AppID
-    extern const fostlib::setting<fostlib::string> c_facebook_app_id;
-
-    /// Facebook Secret
-    extern const fostlib::setting<fostlib::string> c_facebook_secret;
+    /// Facebook Apps
+    extern const fostlib::setting<fostlib::json> c_facebook_apps;
 
     /// Facebook API Endpoint
     extern const fostlib::setting<fostlib::string> c_facebook_endpoint;
