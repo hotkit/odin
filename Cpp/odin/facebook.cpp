@@ -46,6 +46,9 @@ bool odin::facebook::is_user_authenticated(
     fb_url.query(qs);
     fostlib::http::user_agent ua(fb_url);
     auto response = ua.get(fb_url);
+    if (response->status() != 200) {
+        return false;
+    }
     auto response_data = fostlib::coerce<fostlib::string>(
             fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
     fostlib::json body = fostlib::json::parse(response_data);
@@ -56,7 +59,7 @@ bool odin::facebook::is_user_authenticated(
 fostlib::json odin::facebook::get_user_detail(f5::u8view user_token) {
     fostlib::url base_url(odin::c_facebook_endpoint.value());
     fostlib::url::filepath_string api{"/me"};
-    auto fb_apps = odin::c_facebook_apps.value()["Client_ID"];
+    auto fb_apps = odin::c_facebook_apps.value();
     for (const auto fb_app : fb_apps) {
         const auto app_token = get_app_token(
                 fostlib::coerce<f5::u8string>(fb_app["app_id"]),
