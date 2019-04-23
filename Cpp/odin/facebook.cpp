@@ -46,6 +46,9 @@ bool odin::facebook::is_user_authenticated(
     fb_url.query(qs);
     fostlib::http::user_agent ua(fb_url);
     auto response = ua.get(fb_url);
+    if (response->status() != 200) {
+        return false;
+    }
     auto response_data = fostlib::coerce<fostlib::string>(
             fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
     fostlib::json body = fostlib::json::parse(response_data);
