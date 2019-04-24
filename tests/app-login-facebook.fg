@@ -21,6 +21,11 @@ odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 
 setting odin "JWT secret" <JWT_SECRET>
+setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
+setting odin "Facebook" {
+    "main": "111111111111111",
+    "allowed": ["111111111111111", "222222222222222"]
+}
 
 ## ## Register app
 sql.insert odin.identity {"id": "open-app"}
@@ -55,38 +60,193 @@ setting webserver views/test/sec/installation {
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 201))
 
-setting webserver views/odin/test/sec/facebook/login/ok {
-        "view": "odin.app.secure",
-        "configuration": {
-            "secure": {
-                "view": "odin.app.facebook.login",
-                "configuration": {
-                    "expires": {"hours": 72},
-                    "facebook-mock": "OK"
+setting webserver views/odin/test/ids-for-biz-failed {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "error": {
+                                "message": "Malformed access token ACCESS_TOKEN",
+                                "type": "OAuthException",
+                                "code": 190,
+                                "fbtrace_id": "xxxxxxxx"
+                            }
+                        }
+                    }
                 }
-            },
-            "unsecure": "fost.response.403"
-        }
+            }
+        },
+        "unsecure": "fost.response.403"
     }
+}
+POST odin/test/ids-for-biz-failed / {"access_token": "user_1"} 501
+
+setting webserver views/odin/test/ids-for-biz-not-include-allow-apps {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "1234512351235",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://random-club/",
+                                        "name": "Random Club",
+                                        "id": "123512351235"
+                                    }
+                                },
+                                {
+                                    "id": "123612352345123",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-sunday/",
+                                        "name": "The Bowling Sunday",
+                                        "id": "123512361234"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+POST odin/test/ids-for-biz-not-include-allow-apps / {"access_token": "user_1"} 501
+
+setting webserver views/odin/test/get-detail-failed {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "112233445566778",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://caveman-club/",
+                                        "name": "Caveman Club",
+                                        "id": "111111111111111"
+                                    }
+                                },
+                                {
+                                    "id": "778899112233445",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "error": {
+                                "message": "Malformed access token ACCESS_TOKEN",
+                                "type": "OAuthException",
+                                "code": 190,
+                                "fbtrace_id": "xxxxxxxx"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+POST odin/test/get-detail-failed / {"access_token": "user_1"} 501
+
+setting webserver views/odin/test/sec/facebook/login/ok-main-app {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "112233445566778",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://caveman-club/",
+                                        "name": "Caveman Club",
+                                        "id": "111111111111111"
+                                    }
+                                },
+                                {
+                                    "id": "778899112233445",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "Fred Flintstone",
+                            "id": "112233445566778"
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
 
 ## The installation counts as an extra user
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
 ## Disallowed methods return a 405
-GET odin/test/sec/facebook/login/ok / 405
-PUT odin/test/sec/facebook/login/ok / {"installation_id": "ins01", "access_token": "user_1"} 405
+GET odin/test/sec/facebook/login/ok-main-app / 405
+PUT odin/test/sec/facebook/login/ok-main-app / {"installation_id": "ins01", "access_token": "user_1"} 405
 
 ## Need required fields
-POST odin/test/sec/facebook/login/ok / {} 501
+POST odin/test/sec/facebook/login/ok-main-app / {} 501
 
 ## Login with Facebook ID that has not been seen before
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
 ## Login again later on should be just fine
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
@@ -104,7 +264,7 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
 ## Login with Facebook ID that *has* been seen before
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
 
 ## There is no new Facebook user
 GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
@@ -140,9 +300,78 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
 ## A Facebook login now merges the new installation with the old user
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
 
 ## There is no new Facebook user, but the new installation ID has
 ## been merged to the old identity so there is one fewer user.
 GET odin/test/facebook/validate_login /count-users 200 {"count": 4}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+
+## Can login with allowed applications
+setting webserver views/odin/test/sec/facebook/login/ok-allow-app {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "778899112233445",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                },
+                                {
+                                    "id": "112233445566778",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://caveman-club/",
+                                        "name": "Caveman Club",
+                                        "id": "111111111111111"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "Fred Flintstone",
+                            "id": "778899112233445"
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+
+## Login with Facebook ID that has not been seen before
+POST odin/test/sec/facebook/login/ok-allow-app / {"access_token": "user_1"} 200
+
+setting webserver views/validate-facebook-id {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [
+            {
+                "return": "object",
+                "path": ["/by-full-name", 1],
+                "GET": "SELECT * FROM odin.facebook_credentials fb, odin.identity id WHERE fb.identity_id=id.id AND id.full_name LIKE '%' || $1 || '%'"
+            }
+        ]
+    }
+}
+
+GET validate-facebook-id /by-full-name/Fred 200 {
+    "facebook_user_id": "112233445566778"
+}

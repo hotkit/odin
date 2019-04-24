@@ -5,9 +5,15 @@ odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 
+setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
+setting odin "Facebook" {
+    "main": "111111111111111",
+    "allowed": ["111111111111111", "222222222222222"]
+}
 
 # For self registration we must be not logged in
 GET odin /api/ 401 {"odin": {"login": "./login/"}}
+
 POST odin/register / {"username": "self_register_user", "password": "password1234"} 201
 POST odin/login / {"username": "self_register_user", "password": "password1234"} 200
 

@@ -15,67 +15,125 @@
 
 #include <fost/insert>
 
+namespace {
 
-f5::u8string odin::facebook::get_app_token(
-        const f5::u8string &app_id, const f5::u8string &app_secret) {
-    fostlib::url base_url(odin::c_facebook_endpoint.value());
-    fostlib::url::filepath_string api{"/oauth/access_token"};
-    fostlib::url::query_string qs{};
-    fostlib::url fb_url(base_url, api);
-    qs.append("client_id", app_id);
-    qs.append("client_secret", app_secret);
-    qs.append("grant_type", "client_credentials");
-    fb_url.query(qs);
-    fostlib::http::user_agent ua(fb_url);
-    auto response = ua.get(fb_url);
-    auto response_data = fostlib::coerce<fostlib::string>(
-            fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
-    fostlib::json body = fostlib::json::parse(response_data);
-    return fostlib::coerce<f5::u8string>(body["access_token"]);
+
+    std::unique_ptr<fostlib::http::user_agent::response> get_or_mock(
+            fostlib::http::user_agent &ua,
+            fostlib::url url,
+            fostlib::json config = {}) {
+        if (config.isnull()) { return ua.get(url); }
+        /// Create mock response based on config
+        int status{200};
+        if (config.has_key("status")) {
+            status = fostlib::coerce<int>(config["status"]);
+        }
+        fostlib::json body{};
+        if (config.has_key("body")) { body = config["body"]; }
+        auto const bodydata = fostlib::json::unparse(body, false);
+        // TODO: Can set headers
+        fostlib::mime::mime_headers headers;
+        // fostlib::json headers{};
+        return std::make_unique<fostlib::http::user_agent::response>(
+                "GET", url, 200,
+                std::make_unique<fostlib::binary_body>(
+                        bodydata.memory().begin(), bodydata.memory().end(),
+                        headers));
+    }
 }
 
+fostlib::json odin::facebook::get_user_detail(
+        f5::u8view user_token, fostlib::json config) {
 
-bool odin::facebook::is_user_authenticated(
-        f5::u8view app_token, f5::u8view user_token) {
-    fostlib::url base_url(odin::c_facebook_endpoint.value());
-    fostlib::url::filepath_string api{"/debug_token"};
-    fostlib::url fb_url(base_url, api);
-    fostlib::url::query_string qs{};
-    qs.append("input_token", user_token);
-    qs.append("access_token", app_token);
-    fb_url.query(qs);
-    fostlib::http::user_agent ua(fb_url);
-    auto response = ua.get(fb_url);
-    auto response_data = fostlib::coerce<fostlib::string>(
-            fostlib::coerce<fostlib::utf8_string>(response->body()->data()));
-    fostlib::json body = fostlib::json::parse(response_data);
-    return fostlib::coerce<bool>(body["data"]["is_valid"]);
-}
+    fostlib::http::user_agent ua{};
+    fostlib::url base_facebook_url(odin::c_facebook_endpoint.value());
 
-
-fostlib::json odin::facebook::get_user_detail(f5::u8view user_token) {
-    fostlib::url base_url(odin::c_facebook_endpoint.value());
-    fostlib::url::filepath_string api{"/me"};
-    auto fb_apps = odin::c_facebook_apps.value()["Client_ID"];
-    for (const auto fb_app : fb_apps) {
-        const auto app_token = get_app_token(
-                fostlib::coerce<f5::u8string>(fb_app["app_id"]),
-                fostlib::coerce<f5::u8string>(fb_app["app_secret"]));
-        if (is_user_authenticated(app_token, user_token)) {
-            fostlib::url fb_url(base_url, api);
-            fostlib::url::query_string qs{};
-            qs.append("access_token", user_token);
-            qs.append("fields", "id,name,email");
-            fb_url.query(qs);
-            fostlib::http::user_agent ua(fb_url);
-            auto response = ua.get(fb_url);
-            auto response_data = fostlib::coerce<fostlib::string>(
+    /// Get list of ids for business from Facebook
+    fostlib::url ids_for_biz_url(base_facebook_url, "/me/ids_for_business");
+    fostlib::url::query_string ids_for_biz_qs{};
+    ids_for_biz_qs.append("access_token", user_token);
+    ids_for_biz_url.query(ids_for_biz_qs);
+    fostlib::json ids_for_biz_conf{};
+    if (config.has_key(fostlib::jcursor{"facebook-mock", "ids_for_business"})) {
+        ids_for_biz_conf =
+                config[fostlib::jcursor{"facebook-mock", "ids_for_business"}];
+    }
+    auto const ids_for_biz_resp =
+            get_or_mock(ua, ids_for_biz_url, ids_for_biz_conf);
+    fostlib::json const ids_for_biz =
+            fostlib::json::parse(fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(
-                            response->body()->data()));
-            return fostlib::json::parse(response_data);
+                            ids_for_biz_resp->body()->data())));
+    if (!ids_for_biz.has_key("data")) {
+        fostlib::log::error(c_odin)("Error", "ids_for_business")(
+                "URL", ids_for_biz_url)("status", ids_for_biz_resp->status())(
+                "body", ids_for_biz);
+        // TODO: Should return 422
+        throw fostlib::exceptions::not_implemented(
+                __PRETTY_FUNCTION__,
+                "Cannot retrieve /me/ids_for_business from Facebook");
+    }
+
+    fostlib::json fb_user{};
+    /// Check with allow facebook apps
+    auto const fb_conf = odin::c_facebook_apps.value();
+    auto const allow_apps = fb_conf["allowed"];
+    auto const main_app = fb_conf["main"];
+    fostlib::json fb_app_id{};
+    bool allowed = false;
+    fostlib::jcursor const app_id_cursor{"app", "id"};
+    for (auto const authorized_app : ids_for_biz["data"]) {
+        auto const app_id = authorized_app[app_id_cursor];
+        if (app_id == main_app) {
+            /// Use facebook_user_id from main app
+            fostlib::insert(fb_user, "id", authorized_app["id"]);
+        }
+        if (std::find(allow_apps.begin(), allow_apps.end(), app_id)
+            != allow_apps.end()) {
+            // found in allow_apps
+            allowed = true;
         }
     }
-    return fostlib::json{};
+    if (!allowed || !fb_user.has_key("id")) {
+        // One of these two not found in ids_for_biz, raise exception
+        // TODO: Should return 422
+        throw fostlib::exceptions::not_implemented(
+                __PRETTY_FUNCTION__,
+                "main or allowed facebook apps not found for this access "
+                "token");
+    }
+
+    /// Retrieve facebook user detail
+    fostlib::url user_detail_url(base_facebook_url, "/me");
+    fostlib::url::query_string user_detail_qs{};
+    user_detail_qs.append("access_token", user_token);
+    user_detail_qs.append("fields", "name,email");
+    user_detail_url.query(user_detail_qs);
+    fostlib::json me_conf{};
+    if (config.has_key(fostlib::jcursor{"facebook-mock", "me"})) {
+        me_conf = config[fostlib::jcursor{"facebook-mock", "me"}];
+    }
+    auto const user_detail_resp = get_or_mock(ua, user_detail_url, me_conf);
+    auto user_detail = fostlib::json::parse(fostlib::coerce<fostlib::string>(
+            fostlib::coerce<fostlib::utf8_string>(
+                    user_detail_resp->body()->data())));
+    fostlib::log::error(c_odin)("Response", user_detail);
+    if (user_detail.has_key("error")) {
+        fostlib::log::error(c_odin)("Error", "get-user-detail")(
+                "URL", user_detail_url)("status", user_detail_resp->status())(
+                "body", user_detail);
+        // TODO: Should return 422
+        throw fostlib::exceptions::not_implemented(
+                __PRETTY_FUNCTION__,
+                "Cannot retrieve /me?field=name,email from Facebook");
+    }
+    if (user_detail.has_key("name")) {
+        fostlib::insert(fb_user, "name", user_detail["name"]);
+    }
+    if (user_detail.has_key("email")) {
+        fostlib::insert(fb_user, "email", user_detail["email"]);
+    }
+    return fb_user;
 }
 
 

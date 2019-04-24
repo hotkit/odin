@@ -15,6 +15,11 @@ odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql
 odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
 
+setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
+setting odin "Facebook" {
+    "main": "111111111111111",
+    "allowed": ["111111111111111", "222222222222222"]
+}
 
 GET odin/test/google/login/ok / 501
 
@@ -51,6 +56,51 @@ odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+
+setting webserver views/odin/test/facebook/login/ok {
+    "view": "odin.facebook.login",
+    "configuration": {
+        "expires": {
+            "hours": 72
+        },
+        "facebook-mock": {
+            "ids_for_business": {
+                "status": 200,
+                "headers": {},
+                "body": {
+                    "data": [
+                        {
+                            "id": "112233445566778",
+                            "app": {
+                                "category": "Business",
+                                "link": "https://caveman-club/",
+                                "name": "Caveman Club",
+                                "id": "111111111111111"
+                            }
+                        },
+                        {
+                            "id": "778899112233445",
+                            "app": {
+                                "category": "Business",
+                                "link": "https://bowling-friday/",
+                                "name": "The Bowling Fridy",
+                                "id": "222222222222222"
+                            }
+                        }
+                    ]
+                }
+            },
+            "me": {
+                "body": {
+                    "name": "Fred Flintstone",
+                    "email": "login_via_gp@example.com",
+                    "id": "112233445566778"
+                }
+            }
+        }
+    }
+}
+
 POST odin/test/facebook/login/ok / {"access_token": "login_via_gp"} 200
 POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 422 {"message": "This email already exists"}
 
