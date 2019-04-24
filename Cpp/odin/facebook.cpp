@@ -53,9 +53,13 @@ fostlib::json odin::facebook::get_user_detail(
     fostlib::url::query_string ids_for_biz_qs{};
     ids_for_biz_qs.append("access_token", user_token);
     ids_for_biz_url.query(ids_for_biz_qs);
-    auto const ids_for_biz_resp = get_or_mock(
-            ua, ids_for_biz_url,
-            config[fostlib::jcursor{"facebook-mock", "ids_for_business"}]);
+    fostlib::json ids_for_biz_conf{};
+    if (config.has_key(fostlib::jcursor{"facebook-mock", "ids_for_business"})) {
+        ids_for_biz_conf =
+                config[fostlib::jcursor{"facebook-mock", "ids_for_business"}];
+    }
+    auto const ids_for_biz_resp =
+            get_or_mock(ua, ids_for_biz_url, ids_for_biz_conf);
     fostlib::json const ids_for_biz =
             fostlib::json::parse(fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(
@@ -105,10 +109,11 @@ fostlib::json odin::facebook::get_user_detail(
     user_detail_qs.append("access_token", user_token);
     user_detail_qs.append("fields", "name,email");
     user_detail_url.query(user_detail_qs);
-
-    auto const user_detail_resp = get_or_mock(
-            ua, user_detail_url,
-            config[fostlib::jcursor{"facebook-mock", "me"}]);
+    fostlib::json me_conf{};
+    if (config.has_key(fostlib::jcursor{"facebook-mock", "me"})) {
+        me_conf = config[fostlib::jcursor{"facebook-mock", "me"}];
+    }
+    auto const user_detail_resp = get_or_mock(ua, user_detail_url, me_conf);
     auto user_detail = fostlib::json::parse(fostlib::coerce<fostlib::string>(
             fostlib::coerce<fostlib::utf8_string>(
                     user_detail_resp->body()->data())));
