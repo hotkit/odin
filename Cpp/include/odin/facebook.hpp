@@ -17,16 +17,9 @@ namespace odin {
 
     namespace facebook {
 
-
-        /// Return facebook app token
-        f5::u8string get_app_token(
-                const f5::u8string &app_id, const f5::u8string &app_secret);
-
-        /// Check user does authenticated with Facebook
-        bool is_user_authenticated(f5::u8view app_token, f5::u8view user_token);
-
         /// Return user data from Facebook
-        fostlib::json get_user_detail(f5::u8view user_token);
+        fostlib::json
+                get_user_detail(f5::u8view user_token, fostlib::json config);
 
         /// Return the database row for the identity together with the
         /// facebook credentials. If the credentials failed to match an empty

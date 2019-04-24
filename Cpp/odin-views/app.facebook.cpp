@@ -78,19 +78,20 @@ namespace {
                     fostlib::coerce<fostlib::string>(body["access_token"]);
 
             fostlib::json user_detail;
-            if (config.has_key("facebook-mock")) {
-                if (fostlib::coerce<fostlib::string>(config["facebook-mock"])
-                    == "OK") {
-                    // Use access token as facebook ID
-                    fostlib::insert(user_detail, "id", access_token);
-                    fostlib::insert(user_detail, "name", "Test User");
-                    fostlib::insert(
-                            user_detail, "email",
-                            access_token + "@example.com");
-                }
-            } else {
-                user_detail = odin::facebook::get_user_detail(access_token);
-            }
+            //     if (config.has_key("facebook-mock")) {
+            //         if
+            //         (fostlib::coerce<fostlib::string>(config["facebook-mock"])
+            //             == "OK") {
+            //             // Use access token as facebook ID
+            //             fostlib::insert(user_detail, "id", access_token);
+            //             fostlib::insert(user_detail, "name", "Test User");
+            //             fostlib::insert(
+            //                     user_detail, "email",
+            //                     access_token + "@example.com");
+            //         }
+            //     } else {
+            user_detail = odin::facebook::get_user_detail(access_token, config);
+            //     }
             logger("user_detail", user_detail);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
