@@ -43,7 +43,9 @@ namespace {
 }
 
 fostlib::json odin::facebook::get_user_detail(
-        f5::u8view user_token, fostlib::json config) {
+        fostlib::pg::connection &cnx,
+        f5::u8view user_token,
+        fostlib::json config) {
 
     fostlib::http::user_agent ua{};
     fostlib::url base_facebook_url(odin::c_facebook_endpoint.value());
@@ -78,30 +80,41 @@ fostlib::json odin::facebook::get_user_detail(
     /// Check with allow facebook apps
     auto const fb_conf = odin::c_facebook_apps.value();
     auto const allow_apps = fb_conf["allowed"];
-    auto const main_app = fb_conf["main"];
     fostlib::json fb_app_id{};
-    bool allowed = false;
+    bool found_app_id = false;
+    std::optional<f5::u8string> userid;
     fostlib::jcursor const app_id_cursor{"app", "id"};
-    for (auto const authorized_app : ids_for_biz["data"]) {
-        auto const app_id = authorized_app[app_id_cursor];
-        if (app_id == main_app) {
-            /// Use facebook_user_id from main app
-            fostlib::insert(fb_user, "id", authorized_app["id"]);
-        }
-        if (std::find(allow_apps.begin(), allow_apps.end(), app_id)
-            != allow_apps.end()) {
-            // found in allow_apps
-            allowed = true;
-        }
-    }
-    if (!allowed || !fb_user.has_key("id")) {
-        // One of these two not found in ids_for_biz, raise exception
+    std::for_each(
+            ids_for_biz["data"].begin(), ids_for_biz["data"].end(),
+            [&](auto appdata) {
+                if (!found_app_id) {
+                    auto const app_id = appdata[app_id_cursor];
+                    auto const usr_id =
+                            fostlib::coerce<f5::u8string>(appdata["id"]);
+                    if (std::find(allow_apps.begin(), allow_apps.end(), app_id)
+                        != allow_apps.end()) {
+                        userid = usr_id;
+                        auto data = fostgres::sql(
+                                cnx,
+                                "SELECT * FROM odin.facebook_credentials WHERE "
+                                "facebook_user_id=$1",
+                                std::vector<fostlib::string>{usr_id});
+                        auto &rs = data.second;
+                        if (rs.begin() != rs.end()) { found_app_id = true; }
+                    }
+                }
+            });
+
+    if (!userid.has_value()) {
+        // The allowed apps are not in the list
         // TODO: Should return 422
         throw fostlib::exceptions::not_implemented(
                 __PRETTY_FUNCTION__,
-                "main or allowed facebook apps not found for this access "
+                "Authorized facebook apps not found for this access "
                 "token");
     }
+
+    fostlib::insert(fb_user, "id", static_cast<f5::u8view>(userid.value()));
 
     /// Retrieve facebook user detail
     fostlib::url user_detail_url(base_facebook_url, "/me");
