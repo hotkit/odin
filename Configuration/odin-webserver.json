@@ -3,7 +3,6 @@
         "JWT secret": "<JWT_SECRET>",
         "JWT reset forgotten password secret": "<JWT_RESET_FORGOTTEN_PASSWORD_SECRET>",
         "Facebook": {
-            "main": "AppID_1",
             "allowed": [
                 "AppID_1",
                 "AppID_2"

@@ -80,7 +80,6 @@ fostlib::json odin::facebook::get_user_detail(
     /// Check with allow facebook apps
     auto const fb_conf = odin::c_facebook_apps.value();
     auto const allow_apps = fb_conf["allowed"];
-    // auto const main_app = fb_conf["main"];
     fostlib::json fb_app_id{};
     bool found_app_id = false;
     std::optional<f5::u8string> userid;
