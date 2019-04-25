@@ -365,13 +365,116 @@ setting webserver views/validate-facebook-id {
         "sql": [
             {
                 "return": "object",
-                "path": ["/by-full-name", 1],
-                "GET": "SELECT * FROM odin.facebook_credentials fb, odin.identity id WHERE fb.identity_id=id.id AND id.full_name LIKE '%' || $1 || '%'"
+                "path": [1],
+                "GET": "SELECT * FROM odin.facebook_credentials fb, odin.identity id WHERE fb.identity_id=id.id AND fb.facebook_user_id=$1"
             }
         ]
     }
 }
 
-GET validate-facebook-id /by-full-name/Fred 200 {
-    "facebook_user_id": "112233445566778"
+GET validate-facebook-id /778899112233445 200 {
+    "facebook_user_id": "778899112233445",
+    "full_name": "Fred Flintstone"
+}
+
+setting webserver views/odin/test/sec/facebook/login/ok-allow-app-only {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "123412351236123",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "Barney",
+                            "id": "123412351236123"
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+
+## Login with Facebook ID that has not been seen before
+POST odin/test/sec/facebook/login/ok-allow-app-only / {"access_token": "user_1"} 200
+
+GET validate-facebook-id /123412351236123 200 {
+    "facebook_user_id": "123412351236123",
+    "full_name": "Barney"
+}
+
+setting webserver views/odin/test/sec/facebook/login/ok-login-main-again {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "123412351236123",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                },
+                                {
+                                    "id": "695849682359858",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://fred-party/",
+                                        "name": "Fred Party",
+                                        "id": "111111111111111"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "Barney",
+                            "id": "695849682359858"
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+## Login with Facebook ID that has not been seen before
+POST odin/test/sec/facebook/login/ok-login-main-again / {"access_token": "user_1"} 200
+
+GET validate-facebook-id /123412351236123 200 {
+    "facebook_user_id": "123412351236123",
+    "full_name": "Barney"
 }

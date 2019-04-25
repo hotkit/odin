@@ -77,8 +77,10 @@ namespace {
             auto const access_token =
                     fostlib::coerce<fostlib::string>(body["access_token"]);
 
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
             fostlib::json user_detail;
-            user_detail = odin::facebook::get_user_detail(access_token, config);
+            user_detail =
+                    odin::facebook::get_user_detail(cnx, access_token, config);
             logger("user_detail", user_detail);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
@@ -86,7 +88,6 @@ namespace {
 
             auto const facebook_user_id =
                     fostlib::coerce<f5::u8view>(user_detail["id"]);
-            fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto const reference = odin::reference();
             auto facebook_user =
                     odin::facebook::credentials(cnx, facebook_user_id);

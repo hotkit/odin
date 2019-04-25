@@ -57,13 +57,14 @@ namespace {
             const auto access_token =
                     fostlib::coerce<fostlib::string>(body["access_token"]);
             fostlib::json user_detail;
-            user_detail = odin::facebook::get_user_detail(access_token, config);
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
+            user_detail =
+                    odin::facebook::get_user_detail(cnx, access_token, config);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
                         "odin.facebook.login", "User not authenticated");
             const auto facebook_user_id =
                     fostlib::coerce<f5::u8view>(user_detail["id"]);
-            fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto reference = odin::reference();
             auto facebook_user =
                     odin::facebook::credentials(cnx, facebook_user_id);
@@ -163,8 +164,10 @@ namespace {
             const auto access_token =
                     fostlib::coerce<fostlib::string>(body["access_token"]);
 
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
             fostlib::json user_detail;
-            user_detail = odin::facebook::get_user_detail(access_token, config);
+            user_detail =
+                    odin::facebook::get_user_detail(cnx, access_token, config);
             if (user_detail.isnull()) {
                 throw fostlib::exceptions::not_implemented(
                         "odin.facebook.link", "User not authenticated");
@@ -178,7 +181,6 @@ namespace {
                     fostlib::coerce<fostlib::string>(req.headers()["__user"]);
             const auto facebook_user_id =
                     fostlib::coerce<f5::u8view>(user_detail["id"]);
-            fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto facebook_user =
                     odin::facebook::credentials(cnx, facebook_user_id);
 
