@@ -1,5 +1,5 @@
 /**
-    Copyright 2018 Felspar Co Ltd. <http://odin.felspar.com/>
+    Copyright 2018-2019, Felspar Co Ltd. <http://odin.felspar.com/>
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -20,8 +20,7 @@ namespace {
             pbkdf2(f5::u8view password, fostlib::json procedure) {
         const auto salt = fostlib::coerce<std::vector<unsigned char>>(
                 fostlib::base64_string(
-                        fostlib::coerce<fostlib::string>(procedure["salt"])
-                                .c_str()));
+                        fostlib::coerce<fostlib::string>(procedure["salt"])));
         const auto rounds = fostlib::coerce<int64_t>(procedure["rounds"]);
         const auto length = fostlib::coerce<int64_t>(procedure["length"]);
         const auto hashed =
@@ -50,7 +49,8 @@ namespace {
                 return ripemd(password, procedure);
             } else {
                 throw fostlib::exceptions::not_implemented(
-                        __func__, "Unknown hash function name", name);
+                        __PRETTY_FUNCTION__, "Unknown hash function name",
+                        name);
             }
         };
         if (procedure.isobject()) {
@@ -58,11 +58,11 @@ namespace {
         } else if (procedure.isarray()) {
             /// **TODO** Fill this in later on
             throw fostlib::exceptions::not_implemented(
-                    __func__,
+                    __PRETTY_FUNCTION__,
                     "Procedure that consists of an array of operations");
         } else {
             throw fostlib::exceptions::not_implemented(
-                    __func__, "Unknown procedure type", procedure);
+                    __PRETTY_FUNCTION__, "Unknown procedure type", procedure);
         }
     }
 
@@ -74,7 +74,7 @@ bool odin::check_password(
         const fostlib::string &hash,
         const fostlib::json &procedure) {
     const auto hashb = fostlib::coerce<std::vector<unsigned char>>(
-            fostlib::base64_string(hash.c_str()));
+            fostlib::base64_string(hash));
     const auto hashed = ::hash(password, procedure);
     return fostlib::crypto_compare(hashed, hashb);
 }
@@ -90,10 +90,7 @@ std::pair<fostlib::string, fostlib::json>
     fostlib::insert(
             process, "salt",
             fostlib::coerce<fostlib::base64_string>(
-                    std::vector<unsigned char>(salt.begin(), salt.end()))
-                    .underlying()
-                    .underlying()
-                    .c_str());
+                    std::vector<unsigned char>(salt.begin(), salt.end())));
     auto hashed = fostlib::string(
             fostlib::coerce<fostlib::base64_string>(hash(password, process)));
     return std::make_pair(hashed, process);

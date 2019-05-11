@@ -1,5 +1,5 @@
 /**
-    Copyright 2016-2018 Felspar Co Ltd. <http://odin.felspar.com/>
+    Copyright 2016-2019, Felspar Co Ltd. <http://odin.felspar.com/>
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -129,8 +129,7 @@ namespace {
                     "Expires",
                     fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
                             .underlying()
-                            .underlying()
-                            .c_str());
+                            .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::utf8_string(
                             jwt.token(odin::c_jwt_secret.value().data())),
@@ -187,8 +186,8 @@ namespace {
             if (!facebook_user.isnull()) {
                 if (identity_id
                     == fostlib::coerce<fostlib::string>(
-                               facebook_user["facebook_credentials"]
-                                            ["identity_id"])) {
+                            facebook_user["facebook_credentials"]
+                                         ["identity_id"])) {
                     throw fostlib::exceptions::not_implemented(
                             "odin.facebook.link",
                             "This user already linked to this facebook");
@@ -217,8 +216,7 @@ namespace {
                     "Expires",
                     fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
                             .underlying()
-                            .underlying()
-                            .c_str());
+                            .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::utf8_string(jwt_response.token(
                             odin::c_jwt_secret.value().data())),

@@ -1,5 +1,5 @@
 /**
-    Copyright 2018 Felspar Co Ltd. <http://odin.felspar.com/>
+    Copyright 2018-2019, Felspar Co Ltd. <http://odin.felspar.com/>
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -137,8 +137,7 @@ namespace {
                     "Expires",
                     fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
                             .underlying()
-                            .underlying()
-                            .c_str());
+                            .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::utf8_string(
                             jwt.token(odin::c_jwt_secret.value().data())),

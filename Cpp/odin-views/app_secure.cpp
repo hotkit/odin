@@ -1,8 +1,8 @@
-/*
-    Copyright 2018 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2018-2019, Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
@@ -45,7 +45,7 @@ namespace {
                     __PRETTY_FUNCTION__, "App namespace prefix does not match");
         }
         auto const app_id =
-                jwt_iss.substr(odin::c_app_namespace.value().length());
+                jwt_iss.substr(odin::c_app_namespace.value().code_points());
         fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
         if (app.isnull()) {
             throw fostlib::exceptions::not_implemented(
@@ -91,7 +91,7 @@ namespace {
                             fostlib::coerce<fostlib::string>(
                                     jwt.value().payload["iss"])
                                     .substr(odin::c_app_namespace.value()
-                                                    .length()));
+                                                    .code_points()));
                     return execute(config["secure"], path, req, host);
                 }
             }
