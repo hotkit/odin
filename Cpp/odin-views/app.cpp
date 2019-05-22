@@ -114,8 +114,7 @@ namespace {
                     "Expires",
                     fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
                             .underlying()
-                            .underlying()
-                            .c_str());
+                            .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::json::unparse(result, true), headers,
                     L"application/json"));
@@ -237,8 +236,7 @@ namespace {
                     "Expires",
                     fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
                             .underlying()
-                            .underlying()
-                            .c_str());
+                            .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::utf8_string(
                             jwt.token(odin::c_jwt_secret.value().data())),

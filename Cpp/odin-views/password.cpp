@@ -1,5 +1,5 @@
 /**
-    Copyright 2016-2018 Felspar Co Ltd. <http://odin.felspar.com/>
+    Copyright 2016-2019, Felspar Co Ltd. <http://odin.felspar.com/>
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -40,9 +40,10 @@ namespace {
         const auto parts = fostlib::split(t, ".");
         if (parts.size() != 3u) {
             throw fostlib::exceptions::not_implemented(
-                    __func__, "Can't parse to jwt. This should be a 403");
+                    __PRETTY_FUNCTION__,
+                    "Can't parse to jwt. This should be a 403");
         }
-        const fostlib::base64_string b64_payload(parts[1].c_str());
+        const fostlib::base64_string b64_payload(parts[1]);
         const auto v64_payload =
                 fostlib::coerce<std::vector<unsigned char>>(b64_payload);
         const auto u8_payload =
@@ -171,7 +172,7 @@ namespace {
             auto jwt = fostlib::jwt::token::load(
                     odin::c_jwt_reset_forgotten_password_secret.value()
                             + fostlib::coerce<fostlib::string>(
-                                      user["password"]["hash"]),
+                                    user["password"]["hash"]),
                     reset_token);
             if (not jwt) { return respond("Invalid token", 403); }
             auto username = fostlib::coerce<f5::u8view>(user["login"]);

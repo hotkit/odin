@@ -172,8 +172,7 @@ namespace {
                     "Expires",
                     fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
                             .underlying()
-                            .underlying()
-                            .c_str());
+                            .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     jwt.first, headers, L"application/jwt"));
 
