@@ -3,7 +3,7 @@ project(odin)
 
 add_subdirectory(Configuration)
 add_subdirectory(Cpp)
-if(NOT ${SKIP_PYTHON})
+if(NOT DEFINED SKIP_PYTHON OR NOT ${SKIP_PYTHON})
     add_subdirectory(Python)
     add_subdirectory(Schema)
 endif()
