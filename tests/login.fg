@@ -24,6 +24,11 @@ POST odin/login / {"username": "test@test.com", "password": "password1234"} 200
 POST odin/login / {"username": "test", "password": "password12345"} 401
 POST odin/login / {"username": "tester", "password": "password1234"} 401
 
+# For now login should fail when one user uses another's email as their username but passes if uses their unique email
+odin.user test2 test@test.com password123456 test@test2.com
+POST odin/login / {"username": "test@test.com", "password": "password123456"} 401
+POST odin/login / {"username": "test@test2.com", "password": "password123456"} 200 
+
 # Expire the user and make sure they can't now log in
 odin.user.expire test
 POST odin/login / {"username": "test", "password": "password1234"} 401

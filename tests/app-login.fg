@@ -52,6 +52,13 @@ POST odin/app /login/random_app/ {"username": "invited1", "password": "password1
 POST odin/app /login/invite-only-app/ {"username": "invited1", "password": "password1234"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}
 POST odin/app /login/invite-only-app/ {"username": "inv2@inv.com", "password": "password12345"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}
 
+# For now login should fail if someone takeover someone's email and their username but passes if uses their unique email
+odin.user invited3 inv2@inv.com password123456 inv3@inv.com
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "invite-only-app", "identity_id": "invited3"}
+
+POST odin/app /login/invite-only-app/ {"username": "inv2@inv.com", "password": "password123456"} 501
+POST odin/app /login/invite-only-app/ {"username": "inv3@inv.com", "password": "password123456"} 200
+
 # Return error to uninvited user
 POST odin/app /login/invite-only-app/ {"username": "player2", "password": "password1234"} 501
 
