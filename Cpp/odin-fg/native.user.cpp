@@ -48,6 +48,10 @@ const fg::frame::builtin odin::lib::user = [](fg::frame &stack,
                 stack.resolve_string(stack.argument("password", pos, end));
         odin::set_password(cnx, ref, identity_id, username, password);
     }
+    if (pos != end) {
+        auto email = fostlib::coerce<fostlib::email_address>(stack.resolve_string(stack.argument("email", pos, end)));
+        odin::set_email(cnx, ref, identity_id, email);
+    }
     cnx.commit();
     return fostlib::json();
 };

@@ -30,10 +30,10 @@ fostlib::json odin::credentials(
             "FROM odin.credentials "
             "JOIN odin.identity ON "
             "odin.identity.id=odin.credentials.identity_id "
-            "WHERE odin.credentials.login = $1");
+            "WHERE odin.credentials.login = $1 "
+            "OR odin.identity.email = $1");
 
     fostlib::json attempt;
-    fostlib::insert(attempt, "username", username);
     fostlib::insert(attempt, "source_address", source);
     fostlib::insert(attempt, "annotation", annotation);
 
@@ -41,6 +41,7 @@ fostlib::json odin::credentials(
     auto &rs = data.second;
     auto row = rs.begin();
     if (row == rs.end()) {
+        fostlib::insert(attempt, "username", username);
         fostlib::log::warning(c_odin)("", "User not found")(
                 "username", username);
         cnx.insert("odin.login_failed", attempt);
@@ -48,6 +49,7 @@ fostlib::json odin::credentials(
     }
     auto record = *row;
     if (++row != rs.end()) {
+        fostlib::insert(attempt, "username", username);
         fostlib::log::error(c_odin)("", "More than one user returned")(
                 "username", username);
         cnx.insert("odin.login_failed", attempt);
@@ -58,6 +60,7 @@ fostlib::json odin::credentials(
     for (std::size_t index{0}; index < record.size(); ++index) {
         const auto parts = fostlib::split(data.first[index], "__");
         if (parts.size() && parts[parts.size() - 1] == "tableoid") continue;
+        if (parts.size() && parts[parts.size() - 1] == "login") fostlib::insert(attempt, "username", record[index]);
         fostlib::jcursor pos;
         for (const auto &p : parts) pos /= p;
         fostlib::insert(user, pos, record[index]);

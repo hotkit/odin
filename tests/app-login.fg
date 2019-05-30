@@ -1,6 +1,9 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
@@ -14,6 +17,7 @@ odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 # Set up new users
 odin.user owner owner password1234
 odin.user invited1 invited1 password1234
+odin.user invited2 invited2 password12345 inv2@inv.com
 odin.user player2 player2 password1234
 
 # Register invite-only-app
@@ -29,6 +33,7 @@ sql.insert odin.app_ledger {
 }
 
 sql.insert odin.app_user_ledger {"reference": "ref1", "app_id": "invite-only-app", "identity_id": "invited1"}
+sql.insert odin.app_user_ledger {"reference": "ref2", "app_id": "invite-only-app", "identity_id": "invited2"}
 
 # Validate payload
 POST odin/app /login/invite-only-app/ {} 501
@@ -45,6 +50,7 @@ POST odin/app /login/random_app/ {"username": "invited1", "password": "password1
 
 # Return redirect url if successfully login
 POST odin/app /login/invite-only-app/ {"username": "invited1", "password": "password1234"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}
+POST odin/app /login/invite-only-app/ {"username": "inv2@inv.com", "password": "password12345"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}
 
 # Return error to uninvited user
 POST odin/app /login/invite-only-app/ {"username": "player2", "password": "password1234"} 501
