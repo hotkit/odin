@@ -1,0 +1,46 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+
+# Create new users
+odin.user test test password1234
+
+
+# Register app01
+sql.insert odin.identity {"id": "app01"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "INVITE_ONLY",
+    "data_sharing_policy": "ALL"
+}
+
+# Test cannot get data if user is not authorized
+GET test/app/secure / 401
+
+# Get JWT
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+# Can get data after logged in
+GET test/app/secure / 200
+
+# Get JWT again
+GET /test/app/renew-jwt / 200
+# Can get data after renew JWT
+GET test/app/secure / 200
+
+
+
+# JWTs should be different
+GET test/app/equal (cat (lookup app_jwt) "/" (lookup app_jwt_2)) 200 {"result" : false}
