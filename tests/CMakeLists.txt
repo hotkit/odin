@@ -756,15 +756,15 @@ if(TARGET stress OR TARGET pgtest)
 
 
 
-    add_custom_command(OUTPUT renew-jwt
-            COMMAND fostgres-test odin-renew-jwt -o renew-jwt
+    add_custom_command(OUTPUT jwt-renewal
+            COMMAND fostgres-test odin-jwt-renewal -o jwt-renewal
                 $<TARGET_SONAME_FILE:odin-fg>
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/renew-jwt.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/renew-jwt.fg
-            MAIN_DEPENDENCY renew-jwt.fg
+                ${CMAKE_CURRENT_SOURCE_DIR}/jwt-renewal.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/jwt-renewal.fg
+            MAIN_DEPENDENCY jwt-renewal.fg
             DEPENDS
                 fostgres-test
                 fostgres
@@ -781,8 +781,8 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Schema/authz/004-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
-                renew-jwt.json
-                renew-jwt.fg
+                jwt-renewal.json
+                jwt-renewal.fg
         )
 
     ## Because of the way cmake works we need this stuff at the end to
@@ -811,7 +811,7 @@ if(TARGET stress OR TARGET pgtest)
             test-login-google
             test-link-facebook
             test-expire-user
-            renew-jwt
+            jwt-renewal
         )
     if(TARGET stress)
         add_dependencies(stress odin-tests)

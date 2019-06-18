@@ -10,9 +10,8 @@ odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 
-# Create new users
-odin.user test test password1234
-
+# # Create new users
+# odin.user test test password1234
 
 # Register app01
 sql.insert odin.identity {"id": "app01"}
@@ -36,11 +35,12 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure / 200
 
 # Get JWT again
-GET /test/app/renew-jwt / 200
+GET test/app/renew-jwt / 500
 # Can get data after renew JWT
 GET test/app/secure / 200
 
 
 
 # JWTs should be different
-GET test/app/equal (cat (lookup app_jwt) "/" (lookup app_jwt_2)) 200 {"result" : false}
+GET test/app/equal (cat "/" (lookup app_jwt) "/" (lookup app_jwt)) 200 {"result" : true}
+
