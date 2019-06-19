@@ -10,7 +10,7 @@ odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 
-
+odin.user some_user some_user password1234
 # Register app01
 sql.insert odin.identity {"id": "app01"}
 sql.insert odin.app_ledger {

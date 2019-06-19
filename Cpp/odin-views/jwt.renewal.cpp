@@ -30,6 +30,27 @@ namespace {
         return fostlib::json::parse(body_str);
     }
 
+    std::vector<f5::byte> load_key(
+            fostlib::pg::connection &cnx,
+            fostlib::json jwt_header,
+            fostlib::json jwt_body) {
+        auto const jwt_iss = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
+        if (jwt_iss.find(odin::c_app_namespace.value()) == std::string::npos) {
+            throw fostlib::exceptions::not_implemented(
+                    __PRETTY_FUNCTION__, "App namespace prefix does not match");
+        }
+        auto const app_id =
+                jwt_iss.substr(odin::c_app_namespace.value().code_points());
+        fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
+        if (app.isnull()) {
+            throw fostlib::exceptions::not_implemented(
+                    __PRETTY_FUNCTION__, "App not found");
+        }
+        auto const app_token = odin::c_jwt_secret.value() + app_id;
+        return std::vector<f5::byte>(
+                app_token.data().begin(), app_token.data().end());
+    }
+
     const class jwt_renewal : public fostlib::urlhandler::view {
       public:
         jwt_renewal() : view("odin.jwt.renewal") {}
@@ -54,26 +75,82 @@ namespace {
                         __PRETTY_FUNCTION__,
                         "Required GET, this should be a 405");
 
-            auto const app_id = req.headers()["__app"].value();
-            fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            fostlib::json app = odin::app::get_detail(cnx, app_id);
+            // fostlib::pg::connection cnx{fostgres::connection(config, req)};
+            // fostlib::json app = odin::app::get_detail(cnx, app_id);
 
+            auto const app_id = req.headers()["__app"].value();
             const auto jwt_user = req.headers()["__user"].value();
-      
-            auto jwt = odin::app::mint_user_jwt(
-                    jwt_user, app_id,
-                    fostlib::coerce<fostlib::timediff>(config["expires"]));
-            fostlib::mime::mime_headers headers;
-            headers.add(
+
+            std::cout << app_id << "-------------------------" << jwt_user << std::endl;
+
+            if (app_id == jwt_user) {
+                auto jwt = odin::app::mint_user_jwt(
+                        jwt_user, app_id,
+                        fostlib::coerce<fostlib::timediff>(config["expires"]));
+                fostlib::mime::mime_headers headers;
+                headers.add(
+                        "Expires",
+                        fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
+                                .underlying()
+                                .underlying());
+
+                boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                        jwt.first, headers, L"application/jwt"));
+                return std::make_pair(response, 200);
+            } else {
+
+                fostlib::pg::connection cnx{fostgres::connection(config, req)};
+                static const fostlib::string sql("SELECT * FROM odin.identity WHERE odin.identity.id = $1");
+                auto data = fostgres::sql(
+                    cnx, sql, std::vector<fostlib::string>{jwt_user});
+                // owner
+                auto &rs = data.second;
+                auto row = rs.begin();
+                if (row == rs.end()) {
+                    throw fostlib::exceptions::not_implemented(
+                        __func__,
+                        "error -----------------------------1");
+                    // return fostlib::json();
+                }
+                auto record = *row;
+                if (++row != rs.end()) {
+                    throw fostlib::exceptions::not_implemented(
+                        __func__,
+                        "error -----------------------------2");
+                    // return fostlib::json();
+                }
+                fostlib::json user;
+                for (std::size_t index{0}; index < record.size(); ++index) {
+                    const auto parts = fostlib::split(data.first[index], "__");
+                    if (parts.size() && parts[parts.size() - 1] == "tableoid") continue;
+                    fostlib::jcursor pos;
+                    for (const auto &p : parts) pos /= p;
+                    fostlib::insert(user, pos, record[index]);
+                }
+
+                std::cout << user << "-------------------------" << std::endl;
+
+                auto jwt_response(odin::mint_login_jwt(user));
+
+
+
+                auto exp = jwt_response.expires(
+                    fostlib::coerce<fostlib::timediff>(config["expires"]),
+                    false);
+                fostlib::mime::mime_headers headers;
+                headers.add(
                     "Expires",
-                    fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
                             .underlying()
                             .underlying());
 
-            boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    jwt.first, headers, L"application/jwt"));
-
-            return std::make_pair(response, 200);
+                boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                    fostlib::utf8_string(jwt_response.token(
+                            odin::c_jwt_secret.value().data())),
+                    headers, L"application/jwt"));
+                
+                return std::make_pair(response, 200);
+            }
         }
 
     } c_jwt_renewal;
