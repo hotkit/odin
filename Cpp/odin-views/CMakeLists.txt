@@ -7,7 +7,7 @@ add_library(odin-views
         app.mint.cpp
         facebook.cpp
         google.cpp
-        jwt_renewal.cpp
+        jwt.renewal.cpp
         login.cpp
         logout.cpp
         middleware.reference.cpp

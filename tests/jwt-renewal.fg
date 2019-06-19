@@ -10,8 +10,6 @@ odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 
-# # Create new users
-# odin.user test test password1234
 
 # Register app01
 sql.insert odin.identity {"id": "app01"}
@@ -27,6 +25,7 @@ sql.insert odin.app_ledger {
 
 # Test cannot get data if user is not authorized
 GET test/app/secure / 401
+GET test/app/renew-jwt / 401
 
 # Get JWT
 set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
@@ -34,13 +33,19 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 # Can get data after logged in
 GET test/app/secure / 200
 
-# Get JWT again
-GET test/app/renew-jwt / 500
+# Should return error if not config renew JWT view under secure view
+GET test/app/renew-jwt-2 / 501
+
+# Should return error if not use GET method
+POST test/app/renew-jwt / {} 501
+
+# Renew JWT
+set app_jwt_2 (GET test/app/renew-jwt / 200)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt_2))
+
 # Can get data after renew JWT
 GET test/app/secure / 200
 
-
-
 # JWTs should be different
-GET test/app/equal (cat "/" (lookup app_jwt) "/" (lookup app_jwt)) 200 {"result" : true}
+GET test/app/equal (cat "/" (lookup app_jwt) "/" (lookup app_jwt_2)) 200 {"result" : false}
 

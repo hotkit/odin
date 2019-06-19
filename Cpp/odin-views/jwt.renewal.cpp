@@ -49,54 +49,19 @@ namespace {
                         "to find App ID and User ID in");
             }
 
-        //     if (req.method() != "POST")
-        //         throw fostlib::exceptions::not_implemented(
-        //                 __PRETTY_FUNCTION__,
-        //                 "Required POST, this should be a 405");
+            if (req.method() != "GET")
+                throw fostlib::exceptions::not_implemented(
+                        __PRETTY_FUNCTION__,
+                        "Required GET, this should be a 405");
 
             auto const app_id = req.headers()["__app"].value();
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             fostlib::json app = odin::app::get_detail(cnx, app_id);
 
-            fostlib::json body = parse_payload(req);
-            if (!body.has_key("username") || !body.has_key("password")) {
-                throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__,
-                        "Must pass both username and password fields");
-            }
-            const auto username =
-                    fostlib::coerce<fostlib::string>(body["username"]);
-            const auto password =
-                    fostlib::coerce<fostlib::string>(body["password"]);
-
-            auto user = odin::credentials(
-                    cnx, username, password, req.remote_address());
-            if (user.isnull()) {
-                throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__, "User not found");
-            }
             const auto jwt_user = req.headers()["__user"].value();
-            if (user["identity"]["id"] != jwt_user) {
-                // identity_id mismatch, triggering merge account
-                fostlib::json merge_value;
-                fostlib::insert(merge_value, "from_identity_id", jwt_user);
-                fostlib::insert(
-                        merge_value, "to_identity_id", user["identity"]["id"]);
-                try {
-                    cnx.insert("odin.merge_ledger", merge_value);
-                    cnx.commit();
-                } catch (const pqxx::unique_violation &e) {
-                    // Cannot merge, abandon the unregistered identity.
-                    fostlib::log::info(odin::c_odin)(
-                            "", "Merge account failed")("from", jwt_user)(
-                            "to",
-                            user["identity"]["id"])("abandoned", jwt_user);
-                }
-            }
-            auto const identity_id =
-                    fostlib::coerce<f5::u8view>(user["identity"]["id"]);
+      
             auto jwt = odin::app::mint_user_jwt(
-                    identity_id, app_id,
+                    jwt_user, app_id,
                     fostlib::coerce<fostlib::timediff>(config["expires"]));
             fostlib::mime::mime_headers headers;
             headers.add(
