@@ -42,7 +42,7 @@ namespace {
             if (req.method() != "GET") {
                 fostlib::json config;
                 fostlib::insert(config, "view", "fost.response.405");
-                fostlib::push_back(config, "configuration", "allow", "POST");
+                fostlib::push_back(config, "configuration", "allow", "GET");
                 return execute(config, path, req, host);
             }
 
