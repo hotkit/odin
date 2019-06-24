@@ -72,19 +72,13 @@ namespace {
                 auto record = *row;
 
                 fostlib::json user;
-                for (std::size_t index{0}; index < record.size(); ++index) {
-                    const auto parts = fostlib::split(data.first[index], "__");
-                    fostlib::jcursor pos;
-                    for (const auto &p : parts) pos /= p;
-                    fostlib::insert(user, pos, record[index]);
-                    
-                }
-
-                std::map<fostlib::string, fostlib::json> format;
-                format.insert(std::pair<fostlib::string, fostlib::json>("identity", user));
-                fostlib::json identity_user = format;
-
-                auto jwt_response(odin::mint_login_jwt(identity_user));
+                static const fostlib::jcursor identity_id("identity", "id");
+                fostlib::insert(user, identity_id, record[0]);
+            
+                static const fostlib::jcursor expire_date("identity", "expires");
+                fostlib::insert(user, expire_date, record[1]);
+             
+                auto jwt_response(odin::mint_login_jwt(user));
                 exp = jwt_response.expires(
                     fostlib::coerce<fostlib::timediff>(config["expires"]),
                     false);
