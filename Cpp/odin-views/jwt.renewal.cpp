@@ -6,15 +6,18 @@
 */
 
 #include <odin/app.hpp>
+#include <odin/credentials.hpp>
 #include <odin/odin.hpp>
 #include <odin/user.hpp>
 #include <odin/views.hpp>
-#include <odin/credentials.hpp>
-#include <fost/insert>
-#include <fost/json>
+
 #include <fostgres/sql.hpp>
 
+#include <fost/insert>
+#include <fost/json>
+#include <fost/push_back>
 #include <fost/string.hpp>
+
 namespace {
 
     const class jwt_renewal : public fostlib::urlhandler::view {
@@ -27,19 +30,21 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-             if (!req.headers().exists("__app") && !req.headers().exists("__user")) {
+            if (!req.headers().exists("__app") && !req.headers().exists("__user")) {
                 throw fostlib::exceptions::not_implemented(
-                        __func__,
+                        __PRETTY_FUNCTION__,
                         "The odin.jwt.renewal view must be wrapped by an "
                         "odin.app.secure "
                         "view on the secure path so that there is a valid JWT "
                         "to find App ID and User ID in");
             }
 
-            if (req.method() != "GET")
-                throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__,
-                        "Required GET, this should be a 405");
+            if (req.method() != "GET") {
+                fostlib::json config;
+                fostlib::insert(config, "view", "fost.response.405");
+                fostlib::push_back(config, "configuration", "allow", "POST");
+                return execute(config, path, req, host);
+            }
 
             auto const app_id = req.headers()["__app"].value();
             auto const jwt_user = req.headers()["__user"].value();
