@@ -3,27 +3,7 @@
         "JWT secret": "<JWT_SECRET>"
     },
     "webserver": {
-        "views/test/app/secure": {
-            "view": "odin.app.secure",
-            "configuration": {
-                "secure": {
-                    "view": "fost.view.pathprefix",
-                    "configuration": {
-                        "": "fost.response.200",
-                        "compare": "fost.response.200"
-                    }
-                },
-                "unsecure": {
-                    "view": "fost.response.401",
-                    "configuration": {
-                        "schemes": {
-                            "Bearer": {}
-                        }
-                    }
-                }
-            }
-        },
-        "views/test/app/equal": {
+        "views/test/not-old-jwt": {
             "view": "fostgres.sql",
             "configuration": {
                 "host": ["request", "headers", "__pgdsn", "host"],
@@ -34,7 +14,7 @@
                         "return": "object",
                         "path": [1, 2],
                         "GET": {
-                            "command" :"SELECT $1 = $2 as result",
+                            "command" :"SELECT $1 != $2 as result",
                             "arguments": [1, 2]
                         }
                     }
