@@ -29,9 +29,15 @@ GET test/secure/renew-jwt / 401
 # Use APP JWT
 set app_jwt (odin.jwt.mint {"sub": "quser01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+
+# Can only use with GET method
 POST test/app-secure/renew-jwt / {} 501
+
+# New JWT is different with the old one
 set new_app_jwt (GET test/app-secure/renew-jwt / 200)
 GET test/not-old-jwt (cat "/" (lookup app_jwt) "/" (lookup new_app_jwt)) 200 {"result" : true}
+
+# New JWT can use without error
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup new_app_jwt))
 GET test/app-secure/renew-jwt / 200
 
