@@ -9,8 +9,6 @@ odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
-
-odin.user some_user some_user password1234
 # Register app01
 sql.insert odin.identity {"id": "app01"}
 sql.insert odin.app_ledger {
@@ -23,29 +21,27 @@ sql.insert odin.app_ledger {
     "data_sharing_policy": "ALL"
 }
 
-# Test cannot get data if user is not authorized
-GET test/app/secure / 401
-GET test/app/renew-jwt / 401
 
-# Get JWT
-set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
+
+# Test cannot get data if user is not authorized
+GET test/app-secure/renew-jwt  / 401
+GET test/secure/renew-jwt / 401
+
+
+# Get APP JWT
+set app_jwt (odin.jwt.mint {"sub": "user01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
-# Can get data after logged in
-GET test/app/secure / 200
+GET test/app-secure/renew-jwt / 200
+POST test/app-secure/renew-jwt / {} 501
+
+
+# Get non APP JWT
+odin.user user02 user02 password1234
+set jwt (odin.jwt.mint {"sub": "user02"} <JWT_SECRET>)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup jwt))
+GET test/secure/renew-jwt / 200
+POST test/secure/renew-jwt / {} 501
+
 
 # Should return error if not config renew JWT view under secure view
-GET test/app/renew-jwt-2 / 501
-
-# Should return error if not use GET method
-POST test/app/renew-jwt / {} 501
-
-# Renew JWT
-set app_jwt_2 (GET test/app/renew-jwt / 200)
-set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt_2))
-
-# Can get data after renew JWT
-GET test/app/secure / 200
-
-# JWTs should be different
-GET test/app/equal (cat "/" (lookup app_jwt) "/" (lookup app_jwt_2)) 200 {"result" : false}
-
+GET test/renew-jwt / 501

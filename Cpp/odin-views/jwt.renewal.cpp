@@ -6,29 +6,16 @@
 */
 
 #include <odin/app.hpp>
-#include <odin/credentials.hpp>
-#include <odin/group.hpp>
-#include <odin/nonce.hpp>
 #include <odin/odin.hpp>
 #include <odin/user.hpp>
 #include <odin/views.hpp>
-
-#include <pqxx/except>
-#include <fost/exception/parse_error.hpp>
+#include <odin/credentials.hpp>
 #include <fost/insert>
 #include <fost/json>
-#include <fost/log>
 #include <fostgres/sql.hpp>
 
-
+#include <fost/string.hpp>
 namespace {
-
-    fostlib::json parse_payload(fostlib::http::server::request &req) {
-        // TODO: Support multiple ContentType
-        auto body_str = fostlib::coerce<fostlib::string>(
-                fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
-        return fostlib::json::parse(body_str);
-    }
 
     const class jwt_renewal : public fostlib::urlhandler::view {
       public:
@@ -40,7 +27,7 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-            if (!req.headers().exists("__app")) {
+             if (!req.headers().exists("__app") && !req.headers().exists("__user")) {
                 throw fostlib::exceptions::not_implemented(
                         __func__,
                         "The odin.jwt.renewal view must be wrapped by an "
@@ -57,8 +44,9 @@ namespace {
             auto const app_id = req.headers()["__app"].value();
             auto const jwt_user = req.headers()["__user"].value();
             
-            // Check whether it is App's JWT or basic JWT
-            if (app_id == jwt_user) {
+            // Check whether it is APP JWT or non APP JWT
+            if (req.headers().exists("__app")) {
+                
                 auto jwt = odin::app::mint_user_jwt(
                         jwt_user, app_id,
                         fostlib::coerce<fostlib::timediff>(config["expires"]));
@@ -72,28 +60,19 @@ namespace {
                 boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                         jwt.first, headers, L"application/jwt"));
                 return std::make_pair(response, 200);
-            } else {
 
+            } else {
+                
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
+                
                 static const fostlib::string sql("SELECT * FROM odin.identity WHERE odin.identity.id = $1");
                 auto data = fostgres::sql(
                     cnx, sql, std::vector<fostlib::string>{jwt_user});
                 auto &rs = data.second;
                 auto row = rs.begin();
-                if (row == rs.end()) {
-                    throw fostlib::exceptions::not_implemented(
-                        __func__,
-                        "error -----------------------------1");
-                    // return fostlib::json();
-                }
                 auto record = *row;
 
-                if (++row != rs.end()) {
-                    throw fostlib::exceptions::not_implemented(
-                        __func__,
-                        "error -----------------------------2");
-                    // return fostlib::json();
-                }
+        
                 fostlib::json user;
                 for (std::size_t index{0}; index < record.size(); ++index) {
                     const auto parts = fostlib::split(data.first[index], "__");
@@ -101,12 +80,18 @@ namespace {
                     fostlib::jcursor pos;
                     for (const auto &p : parts) pos /= p;
                     fostlib::insert(user, pos, record[index]);
+                    
                 }
 
-                auto jwt_response(odin::mint_login_jwt(user));
+                std::map<fostlib::string, fostlib::json> test;
+                test.insert(std::pair<fostlib::string, fostlib::json>("identity", user));
+                fostlib::json right_constructed_user = test;
+
+                auto jwt_response(odin::mint_login_jwt(right_constructed_user));
                 auto exp = jwt_response.expires(
                     fostlib::coerce<fostlib::timediff>(config["expires"]),
                     false);
+
                 fostlib::mime::mime_headers headers;
                 headers.add(
                     "Expires",
