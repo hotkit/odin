@@ -185,6 +185,8 @@ fostlib::json odin::facebook::credentials(
         for (const auto &p : parts) pos /= p;
         fostlib::insert(user, pos, record[index]);
     }
+
+    std::cout << "facebook -----uesr----" << user << std::endl;
     return user;
 }
 

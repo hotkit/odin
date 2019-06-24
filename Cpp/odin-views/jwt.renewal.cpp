@@ -75,14 +75,10 @@ namespace {
                         __PRETTY_FUNCTION__,
                         "Required GET, this should be a 405");
 
-            // fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            // fostlib::json app = odin::app::get_detail(cnx, app_id);
-
             auto const app_id = req.headers()["__app"].value();
-            const auto jwt_user = req.headers()["__user"].value();
-
-            std::cout << app_id << "-------------------------" << jwt_user << std::endl;
-
+            auto const jwt_user = req.headers()["__user"].value();
+            
+            // Check whether it is App's JWT or basic JWT
             if (app_id == jwt_user) {
                 auto jwt = odin::app::mint_user_jwt(
                         jwt_user, app_id,
@@ -103,7 +99,6 @@ namespace {
                 static const fostlib::string sql("SELECT * FROM odin.identity WHERE odin.identity.id = $1");
                 auto data = fostgres::sql(
                     cnx, sql, std::vector<fostlib::string>{jwt_user});
-                // owner
                 auto &rs = data.second;
                 auto row = rs.begin();
                 if (row == rs.end()) {
@@ -113,6 +108,7 @@ namespace {
                     // return fostlib::json();
                 }
                 auto record = *row;
+
                 if (++row != rs.end()) {
                     throw fostlib::exceptions::not_implemented(
                         __func__,
@@ -128,12 +124,7 @@ namespace {
                     fostlib::insert(user, pos, record[index]);
                 }
 
-                std::cout << user << "-------------------------" << std::endl;
-
                 auto jwt_response(odin::mint_login_jwt(user));
-
-
-
                 auto exp = jwt_response.expires(
                     fostlib::coerce<fostlib::timediff>(config["expires"]),
                     false);
