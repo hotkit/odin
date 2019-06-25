@@ -99,5 +99,3 @@ namespace {
 
     } c_jwt_renewal;
 }
-
-const fostlib::urlhandler::view &odin::view::jwt_renewal = c_jwt_renewal;
