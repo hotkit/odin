@@ -30,11 +30,11 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-            if (!req.headers().exists("__app") && !req.headers().exists("__user")) {
+            if (not req.headers().exists("__app") && not req.headers().exists("__user")) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
                         "The odin.jwt.renewal view must be wrapped by an "
-                        "odin.app.secure "
+                        "odin.app.secure or odin.secure"
                         "view on the secure path so that there is a valid JWT "
                         "to find App ID and User ID in");
             }
