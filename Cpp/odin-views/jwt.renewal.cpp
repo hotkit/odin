@@ -16,7 +16,6 @@
 #include <fost/insert>
 #include <fost/json>
 #include <fost/push_back>
-#include <fost/string.hpp>
 
 namespace {
 
@@ -30,7 +29,7 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-            if (not req.headers().exists("__app") && not req.headers().exists("__user")) {
+            if (not req.headers().exists("__user")) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
                         "The odin.jwt.renewal view must be wrapped by an "
@@ -50,7 +49,6 @@ namespace {
             auto const jwt_user = req.headers()["__user"].value();
             
             // Check whether it is APP JWT or non APP JWT
-
             fostlib::timestamp exp;
             fostlib::utf8_string token;
             if (req.headers().exists("__app")) {

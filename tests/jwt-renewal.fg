@@ -45,9 +45,15 @@ GET test/app-secure/renew-jwt / 200
 odin.user user02 user02 password1234
 set jwt (odin.jwt.mint {"sub": "user02"} <JWT_SECRET>)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup jwt))
+
+# Can only use with GET method
 PUT test/secure/renew-jwt / {} 405
+
+# New JWT is different with the old one
 set new_jwt (GET test/secure/renew-jwt / 200)
 GET test/not-old-jwt (cat "/" (lookup jwt) "/" (lookup new_jwt)) 200 {"result" : true}
+
+# New JWT can use without error
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup new_jwt))
 GET test/secure/renew-jwt / 200
 

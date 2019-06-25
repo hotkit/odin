@@ -752,8 +752,8 @@ if(TARGET stress OR TARGET pgtest)
 
 
 
-    add_custom_command(OUTPUT jwt-renewal
-            COMMAND fostgres-test odin-jwt-renewal -o jwt-renewal
+    add_custom_command(OUTPUT test-jwt-renewal
+            COMMAND fostgres-test odin-test-jwt-renewal -o test-jwt-renewal
                 $<TARGET_SONAME_FILE:odin-fg>
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -807,7 +807,7 @@ if(TARGET stress OR TARGET pgtest)
             test-login-google
             test-link-facebook
             test-expire-user
-            jwt-renewal
+            test-jwt-renewal
         )
     if(TARGET stress)
         add_dependencies(stress odin-tests)
