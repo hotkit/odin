@@ -11,14 +11,30 @@
 #include <odin/user.hpp>
 #include <odin/views.hpp>
 
-#include <fostgres/sql.hpp>
-
 #include <fost/insert>
 #include <fost/json>
+#include <fost/log>
 #include <fost/push_back>
 
 namespace {
 
+
+    std::optional<fostlib::string>
+            bearer_jwt(fostlib::http::server::request const &req) {
+        if (req.headers().exists("Authorization")) {
+            auto parts = fostlib::partition(
+                    req.headers()["Authorization"].value(), " ");
+            if (parts.first == "Bearer" && parts.second) {
+                return parts.second;
+            } else {
+                fostlib::log::warning(odin::c_odin)(
+                        "", "Invalid Authorization scheme")(
+                        "scheme", parts.first)("data", parts.second);
+            }
+        }
+        return {};
+    }
+    
     const class jwt_renewal : public fostlib::urlhandler::view {
       public:
         jwt_renewal() : view("odin.jwt.renewal") {}
@@ -48,41 +64,18 @@ namespace {
             auto const app_id = req.headers()["__app"].value();
             auto const jwt_user = req.headers()["__user"].value();
             
+            auto const jwt_body = bearer_jwt(req);
+
             // Check whether it is APP JWT or non APP JWT
-            fostlib::timestamp exp;
-            fostlib::utf8_string token;
+            fostlib::timestamp exp(2019,10,19);
+            fostlib::string secret; 
             if (req.headers().exists("__app")) {
-                
-                auto jwt = odin::app::mint_user_jwt(
-                        jwt_user, app_id,
-                        fostlib::coerce<fostlib::timediff>(config["expires"]));
-                token = jwt.first;
-                exp = jwt.second;
+                secret = odin::c_jwt_secret.value() + app_id;
             } else {
-                
-                fostlib::pg::connection cnx{fostgres::connection(config, req)};
-                
-                static const fostlib::string sql("SELECT * FROM odin.identity WHERE odin.identity.id = $1");
-                auto data = fostgres::sql(
-                    cnx, sql, std::vector<fostlib::string>{jwt_user});
-                auto &rs = data.second;
-                auto row = rs.begin();
-                auto record = *row;
-
-                fostlib::json user;
-                static const fostlib::jcursor identity_id("identity", "id");
-                fostlib::insert(user, identity_id, record[0]);
-            
-                static const fostlib::jcursor expire_date("identity", "expires");
-                fostlib::insert(user, expire_date, record[1]);
-             
-                auto jwt_response(odin::mint_login_jwt(user));
-                exp = jwt_response.expires(
-                    fostlib::coerce<fostlib::timediff>(config["expires"]),
-                    false);
-                token = jwt_response.token(odin::c_jwt_secret.value().data());
-
+                secret = odin::c_jwt_secret.value();
             }
+    
+            fostlib::utf8_string token = odin::renew_jwt(jwt_body.value(), secret, config);
 
             fostlib::mime::mime_headers headers;
             headers.add(

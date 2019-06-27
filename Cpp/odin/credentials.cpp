@@ -123,7 +123,8 @@ fostlib::string odin::renew_jwt(fostlib::string jwt, fostlib::string secret, con
     if (payload.has_key(exp)) {
         exp.del_key(payload);
     }
+    
     fostlib::jwt::mint test_jwt{fostlib::jwt::alg::HS256, std::move(payload)};
     fostlib::timestamp test_exp = test_jwt.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
-    return fostlib::string{test_jwt.token(odin::c_jwt_secret.value().data())};
+    return fostlib::string{test_jwt.token(secret.data())};
 }
