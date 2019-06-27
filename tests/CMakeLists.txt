@@ -758,7 +758,6 @@ if(TARGET stress OR TARGET pgtest)
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/jwt-renewal.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/jwt-renewal.fg
             MAIN_DEPENDENCY jwt-renewal.fg
             DEPENDS
@@ -777,7 +776,6 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Schema/authz/004-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
-                jwt-renewal.json
                 jwt-renewal.fg
         )
 

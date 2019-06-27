@@ -79,7 +79,13 @@
                     "configuration": {
                         "": "odin/secure/sql",
                         "logout/": "odin/logout",
-                        "me/password": "odin.password.me"
+                        "me/password": "odin.password.me",
+                        "renew-jwt/": {
+                            "view": "odin.jwt.renewal",
+                            "configuration": {
+                                "expires": {"hours": 72}
+                            }
+                        }
                     }
                 },
                 "unsecure": {

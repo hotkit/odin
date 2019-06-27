@@ -21,6 +21,69 @@ sql.insert odin.app_ledger {
     "data_sharing_policy": "ALL"
 }
 
+setting odin "JWT secret" "<JWT_SECRET>"
+setting webserver views/test/not-old-jwt {
+        "view": "fostgres.sql",
+        "configuration": {
+            "sql": [
+                {
+                    "return": "object",
+                    "path": [1, 2],
+                    "GET": {
+                        "command" :"SELECT $1 != $2 as result",
+                        "arguments": [1, 2]
+                    }
+                }
+            ]
+        }
+    }
+
+setting webserver views/test/app-secure/renew-jwt {
+        "view": "odin.app.secure",
+        "configuration": {
+            "secure": {
+                "view": "odin.jwt.renewal",
+                "configuration": {
+                    "expires": {"hours": 72}
+                }
+            },
+            "unsecure": {
+                "view": "fost.response.401",
+                "configuration": {
+                    "schemes": {
+                        "Bearer": {}
+                    }
+                }
+            }
+        }
+    }
+
+setting webserver views/test/secure/renew-jwt {
+        "view": "odin.secure",
+        "configuration": {
+            "secure": {
+                "view": "odin.jwt.renewal",
+                "configuration": {
+                    "expires": {"hours": 72}
+                }
+            },
+            "unsecure": {
+                "view": "fost.response.401",
+                "configuration": {
+                    "schemes": {
+                        "Bearer": {}
+                    }
+                }
+            }
+        }
+    }
+
+setting webserver views/test/renew-jwt {
+        "view": "odin.jwt.renewal",
+        "configuration": {
+            "expires": {"hours": 72}
+        }
+    }
 
 # Test cannot get data if user is not authorized
 GET test/app-secure/renew-jwt  / 401
