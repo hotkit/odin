@@ -27,6 +27,7 @@ if(TARGET check)
             middleware.reference.tests.cpp
             password.hash.tests.cpp
             secure.tests.cpp
+            jwt.renewal.tests.cpp
         )
     target_link_libraries(odin-views-smoke odin-views)
     smoke_test(odin-views-smoke)

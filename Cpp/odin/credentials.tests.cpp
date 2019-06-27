@@ -5,14 +5,9 @@
         http://www.boost.org/LICENSE_1_0.txt
 */
 
-
 #include <odin/odin.hpp>
-#include <odin/views.hpp>
 #include <odin/credentials.hpp>
-#include <fost/crypto>
 #include <fost/test>
-#include <fost/exception/parse_error.hpp>
-
 
 FSL_TEST_SUITE(credentials);
 
