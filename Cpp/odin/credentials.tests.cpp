@@ -32,15 +32,19 @@ FSL_TEST_FUNCTION(check_return_all_fields_with_new_exp_field) {
 
     const fostlib::jcursor sub("sub");
     fostlib::insert(payload, sub, "user01");
+
+    const fostlib::jcursor email("email");
+    fostlib::insert(payload, email, "test@email.com");
   
     fostlib::jwt::mint jwt(fostlib::jwt::alg::HS256, payload);
     fostlib::string secret = odin::c_jwt_secret.value();
     std::string jwt_token = jwt.token(odin::c_jwt_secret.value().data());
-    fostlib::string new_jwt_token = odin::renew_jwt(jwt_token, secret, configuration());
-    auto load_jwt = fostlib::jwt::token::load(secret, new_jwt_token);
+    auto const result = odin::renew_jwt(jwt_token, secret, configuration());
+    auto load_jwt = fostlib::jwt::token::load(secret, result.first);
     
     FSL_CHECK_EQ(load_jwt.value().payload[iss], payload[iss]);
     FSL_CHECK_EQ(load_jwt.value().payload[sub], payload[sub]);
+    FSL_CHECK_EQ(load_jwt.value().payload[email], payload[email]);
 
     const fostlib::jcursor exp("exp");
     FSL_CHECK(load_jwt.value().payload.has_key(exp));
@@ -61,8 +65,8 @@ FSL_TEST_FUNCTION(check_can_renew_even_have_old_exp_field) {
     fostlib::jwt::mint jwt(fostlib::jwt::alg::HS256, payload);
     fostlib::string secret = odin::c_jwt_secret.value();
     std::string jwt_token = jwt.token(odin::c_jwt_secret.value().data());
-    fostlib::string new_jwt_token = odin::renew_jwt(jwt_token, secret, configuration());
-    auto load_jwt = fostlib::jwt::token::load(secret, new_jwt_token);
+    auto const result = odin::renew_jwt(jwt_token, secret, configuration());
+    auto load_jwt = fostlib::jwt::token::load(secret, result.first);
     
     FSL_CHECK_NEQ(load_jwt.value().payload[exp], payload[exp]);
 

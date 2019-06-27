@@ -62,12 +62,9 @@ namespace {
             }
 
             auto const app_id = req.headers()["__app"].value();
-            auto const jwt_user = req.headers()["__user"].value();
-            
             auto const jwt_body = bearer_jwt(req);
 
             // Check whether it is APP JWT or non APP JWT
-            fostlib::timestamp exp(2019,10,19);
             fostlib::string secret; 
             if (req.headers().exists("__app")) {
                 secret = odin::c_jwt_secret.value() + app_id;
@@ -75,7 +72,9 @@ namespace {
                 secret = odin::c_jwt_secret.value();
             }
     
-            fostlib::utf8_string token = odin::renew_jwt(jwt_body.value(), secret, config);
+            auto const new_jwt = odin::renew_jwt(jwt_body.value(), secret, config);
+            auto const token = new_jwt.first;
+            auto const exp = new_jwt.second;
 
             fostlib::mime::mime_headers headers;
             headers.add(

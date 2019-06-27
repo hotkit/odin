@@ -36,5 +36,5 @@ namespace odin {
     fostlib::jwt::mint mint_reset_password_jwt(const f5::u8view username);
 
     /// Mint new JWT token based on the old one
-    fostlib::string  renew_jwt(fostlib::string jwt, fostlib::string secret, const fostlib::json config);
+    std::pair<fostlib::utf8_string, fostlib::timestamp> renew_jwt(fostlib::string jwt, fostlib::string secret, const fostlib::json config);
 }
