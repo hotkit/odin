@@ -9,35 +9,10 @@ odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
-# Register app01
-sql.insert odin.identity {"id": "app01"}
-sql.insert odin.app_ledger {
-    "reference": "ref1",
-    "app_id": "app01",
-    "app_name": "MyApp",
-    "token": "APP_TOKEN",
-    "redirect_url": "http://example.com",
-    "access_policy": "INVITE_ONLY",
-    "data_sharing_policy": "ALL"
-}
 
 setting odin "JWT secret" "<JWT_SECRET>"
-setting webserver views/test/not-old-jwt {
-        "view": "fostgres.sql",
-        "configuration": {
-            "sql": [
-                {
-                    "return": "object",
-                    "path": [1, 2],
-                    "GET": {
-                        "command" :"SELECT $1 != $2 as result",
-                        "arguments": [1, 2]
-                    }
-                }
-            ]
-        }
-    }
 
+# Use APP JWT
 setting webserver views/test/app-secure/renew-jwt {
         "view": "odin.app.secure",
         "configuration": {
@@ -58,6 +33,34 @@ setting webserver views/test/app-secure/renew-jwt {
         }
     }
 
+# Test cannot get data if user is not authorized
+GET test/app-secure/renew-jwt  / 401
+
+sql.insert odin.identity {"id": "app01"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "app_name": "OpenApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+odin.user user01 user01 password1234
+set app_jwt (odin.jwt.mint {"sub": "user01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+
+# Can only use with GET method
+POST test/app-secure/renew-jwt / {} 405
+
+# New JWT can use without error
+set new_app_jwt (GET test/app-secure/renew-jwt / 200)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup new_app_jwt))
+GET test/app-secure/renew-jwt / 200
+
+
+# Use non APP JWT
 setting webserver views/test/secure/renew-jwt {
         "view": "odin.secure",
         "configuration": {
@@ -78,47 +81,28 @@ setting webserver views/test/secure/renew-jwt {
         }
     }
 
+set-path testserver.headers ["Authorization"] (cat "Bearer ")
+# Test cannot get data if user is not authorized
+GET test/secure/renew-jwt / 401
+
+odin.user user02 user02 password1234
+set jwt (POST odin/login / {"username": "user02", "password": "password1234"} 200)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup jwt))
+
+# Can only use with GET method
+PUT test/secure/renew-jwt / {} 405
+
+# New JWT can use without error
+set new_jwt (GET test/secure/renew-jwt / 200)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup new_jwt))
+GET test/secure/renew-jwt / 200
+
 setting webserver views/test/renew-jwt {
         "view": "odin.jwt.renewal",
         "configuration": {
             "expires": {"hours": 72}
         }
     }
-
-# Test cannot get data if user is not authorized
-GET test/app-secure/renew-jwt  / 401
-GET test/secure/renew-jwt / 401
-
-# Use APP JWT
-set app_jwt (odin.jwt.mint {"sub": "user01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
-set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
-
-# Can only use with GET method
-POST test/app-secure/renew-jwt / {} 405
-
-# New JWT is different with the old one
-set new_app_jwt (GET test/app-secure/renew-jwt / 200)
-GET test/not-old-jwt (cat "/" (lookup app_jwt) "/" (lookup new_app_jwt)) 200 {"result" : true}
-
-# New JWT can use without error
-set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup new_app_jwt))
-GET test/app-secure/renew-jwt / 200
-
-# Use non APP JWT
-odin.user user02 user02 password1234
-set jwt (odin.jwt.mint {"sub": "user02"} <JWT_SECRET>)
-set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup jwt))
-
-# Can only use with GET method
-PUT test/secure/renew-jwt / {} 405
-
-# New JWT is different with the old one
-set new_jwt (GET test/secure/renew-jwt / 200)
-GET test/not-old-jwt (cat "/" (lookup jwt) "/" (lookup new_jwt)) 200 {"result" : true}
-
-# New JWT can use without error
-set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup new_jwt))
-GET test/secure/renew-jwt / 200
 
 # Should return error if not config renew JWT view under secure view
 GET test/renew-jwt / 501

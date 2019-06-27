@@ -757,7 +757,9 @@ if(TARGET stress OR TARGET pgtest)
                 $<TARGET_SONAME_FILE:odin-fg>
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/jwt-renewal.fg
             MAIN_DEPENDENCY jwt-renewal.fg
             DEPENDS

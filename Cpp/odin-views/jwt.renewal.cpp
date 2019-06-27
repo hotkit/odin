@@ -61,12 +61,12 @@ namespace {
                 return execute(config, path, req, host);
             }
 
-            auto const app_id = req.headers()["__app"].value();
-            auto const jwt_body = bearer_jwt(req);
 
+            auto const jwt_body = bearer_jwt(req);
             // Check whether it is APP JWT or non APP JWT
             fostlib::string secret; 
             if (req.headers().exists("__app")) {
+                auto const app_id = req.headers()["__app"].value();
                 secret = odin::c_jwt_secret.value() + app_id;
             } else {
                 secret = odin::c_jwt_secret.value();
