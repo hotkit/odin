@@ -92,6 +92,12 @@ namespace {
                 odin::set_full_name(cnx, ref, identity_id, full_name);
             }
 
+            if (body.has_key("phone_number")) {
+                const auto phone_number =
+                        fostlib::coerce<f5::u8view>(body["phone_number"]);
+                odin::set_phone_number(cnx, ref, identity_id, phone_number);
+            }
+
             if (body.has_key("email")) {
                 try {
                     const auto email = fostlib::coerce<fostlib::email_address>(

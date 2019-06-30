@@ -76,3 +76,7 @@ odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials
 POST odin/test/facebook/login/ok / {"access_token": "login_via_fb"} 200
 POST odin/register / {"username": "login_via_fb", "password": "password1234", "email": "login_via_fb@example.com"} 422 {"message": "This email already exists"}
 
+## Enable opts/phone module, then user can register with full-name along with username and password
+odin.sql.file (module.path.join ../Schema/opts/phone-number/001-initial.blue.sql)
+POST odin/register / {"username": "user_p01", "password": "password1234", "phone_number": "+661231234"} 201
+GET odin/secure/sql /user/user_p01 200 {"user": {"expires": null, "phone_number": "+661231234"}, "credentials": {"login": "user_p01"}}
