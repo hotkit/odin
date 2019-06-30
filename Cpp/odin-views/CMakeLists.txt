@@ -7,7 +7,6 @@ add_library(odin-views
         app.mint.cpp
         facebook.cpp
         google.cpp
-        jwt.renewal.cpp
         login.cpp
         logout.cpp
         middleware.reference.cpp
@@ -27,7 +26,6 @@ if(TARGET check)
             middleware.reference.tests.cpp
             password.hash.tests.cpp
             secure.tests.cpp
-            jwt.renewal.tests.cpp
         )
     target_link_libraries(odin-views-smoke odin-views)
     smoke_test(odin-views-smoke)

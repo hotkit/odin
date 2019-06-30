@@ -114,18 +114,3 @@ fostlib::jwt::mint odin::mint_reset_password_jwt(const f5::u8view username) {
     jwt.subject(username);
     return jwt;
 }
-
-std::pair<fostlib::utf8_string, fostlib::timestamp> odin::renew_jwt(fostlib::string jwt, fostlib::string secret, const fostlib::json config) {
-    fostlib::nullable<fostlib::jwt::token> jwt_token = fostlib::jwt::token::load(secret, jwt);
-    fostlib::json payload = jwt_token.value().payload;
-
-    const fostlib::jcursor exp("exp");
-    if (payload.has_key(exp)) {
-        exp.del_key(payload);
-    }
-    
-    fostlib::jwt::mint jwt_ob{fostlib::jwt::alg::HS256, std::move(payload)};
-    fostlib::timestamp exp_timestamp = jwt_ob.expires(fostlib::coerce<fostlib::timediff>(config["expires"]), false);
-    const auto token = fostlib::string{jwt_ob.token(secret.data())};
-    return std::make_pair(token, exp_timestamp);
-}
