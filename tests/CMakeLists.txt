@@ -577,7 +577,6 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app-login-facebook.fg
             MAIN_DEPENDENCY app-login-facebook.fg
             DEPENDS
@@ -608,7 +607,6 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/google/004-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
-                login-google-test.json
                 app-login-facebook.fg
         )
 
@@ -620,7 +618,6 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app-login-google.fg
             MAIN_DEPENDENCY app-login-google.fg
             DEPENDS
@@ -653,7 +650,6 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/installation-id/004-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
-                facebook-test.json
                 app-login-google.fg
         )
 
@@ -755,6 +751,36 @@ if(TARGET stress OR TARGET pgtest)
     )
 
 
+
+    add_custom_command(OUTPUT test-jwt-renewal
+            COMMAND fostgres-test odin-test-jwt-renewal -o test-jwt-renewal
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/jwt-renewal.fg
+            MAIN_DEPENDENCY jwt-renewal.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authz/001-initial.blue.sql
+                ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authz/003-alter-ledgers.blue.sql
+                ../Schema/authz/004-merge-account-function.blue.sql
+                ../Configuration/odin-views.json
+                jwt-renewal.fg
+        )
+
     ## Because of the way cmake works we need this stuff at the end to
     ## actually make the above commands run when things change.
     add_custom_target(odin-tests DEPENDS
@@ -781,6 +807,7 @@ if(TARGET stress OR TARGET pgtest)
             test-login-google
             test-link-facebook
             test-expire-user
+            test-jwt-renewal
         )
     if(TARGET stress)
         add_dependencies(stress odin-tests)
