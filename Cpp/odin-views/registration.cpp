@@ -51,8 +51,8 @@ namespace {
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
             const auto username =
-                    fostlib::coerce<fostlib::nullable<f5::u8view>>(
-                            body["username"]);
+                    fostlib::trim(fostlib::coerce<fostlib::nullable<f5::u8view>>(
+                            body["username"]));
 
             if (not username || username.value().empty()) {
                 throw fostlib::exceptions::not_implemented(
@@ -84,7 +84,7 @@ namespace {
 
             if (body.has_key("full_name")) {
                 const auto full_name =
-                        fostlib::coerce<f5::u8view>(body["full_name"]);
+                        fostlib::trim(fostlib::coerce<f5::u8view>(body["full_name"])).value();
                 if (full_name.empty()) {
                     throw fostlib::exceptions::not_implemented(
                             "odin.register", "Full name cannot be empty");

@@ -65,7 +65,7 @@ namespace {
                         "Must pass both username and password fields");
             }
             const auto username =
-                    fostlib::coerce<fostlib::string>(body["username"]);
+                    fostlib::trim(fostlib::coerce<f5::u8view>(body["username"])).value();
             const auto password =
                     fostlib::coerce<fostlib::string>(body["password"]);
 

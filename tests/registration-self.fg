@@ -31,6 +31,13 @@ POST odin/register / {"username": "some-user", "password": "pwd"} 501
 # Password cannot be empty
 POST odin/register / {"username": "some-user", "password": ""} 501
 
+# Leading and trailing whitespace in username should be trimmed
+POST odin/register / {"username": "\u2005\uFEFFtest-whitespace\n\t\r\f", "password": "password1122"} 201
+POST odin/login / {"username": "test-whitespace", "password": "password1122"} 200
+
+# Empty username field should raise an error
+POST odin/register / {"username": "\u2008\u00a0\u0020", "password": "password1234"} 501
+
 # But for managed registration we must be logged in
 odin.user test-user test-user pw1234
 odin.jwt.authorization test-user pw1234

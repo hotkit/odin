@@ -92,12 +92,14 @@ POST odin/app/register / {
 
 # Successfully register
 POST odin/app/register / {
-    "username": "fred",
+    "username": "\u0020fred\u00a0\n\u2008",
     "password": "mercury2",
     "password2": "mercury2",
     "full-name": "Fred",
     "email": "fred@bowling.com"
 } 200
+
+POST odin/login / {"username": "fred", "password": "mercury2"} 200
 
 # TODO: Register second time should return error
 # POST odin/app/register / {
