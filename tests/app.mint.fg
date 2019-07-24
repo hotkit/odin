@@ -9,6 +9,7 @@ odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-installation-indexing.blue.sql)
 
 sql.insert odin.identity {"id": "bowling"}
 sql.insert odin.app_ledger {
