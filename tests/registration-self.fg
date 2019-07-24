@@ -33,6 +33,20 @@ odin.user test-user test-user pw1234
 odin.jwt.authorization test-user pw1234
 GET odin /api/ 200 {"odin": {"user": "./user/:user-id/"}, "user": {"id": "test-user"}}
 
+setting webserver views/odin/register-trim-false {
+    "view": "odin.register",
+    "configuration": {
+        "trim": false
+    }
+}
+
+# Any leading/trailing whitespace in username will be trimmed
+POST odin/register / {"username": "\u0020user\u2008", "password": "password1234"} 201
+POST odin/login / {"username": "user", "password": "password1234"} 200
+
+# However, if set "trim" config to false, it won't trim
+POST odin/register-trim-false / {"username": "\u0020user2\u2008", "password": "password1234"} 201
+POST odin/login / {"username": "\u0020user2\u2008", "password": "password1234"} 200
 
 # Put the user
 PUT odin /api/user/test-user {"password": "1234"} 200

@@ -50,9 +50,11 @@ namespace {
             auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
-            const auto username =
-                    fostlib::coerce<fostlib::nullable<f5::u8view>>(
-                            body["username"]);
+            const auto username = (config["trim"] != fostlib::json(false)) ?
+                fostlib::trim(fostlib::coerce<fostlib::nullable<f5::u8view>>(
+                        body["username"])) : 
+                fostlib::coerce<fostlib::nullable<f5::u8view>>(
+                        body["username"]);
 
             if (not username || username.value().empty()) {
                 throw fostlib::exceptions::not_implemented(

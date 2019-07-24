@@ -65,12 +65,12 @@ namespace {
                         "Must pass both username and password fields");
             }
             const auto username =
-                    fostlib::coerce<fostlib::string>(body["username"]);
+                    fostlib::trim(fostlib::coerce<fostlib::string>(body["username"]));
             const auto password =
                     fostlib::coerce<fostlib::string>(body["password"]);
 
             auto user = odin::credentials(
-                    cnx, username, password, req.remote_address());
+                    cnx, username.value(), password, req.remote_address());
             if (user.isnull()) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "User not found");
