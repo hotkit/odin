@@ -41,12 +41,12 @@ namespace {
 
     std::vector<unsigned char>
             hash(f5::u8view password, fostlib::json procedure) {
-        const auto object = [&password, &procedure]() {
-            const auto name = fostlib::coerce<f5::u8view>(procedure["name"]);
+        const auto object = [](f5::u8view pw, fostlib::json process) {
+            const auto name = fostlib::coerce<f5::u8view>(process["name"]);
             if (name == "pbkdf2-sha256") {
-                return pbkdf2(password, procedure);
+                return pbkdf2(pw, process);
             } else if (name == "ripemd256") {
-                return ripemd(password, procedure);
+                return ripemd(pw, process);
             } else {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "Unknown hash function name",
@@ -54,12 +54,17 @@ namespace {
             }
         };
         if (procedure.isobject()) {
-            return object();
+            return object(password, procedure);
         } else if (procedure.isarray()) {
-            /// **TODO** Fill this in later on
-            throw fostlib::exceptions::not_implemented(
-                    __PRETTY_FUNCTION__,
-                    "Procedure that consists of an array of operations");
+            if (procedure.size() == 0) {
+                throw fostlib::exceptions::not_implemented(
+                    __PRETTY_FUNCTION__, "Empty array", procedure);
+            }
+            auto result = object(password, procedure[0]);
+            for (size_t i = 1; i < procedure.size(); ++i) {
+                result = object(f5::u8view(fostlib::coerce<fostlib::base64_string>(result)), procedure[i]);
+            }
+            return result;
         } else {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "Unknown procedure type", procedure);
