@@ -58,11 +58,14 @@ namespace {
         } else if (procedure.isarray()) {
             if (procedure.size() == 0) {
                 throw fostlib::exceptions::not_implemented(
-                    __PRETTY_FUNCTION__, "Empty array", procedure);
+                        __PRETTY_FUNCTION__, "Empty array", procedure);
             }
             auto result = object(password, procedure[0]);
             for (size_t i = 1; i < procedure.size(); ++i) {
-                result = object(f5::u8view(fostlib::coerce<fostlib::base64_string>(result)), procedure[i]);
+                result = object(
+                        f5::u8view(fostlib::coerce<fostlib::base64_string>(
+                                result)),
+                        procedure[i]);
             }
             return result;
         } else {

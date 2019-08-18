@@ -34,7 +34,7 @@ namespace {
         }
         return {};
     }
-    
+
     const class jwt_renewal : public fostlib::urlhandler::view {
       public:
         jwt_renewal() : view("odin.jwt.renewal") {}
@@ -64,27 +64,28 @@ namespace {
 
             auto const jwt_body = bearer_jwt(req);
             // Check whether it is APP JWT or non APP JWT
-            fostlib::string secret; 
+            fostlib::string secret;
             if (req.headers().exists("__app")) {
                 auto const app_id = req.headers()["__app"].value();
                 secret = odin::c_jwt_secret.value() + app_id;
             } else {
                 secret = odin::c_jwt_secret.value();
             }
-    
-            auto const new_jwt = odin::renew_jwt(jwt_body.value(), secret, config);
+
+            auto const new_jwt =
+                    odin::renew_jwt(jwt_body.value(), secret, config);
             auto const token = new_jwt.first;
             auto const exp = new_jwt.second;
 
             fostlib::mime::mime_headers headers;
             headers.add(
-                        "Expires",
-                        fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
-                                .underlying()
-                                .underlying());
+                    "Expires",
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
+                            .underlying()
+                            .underlying());
 
-            boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                        token, headers, L"application/jwt"));
+            boost::shared_ptr<fostlib::mime> response(
+                    new fostlib::text_body(token, headers, L"application/jwt"));
 
             return std::make_pair(response, 200);
         }
