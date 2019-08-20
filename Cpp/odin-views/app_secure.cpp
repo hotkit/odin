@@ -56,6 +56,7 @@ namespace {
                 app_token.data().begin(), app_token.data().end());
     }
 
+
     const class app_secure : public fostlib::urlhandler::view {
       public:
         app_secure() : view("odin.app.secure") {}
@@ -98,6 +99,33 @@ namespace {
             return execute(config["unsecure"], path, req, host);
         }
     } c_app_secure;
+
+
+    const class app_secure_cookie : public fostlib::urlhandler::view {
+      public:
+        app_secure_cookie() : view("odin.app.secure.cookie") {}
+
+        std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
+                const fostlib::json &config,
+                const fostlib::string &path,
+                fostlib::http::server::request &req,
+                const fostlib::host &host) const {
+            auto cookies = req.headers()["Cookie"];
+            fostlib::parse_cookies(cookies);
+            if (not config.has_key("cookie")) {
+                throw fostlib::exceptions::not_implemented{
+                        __PRETTY_FUNCTION__,
+                        "Configuration item 'cookie' must be specified"};
+            }
+            auto rawjwt = cookies.subvalue(
+                    fostlib::coerce<f5::u8view>(config["cookie"]));
+            throw fostlib::exceptions::not_implemented{
+                    __PRETTY_FUNCTION__,
+                    cookies.subvalue("test-auth-cookie").value_or("**")};
+        }
+    } c_app_secure_cookie;
+
+
 }
 
 
