@@ -117,6 +117,15 @@ POST odin/app/register / {
     "email": "brian@bowling.com"
 } 500
 
+# Check database validity, the identity_id should be the identity that installation API generated
+GET odin/test/validate-register /fred 200 {
+    "id": "installation_ref",
+    "email": "fred@bowling.com",
+    "full_name": "Fred",
+    "login": "fred",
+    "app_id": "bowling-app"
+}
+
 
 # Existing username register twice should failed
 sql.insert odin.identity {"id": "installation_ref2"}
@@ -136,11 +145,47 @@ POST odin/app/register / {
     "email": "fred2@bowling.com"
 } 500
 
-# Check database validity, the identity_id should be the identity that installation API generated
-GET odin/test/validate-register /fred 200 {
-    "id": "installation_ref",
-    "email": "fred@bowling.com",
-    "full_name": "Fred",
-    "login": "fred",
+# Register with leading/trailing username should be trimmed by default
+POST odin/app/register / {
+    "username": "\uFEFF\n\u3000broski\u1680\u180E",
+    "password": "mercury2",
+    "password2": "mercury2",
+    "full-name": "Broski",
+    "email": "broski@bowling.com"
+} 200
+
+# The data should already be trimmed after registration
+GET odin/test/validate-register /broski 200 {
+    "id": "installation_ref2",
+    "email": "broski@bowling.com",
+    "full_name": "Broski",
+    "login": "broski",
+    "app_id": "bowling-app"
+}
+
+# Register new account with "trim": false config
+sql.insert odin.identity {"id": "installation_ref3"}
+sql.insert odin.app_user_installation_id_ledger {
+    "reference": "reference3",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref3",
+    "installation_id": "fred-mobile3"
+}
+
+set app_jwt (odin.jwt.mint {"sub": "installation_ref3", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+POST odin/app/register-test-trim-false / {
+    "username": "ciao",
+    "password": "mercury2",
+    "password2": "mercury2",
+    "full-name": "\u2002Ciao\u2001",
+    "email": "\u2000ciao@bowling.com\t"
+} 200
+
+GET odin/test/validate-register /ciao 200 {
+    "id": "installation_ref3",
+    "email": "\u2000ciao@bowling.com\t",
+    "full_name": "\u2002Ciao\u2001",
+    "login": "ciao",
     "app_id": "bowling-app"
 }
