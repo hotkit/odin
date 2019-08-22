@@ -1,8 +1,8 @@
-/*
-    Copyright 2016-2017 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2016-2019 Felspar Co Ltd. <http://odin.felspar.com/>
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
+    See <http://www.boost.org/LICENSE_1_0.txt>
 */
 
 
@@ -19,9 +19,9 @@
 namespace {
 
 
-    const class secure : public fostlib::urlhandler::view {
+    class secure_base : public fostlib::urlhandler::view {
       public:
-        secure() : view("odin.secure") {}
+        secure_base(f5::u8view n) : view{n} {}
 
         bool check_logout_claim(
                 const fostlib::json &config,
@@ -87,6 +87,10 @@ namespace {
             return true;
         }
 
+        virtual std::optional<fostlib::string> find_jwt(
+                fostlib::json const &config,
+                fostlib::http::server::request const &req) const = 0;
+
         std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
                 const fostlib::json &config,
                 const fostlib::string &path,
@@ -96,31 +100,45 @@ namespace {
             auto ref = odin::reference();
             req.headers().set("__odin_reference", ref);
             // Now check which sub-view to enter
+            auto const jwt_string = find_jwt(config, req);
+            if (jwt_string) {
+                auto jwt = fostlib::jwt::token::load(
+                        odin::c_jwt_secret.value(), jwt_string.value());
+                if (jwt && check_logout_claim(config, req, jwt.value())) {
+                    fostlib::log::debug(odin::c_odin)("", "JWT authenticated")(
+                            "header",
+                            jwt.value().header)("payload", jwt.value().payload);
+                    req.headers().set("__jwt", jwt.value().payload, "sub");
+                    req.headers().set(
+                            "__user",
+                            fostlib::coerce<fostlib::string>(
+                                    jwt.value().payload["sub"]));
+                    return execute(config["secure"], path, req, host);
+                }
+            }
+            return execute(config["unsecure"], path, req, host);
+        }
+    };
+
+
+    const struct secure : public secure_base {
+        secure() : secure_base{"odin.secure"} {}
+
+        std::optional<fostlib::string> find_jwt(
+                fostlib::json const &config,
+                fostlib::http::server::request const &req) const {
             if (req.headers().exists("Authorization")) {
                 auto parts = fostlib::partition(
                         req.headers()["Authorization"].value(), " ");
                 if (parts.first == "Bearer" && parts.second) {
-                    auto jwt = fostlib::jwt::token::load(
-                            odin::c_jwt_secret.value(), parts.second.value());
-                    if (jwt && check_logout_claim(config, req, jwt.value())) {
-                        fostlib::log::debug(odin::c_odin)(
-                                "", "JWT authenticated")(
-                                "header", jwt.value().header)(
-                                "payload", jwt.value().payload);
-                        req.headers().set("__jwt", jwt.value().payload, "sub");
-                        req.headers().set(
-                                "__user",
-                                fostlib::coerce<fostlib::string>(
-                                        jwt.value().payload["sub"]));
-                        return execute(config["secure"], path, req, host);
-                    }
+                    return parts.second;
                 } else {
                     fostlib::log::warning(odin::c_odin)(
                             "", "Invalid Authorization scheme")(
                             "scheme", parts.first)("data", parts.second);
                 }
             }
-            return execute(config["unsecure"], path, req, host);
+            return {};
         }
     } c_secure;
 
