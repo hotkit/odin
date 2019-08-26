@@ -31,7 +31,11 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
             FSL_CHECK_EQ(req.headers().exists("__odin_reference"), true);
-            return std::make_pair(nullptr, 200);
+            boost::shared_ptr<fostlib::mime> response{new fostlib::text_body(
+                    L"<html><head><title>OK</title></head>"
+                    L"<body><h1>OK</h1></body></html>",
+                    fostlib::mime::mime_headers(), L"text/html")};
+            return std::make_pair(response, 200);
         }
     } c_check_odin_reference_header;
 }
