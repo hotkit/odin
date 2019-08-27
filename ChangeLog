@@ -1,3 +1,6 @@
+2019-08-27  Kirit Saelensminde  <kirit@felspar.com>
+ JWTs may be placed in cookies and decoded from there.
+
 2019-08-08  Pattarawut Imamnuaysup  <pattarawut@hot-now.com>
  Add support for password hashing process in an array
 
