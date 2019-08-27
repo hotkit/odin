@@ -24,6 +24,10 @@ namespace {
             fostlib::pg::connection &cnx,
             fostlib::json jwt_header,
             fostlib::json jwt_body) {
+        if (not jwt_body.has_key("iss")) {
+            throw fostlib::exceptions::not_implemented(
+                    __PRETTY_FUNCTION__, "No issuer in the JWT");
+        }
         auto const jwt_iss = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
         if (jwt_iss.find(odin::c_app_namespace.value()) == std::string::npos) {
             throw fostlib::exceptions::not_implemented(
