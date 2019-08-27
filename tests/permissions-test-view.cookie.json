@@ -1,0 +1,38 @@
+{
+    "webserver": {
+        "views/test/permission": {
+            "view": "odin.secure.cookie",
+            "configuration": {
+                "cookie": "test-auth-cookie",
+                "secure": {
+                    "view": "fost.view.pathprefix",
+                    "configuration": {
+                        "": "odin/secure/sql",
+                        "create-group/": {
+                            "view": "odin.permission",
+                            "configuration": {
+                                "permission": "create-group",
+                                "allowed": "odin/secure/sql",
+                                "forbidden": "fost.response.403"
+                            }
+                        },
+                        "not-granted/": {
+                            "view": "odin.permission",
+                            "configuration": {
+                                "permission": "not-granted",
+                                "allowed": "odin/secure/sql",
+                                "forbidden": "fost.response.403"
+                            }
+                        }
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.302",
+                    "configuration": {
+                        "location": "http://example.com/login"
+                    }
+                }
+            }
+        }
+    }
+}

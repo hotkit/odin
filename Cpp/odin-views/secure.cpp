@@ -20,9 +20,68 @@ namespace {
 
 
     class secure_base : public fostlib::urlhandler::view {
-      public:
+      protected:
         secure_base(f5::u8view n) : view{n} {}
 
+        virtual std::optional<fostlib::string> find_jwt(
+                fostlib::json const &config,
+                fostlib::http::server::request const &req) const = 0;
+
+        std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
+                const fostlib::json &config,
+                const fostlib::string &path,
+                fostlib::http::server::request &req,
+                const fostlib::host &host) const {
+            auto logger = fostlib::log::debug(odin::c_odin);
+            logger("", "JWT decoder view");
+            logger("headers", req.headers());
+            // Set the reference header
+            auto ref = odin::reference();
+            req.headers().set("__odin_reference", ref);
+            logger("ref", ref);
+            // Now check which sub-view to enter
+            auto const jwt_string = find_jwt(config, req);
+            if (jwt_string) {
+                auto jwt = fostlib::jwt::token::load(
+                        odin::c_jwt_secret.value(), jwt_string.value());
+                if (jwt) {
+                    if (check_logout_claim(config, req, jwt.value())) {
+                        fostlib::log::debug(odin::c_odin)(
+                                "", "JWT authenticated")(
+                                "header", jwt.value().header)(
+                                "payload", jwt.value().payload);
+                        req.headers().set("__jwt", jwt.value().payload, "sub");
+                        if (not jwt.value().payload.has_key("sub")) {
+                            fostlib::log::warning(odin::c_odin)(
+                                    "", "JWT doesn't contain `sub` clain")(
+                                    "payload", jwt.value().payload);
+                        }
+                        req.headers().set(
+                                "__user",
+                                fostlib::coerce<fostlib::string>(
+                                        jwt.value().payload["sub"]));
+                        logger("execute", "secure");
+                        return execute(config["secure"], path, req, host);
+                    } else {
+                        logger("detail", "Log out claim not valid");
+                        logger("jwt", jwt_string.value());
+                        logger("execute", "unsecure");
+                        return execute(config["unsecure"], path, req, host);
+                    }
+                } else {
+                    logger("detail", "JWT not valid");
+                    logger("jwt", jwt_string.value());
+                    logger("execute", "unsecure");
+                    return execute(config["unsecure"], path, req, host);
+                }
+            } else {
+                logger("detail", "No JWT string found");
+                logger("execute", "unsecure");
+                return execute(config["unsecure"], path, req, host);
+            }
+        }
+
+      private:
         bool check_logout_claim(
                 const fostlib::json &config,
                 fostlib::http::server::request &req,
@@ -86,38 +145,6 @@ namespace {
             }
             return true;
         }
-
-        virtual std::optional<fostlib::string> find_jwt(
-                fostlib::json const &config,
-                fostlib::http::server::request const &req) const = 0;
-
-        std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
-                const fostlib::json &config,
-                const fostlib::string &path,
-                fostlib::http::server::request &req,
-                const fostlib::host &host) const {
-            // Set the reference header
-            auto ref = odin::reference();
-            req.headers().set("__odin_reference", ref);
-            // Now check which sub-view to enter
-            auto const jwt_string = find_jwt(config, req);
-            if (jwt_string) {
-                auto jwt = fostlib::jwt::token::load(
-                        odin::c_jwt_secret.value(), jwt_string.value());
-                if (jwt && check_logout_claim(config, req, jwt.value())) {
-                    fostlib::log::debug(odin::c_odin)("", "JWT authenticated")(
-                            "header",
-                            jwt.value().header)("payload", jwt.value().payload);
-                    req.headers().set("__jwt", jwt.value().payload, "sub");
-                    req.headers().set(
-                            "__user",
-                            fostlib::coerce<fostlib::string>(
-                                    jwt.value().payload["sub"]));
-                    return execute(config["secure"], path, req, host);
-                }
-            }
-            return execute(config["unsecure"], path, req, host);
-        }
     };
 
 
@@ -126,7 +153,7 @@ namespace {
 
         std::optional<fostlib::string> find_jwt(
                 fostlib::json const &config,
-                fostlib::http::server::request const &req) const {
+                fostlib::http::server::request const &req) const override {
             if (req.headers().exists("Authorization")) {
                 auto parts = fostlib::partition(
                         req.headers()["Authorization"].value(), " ");
@@ -137,10 +164,35 @@ namespace {
                             "", "Invalid Authorization scheme")(
                             "scheme", parts.first)("data", parts.second);
                 }
+            } else {
+                fostlib::log::debug(odin::c_odin)("", "odin.secure")(
+                        "failed", "No `Authorization` header");
+                ;
             }
             return {};
         }
     } c_secure;
+
+
+    const struct secure_cookie : public secure_base {
+        secure_cookie() : secure_base{"odin.secure.cookie"} {}
+
+        std::optional<fostlib::string> find_jwt(
+                fostlib::json const &config,
+                fostlib::http::server::request const &req) const override {
+            auto cookies = req.headers()["Cookie"];
+            fostlib::parse_cookies(cookies);
+            if (not config.has_key("cookie")) {
+                throw fostlib::exceptions::not_implemented{
+                        __PRETTY_FUNCTION__,
+                        "Configuration item 'cookie' must be specified"};
+            }
+            fostlib::log::debug(odin::c_odin)("", "Looking for JWT in cookies")(
+                    "cookies", cookies);
+            return cookies.subvalue(
+                    fostlib::coerce<f5::u8view>(config["cookie"]));
+        }
+    } c_secure_cookie;
 
 
 }
