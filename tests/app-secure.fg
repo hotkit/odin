@@ -88,7 +88,7 @@ set-path testserver.cookies ["test-cookie"] hijklmn
 GET test/app/secure/cookie / 200
 GET test/app/secure/cookie /test 200
 
-## Wrong App jwt should return 401
+## Wrong App jwt should return 302
 set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app02"} <JWT_SECRET>app01)
 set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
 GET test/app/secure/cookie / 302
