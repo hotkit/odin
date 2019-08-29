@@ -19,26 +19,15 @@
 
 namespace {
 
-    std::optional<fostlib::string>
-            bearer_jwt(fostlib::http::server::request const &req) {
-        if (req.headers().exists("Authorization")) {
-            auto parts = fostlib::partition(
-                    req.headers()["Authorization"].value(), " ");
-            if (parts.first == "Bearer" && parts.second) {
-                return parts.second;
-            } else {
-                fostlib::log::warning(odin::c_odin)(
-                        "", "Invalid Authorization scheme")(
-                        "scheme", parts.first)("data", parts.second);
-            }
-        }
-        return {};
-    }
 
     std::vector<f5::byte> load_key(
             fostlib::pg::connection &cnx,
             fostlib::json jwt_header,
             fostlib::json jwt_body) {
+        if (not jwt_body.has_key("iss")) {
+            throw fostlib::exceptions::not_implemented(
+                    __PRETTY_FUNCTION__, "No issuer in the JWT");
+        }
         auto const jwt_iss = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
         if (jwt_iss.find(odin::c_app_namespace.value()) == std::string::npos) {
             throw fostlib::exceptions::not_implemented(
@@ -56,16 +45,33 @@ namespace {
                 app_token.data().begin(), app_token.data().end());
     }
 
-    const class app_secure : public fostlib::urlhandler::view {
+
+    /**
+     * Base class used to handle the JWT code. It assumes that there are
+     * a variety of ways of getting at the JWT value itself.
+     */
+    class jwt_secure : public fostlib::urlhandler::view {
       public:
-        app_secure() : view("odin.app.secure") {}
+        jwt_secure(f5::u8view n) : view(n) {}
+
+        /// Must be implemented to load the actual JWT itself
+        virtual std::optional<fostlib::string> find_jwt(
+                const fostlib::json &config,
+                fostlib::http::server::request const &req) const = 0;
 
         std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
                 const fostlib::json &config,
                 const fostlib::string &path,
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
-            auto const jwt_body = bearer_jwt(req);
+            auto const jwt_body = find_jwt(config, req);
+            if (not config.has_key("secure")
+                || not config.has_key("unsecure")) {
+                throw fostlib::exceptions::not_implemented{
+                        __PRETTY_FUNCTION__,
+                        "Configuration must contain both `secure` and "
+                        "`unsecure` views"};
+            }
             if (jwt_body) {
                 fostlib::pg::connection cnx{fostgres::connection(config, req)};
                 auto jwt = fostlib::jwt::token::load(
@@ -97,7 +103,52 @@ namespace {
             }
             return execute(config["unsecure"], path, req, host);
         }
+    };
+
+
+    const class app_secure : public jwt_secure {
+      public:
+        app_secure() : jwt_secure("odin.app.secure") {}
+
+        std::optional<fostlib::string> find_jwt(
+                const fostlib::json &,
+                fostlib::http::server::request const &req) const {
+            if (req.headers().exists("Authorization")) {
+                auto parts = fostlib::partition(
+                        req.headers()["Authorization"].value(), " ");
+                if (parts.first == "Bearer" && parts.second) {
+                    return parts.second;
+                } else {
+                    fostlib::log::warning(odin::c_odin)(
+                            "", "Invalid Authorization scheme")(
+                            "scheme", parts.first)("data", parts.second);
+                }
+            }
+            return {};
+        }
     } c_app_secure;
+
+
+    const class app_secure_cookie : public jwt_secure {
+      public:
+        app_secure_cookie() : jwt_secure("odin.app.secure.cookie") {}
+
+        std::optional<fostlib::string> find_jwt(
+                const fostlib::json &config,
+                fostlib::http::server::request const &req) const {
+            auto cookies = req.headers()["Cookie"];
+            fostlib::parse_cookies(cookies);
+            if (not config.has_key("cookie")) {
+                throw fostlib::exceptions::not_implemented{
+                        __PRETTY_FUNCTION__,
+                        "Configuration item 'cookie' must be specified"};
+            }
+            return cookies.subvalue(
+                    fostlib::coerce<f5::u8view>(config["cookie"]));
+        }
+    } c_app_secure_cookie;
+
+
 }
 
 

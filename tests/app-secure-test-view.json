@@ -22,6 +22,25 @@
                     }
                 }
             }
+        },
+        "views/test/app/secure/cookie": {
+            "view": "odin.app.secure.cookie",
+            "configuration": {
+                "cookie": "test-auth-cookie",
+                "secure": {
+                    "view": "fost.view.pathprefix",
+                    "configuration": {
+                        "": "fost.response.200",
+                        "test/": "fost.response.201"
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.302",
+                    "configuration": {
+                        "location": "https://example.com/login"
+                    }
+                }
+            }
         }
     }
 }

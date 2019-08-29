@@ -234,6 +234,35 @@ if(TARGET stress OR TARGET pgtest)
                 permissions-test-view.json
         )
 
+    add_custom_command(OUTPUT test-permissions-cookie
+            COMMAND fostgres-test odin-test-permissions-cookie -o test-permissions-cookie
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/permissions-test-view.cookie.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/permissions.cookie.fg
+            MAIN_DEPENDENCY permissions.cookie.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authz/001-initial.blue.sql
+                ../Schema/authz/002-view-user_permission.blue.sql
+                ../Schema/authz/003-alter-ledgers.blue.sql
+                ../Schema/authz/004-merge-account-function.blue.sql
+                ../Configuration/odin-views.json
+                permissions.cookie.fg
+                permissions-test-view.cookie.json
+        )
+
     add_custom_command(OUTPUT test-registration-self
             COMMAND fostgres-test odin-test-registration-self -o test-registration-self
                 $<TARGET_SONAME_FILE:odin-fg>
@@ -800,6 +829,7 @@ if(TARGET stress OR TARGET pgtest)
             test-no-auth
             test-password
             test-permissions
+            test-permissions-cookie
             test-registration-self
             test-session
             test-forgotten-password

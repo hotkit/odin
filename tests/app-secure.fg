@@ -1,4 +1,4 @@
-# Set up the database
+## Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
@@ -10,13 +10,13 @@ odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 
-# Set up new users and apps
+## Set up new users and apps
 odin.user owner owner password1234
 odin.user player1 player1 password1234
 odin.user player2 player2 password1234
 odin.user player3 player3 password1234
 
-# Register app01
+## Register app01
 sql.insert odin.identity {"id": "app01"}
 sql.insert odin.app_ledger {
     "reference": "ref1",
@@ -28,7 +28,7 @@ sql.insert odin.app_ledger {
     "data_sharing_policy": "ALL"
 }
 
-# Register app02
+## Register app02
 sql.insert odin.identity {"id": "app02"}
 sql.insert odin.app_ledger {
     "reference": "ref1",
@@ -42,21 +42,60 @@ sql.insert odin.app_ledger {
 
 GET test/app/secure / 401
 
-# Mint App jwt
+## ## Bearer Authorization header
+
+## Mint App jwt
 set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure / 200
 GET test/app/secure /test 200
 
-# Wrong App jwt should return 401
+## Wrong App jwt should return 401
 set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app02"} <JWT_SECRET>app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure / 401
 GET test/app/secure /test 401
 
-# Should return not implemented if iss doesn't prefix with app namespace
+## Should return not implemented if iss doesn't prefix with app namespace
 set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "app02"} APP_TOKEN)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure / 501
 GET test/app/secure /test 501
 
+## ## Cookies
+
+## Clear the app JWT before retrying everything with cookies
+rm-path testserver.headers ["Authorization"]
+GET test/app/secure / 401
+GET test/app/secure /test 401
+
+## View config errors
+GET {"view": "odin.app.secure.cookie"} / 501
+GET {
+        "view": "odin.app.secure.cookie",
+        "configuration": {"cookie": "cookie-name"}
+    } / 501
+
+## Get a valid JWT and set it as a cookie value
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
+set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
+GET test/app/secure/cookie / 200
+GET test/app/secure/cookie /test 200
+
+## Other cookies are ignored
+set-path testserver.cookies ["test"] abcdefg
+set-path testserver.cookies ["test-cookie"] hijklmn
+GET test/app/secure/cookie / 200
+GET test/app/secure/cookie /test 200
+
+## Wrong App jwt should return 302
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app02"} <JWT_SECRET>app01)
+set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
+GET test/app/secure/cookie / 302
+GET test/app/secure/cookie /test 302
+
+## Should return not implemented if iss doesn't prefix with app namespace
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "app02"} APP_TOKEN)
+set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
+GET test/app/secure/cookie / 501
+GET test/app/secure/cookie /test 501
