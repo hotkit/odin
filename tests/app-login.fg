@@ -53,6 +53,7 @@ POST odin/app /login/invite-only-app/ {"username": "player2", "password": "passw
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 
 sql.insert odin.identity {"id": "open-app"}
 sql.insert odin.app_ledger {
