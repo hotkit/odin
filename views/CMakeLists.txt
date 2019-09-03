@@ -35,6 +35,9 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/002-initial.blue.sql
                 ../Schema/app/003-app-role.blue.sql
                 ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
                 app.register.json
                 app.register.fg
         )

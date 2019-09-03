@@ -749,6 +749,32 @@ if(TARGET stress OR TARGET pgtest)
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+            ${CMAKE_CURRENT_SOURCE_DIR}/app-data-test.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/app_user-app_data.fg
+        MAIN_DEPENDENCY app-handover.fg
+        DEPENDS
+            fostgres-test
+            fostgres
+            odin-fg
+            odin-views
+            ../Schema/bootstrap.sql
+            ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
+            ../Schema/app/002-initial.blue.sql
+            ../Schema/app/003-app-role.blue.sql
+            ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
+            ../Schema/app/006-merge-account-function.blue.sql
+            ../Schema/app/007-app-user-data.blue.sql
+            app-data-test.json
+            app_user-app_data.fg
+    )
+
+    add_custom_command(OUTPUT test-app-handover
+        COMMAND fostgres-test odin-test-app-handover -o test-app-handover
+            $<TARGET_SONAME_FILE:odin-fg>
+            $<TARGET_SONAME_FILE:odin-views>
+            ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
             ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
@@ -785,8 +811,6 @@ if(TARGET stress OR TARGET pgtest)
             app-federation-test-client-view.json
             app-handover.fg
     )
-
-
 
     add_custom_command(OUTPUT test-jwt-renewal
             COMMAND fostgres-test odin-test-jwt-renewal -o test-jwt-renewal
