@@ -6,10 +6,7 @@
                 "sql": [{
                     "path": [1, 2],
                     "return": "object",
-                    "GET": {
-                        "command": "SELECT * FROM odin.app_user WHERE identity_id = $1 AND app_id = $2",
-                        "arguments": [1, 2]
-                    }
+                    "GET": "SELECT * FROM odin.app_user WHERE identity_id = $1 AND app_id = $2;"
                 }]
             }
         }
