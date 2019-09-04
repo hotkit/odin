@@ -1,0 +1,42 @@
+# Set up the modules we need
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+
+sql.insert odin.identity {"id": "user01"}
+sql.insert odin.identity {"id": "app01"}
+sql.insert odin.app {"app_id": "app01", "app_name": "app01", "access_policy": "INVITE_ONLY", "data_sharing_policy": "ALL"}
+sql.insert odin.app_user {"app_id": "app01", "identity_id": "user01"}
+
+# Insert app_data
+sql.insert odin.app_user_app_data_ledger {
+    "reference": "ref01", 
+    "app_id": "app01", 
+    "identity_id": "user01", 
+    "app_data": {"key": "value1"}
+}
+
+# Test update app_data
+GET test/app_user /user01/app01 200 {
+    "app_id": "app01", 
+    "identity_id": "user01", 
+    "app_data": {"key": "value1"}
+}
+
+# Update app_data
+sql.insert odin.app_user_app_data_ledger {
+    "reference": "ref02", 
+    "app_id": "app01", 
+    "identity_id": "user01", 
+    "app_data": {"key": "value2"}
+}
+GET test/app_user /user01/app01 200 {
+    "app_id": "app01", 
+    "identity_id": "user01", 
+    "app_data": {"key": "value2"}
+}

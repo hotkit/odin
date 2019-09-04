@@ -12,7 +12,8 @@
                     "GET": {
                         "command": "SELECT identity.*,
                             credentials.login,
-                            app_user.app_id
+                            app_user.app_id,
+                            app_user.app_data
                             FROM odin.identity
                             LEFT JOIN odin.credentials
                             ON identity.id=credentials.identity_id

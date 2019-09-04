@@ -12,6 +12,8 @@ odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 
 # Setup application
 sql.insert odin.identity {"id": "bowling-app"}
@@ -143,4 +145,37 @@ GET odin/test/validate-register /fred 200 {
     "full_name": "Fred",
     "login": "fred",
     "app_id": "bowling-app"
+}
+
+# Set up new user for register
+sql.insert odin.identity {"id": "installation_ref3"}
+sql.insert odin.app_user_installation_id_ledger {
+    "reference": "reference2",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref3",
+    "installation_id": "fred-mobile"
+}
+
+set app_jwt (odin.jwt.mint {"sub": "installation_ref3", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+
+# Register with app_data
+# Successfully register
+POST odin/app/register / {
+    "username": "fred_ad",
+    "password": "mercury2_ad",
+    "password2": "mercury2_ad",
+    "full-name": "Fred_ad",
+    "email": "fred_ad@bowling.com",
+    "app_data": {"key": "value"}
+} 200
+
+# Validate app data
+GET odin/test/validate-register /fred_ad 200 {
+    "id": "installation_ref3",
+    "email": "fred_ad@bowling.com",
+    "full_name": "Fred_ad",
+    "login": "fred_ad",
+    "app_id": "bowling-app",
+    "app_data": {"key": "value"}
 }
