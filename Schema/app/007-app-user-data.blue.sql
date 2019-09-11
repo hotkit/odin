@@ -1,3 +1,5 @@
+INSERT INTO odin.migration VALUES('app', '007-app-user-data.blue.sql');
+
 CREATE TABLE odin.app_user_app_data_ledger (
     reference text NOT NULL,
     app_id text NOT NULL,
