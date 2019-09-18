@@ -10,6 +10,7 @@ odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-appuserid.blue.sql)
 
 ## Set up new users and apps
 odin.user owner owner password1234
@@ -100,3 +101,18 @@ set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "app02"} APP_TOKEN)
 set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
 GET test/app/secure/cookie / 501
 GET test/app/secure/cookie /test 501
+
+odin.user test_user01 test_user01 password1234
+sql.insert odin.identity {"id": "test_app01"}
+sql.insert odin.app {"app_id": "test_app01", "app_name": "test_app01", "access_policy": "OPEN", "data_sharing_policy": "ALL"}
+sql.insert odin.app_user {"app_id": "test_app01", "identity_id": "test_user01", "app_user_id": "test_app_user_id01"}
+
+## Should authorized by app_user_id
+set app_jwt (odin.jwt.mint {"sub": "test_app_user_id01", "iss": "http://odin.felspar.com/app/test_app01"} <JWT_SECRET>test_app01)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET test/app/secureb /me 200 {"user": "test_user01", "app_user": "test_app_user_id01"}
+
+## Not found app_user_id
+set app_jwt (odin.jwt.mint {"sub": "test_app_user_id02", "iss": "http://odin.felspar.com/app/test_app01"} <JWT_SECRET>test_app01)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET test/app/secureb /me 401

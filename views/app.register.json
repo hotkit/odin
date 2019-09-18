@@ -161,7 +161,7 @@
                                                                                         ]
                                                                                     }
                                                                                 }
-                                                                            }
+                                                                            },
                                                                             {
                                                                                 "table": "odin.app_user_app_data_ledger",
                                                                                 "columns": {
