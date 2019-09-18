@@ -94,7 +94,7 @@ namespace {
                     cnx, reference, app_id, identity_id, installation_id);
             cnx.commit();
             auto jwt = odin::app::mint_user_jwt(
-                    identity_id, app_id,
+                    app_user_id, app_id,
                     fostlib::coerce<fostlib::timediff>(config["expires"]));
             fostlib::mime::mime_headers headers;
             headers.add(

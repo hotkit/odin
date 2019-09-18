@@ -1,46 +1,77 @@
 {
-    "odin": {
-        "JWT secret": "<JWT_SECRET>"
-    },
-    "webserver": {
-        "views/test/app/secure": {
-            "view": "odin.app.secure",
-            "configuration": {
-                "secure": {
-                    "view": "fost.view.pathprefix",
-                    "configuration": {
-                        "": "fost.response.200",
-                        "test/": "fost.response.201"
-                    }
-                },
-                "unsecure": {
-                    "view": "fost.response.401",
-                    "configuration": {
-                        "schemes": {
-                            "Bearer": {}
-                        }
-                    }
+  "odin": {
+    "JWT secret": "<JWT_SECRET>"
+  },
+  "webserver": {
+    "views/test/app/secureb": {
+      "view": "odin.app.secure",
+      "configuration": {
+        "secure": {
+          "view": "fostgres.sql",
+          "configuration": {
+            "sql": [
+              {
+                "return": "object",
+                "path": ["/me"],
+                "GET": {
+                  "command": "SELECT $1 AS user, $2 AS app_user;",
+                  "arguments": [
+                    ["request", "headers", "__user"],
+                    ["request", "headers", "__app_user"]
+                  ]
                 }
-            }
+              }
+            ]
+          }
         },
-        "views/test/app/secure/cookie": {
-            "view": "odin.app.secure.cookie",
-            "configuration": {
-                "cookie": "test-auth-cookie",
-                "secure": {
-                    "view": "fost.view.pathprefix",
-                    "configuration": {
-                        "": "fost.response.200",
-                        "test/": "fost.response.201"
-                    }
-                },
-                "unsecure": {
-                    "view": "fost.response.302",
-                    "configuration": {
-                        "location": "https://example.com/login"
-                    }
-                }
+        "unsecure": {
+          "view": "fost.response.401",
+          "configuration": {
+            "schemes": {
+              "Bearer": {}
             }
+          }
         }
+      }
+    },
+    "views/test/app/secure": {
+      "view": "odin.app.secure",
+      "configuration": {
+        "secure": {
+          "view": "fost.view.pathprefix",
+          "configuration": {
+            "": "fost.response.200",
+            "test/": "fost.response.201"
+          }
+        },
+        "unsecure": {
+          "view": "fost.response.401",
+          "configuration": {
+            "schemes": {
+              "Bearer": {}
+            }
+          }
+        }
+      }
+    },
+    "views/test/app/secure/cookie": {
+      "view": "odin.app.secure.cookie",
+      "configuration": {
+        "cookie": "test-auth-cookie",
+        "secure": {
+          "view": "fost.view.pathprefix",
+          "configuration": {
+            "": "fost.response.200",
+            "test/": "fost.response.201"
+          }
+        },
+        "unsecure": {
+          "view": "fost.response.302",
+          "configuration": {
+            "location": "https://example.com/login"
+          }
+        }
+      }
     }
+  }
 }

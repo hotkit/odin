@@ -13,12 +13,23 @@
 
 #include <fost/crypto>
 #include <fost/insert>
+#include <fost/json>
 #include <fost/log>
 #include <fostgres/sql.hpp>
 
 
 namespace {
 
+    inline std::pair<boost::shared_ptr<fostlib::mime>, int>
+            respond(fostlib::string message, int code = 403) {
+        fostlib::json ret;
+        if (not message.empty())
+            fostlib::insert(ret, "message", std::move(message));
+        fostlib::mime::mime_headers headers;
+        boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                fostlib::json::unparse(ret, true), headers, "application/json"));
+        return std::make_pair(response, code);
+    }
 
     std::vector<f5::byte> load_key(
             fostlib::pg::connection &cnx,
@@ -88,9 +99,50 @@ namespace {
                     if (jwt.value().payload.has_key("sub")) {
                         req.headers().set("__jwt", jwt.value().payload, "sub");
                         req.headers().set(
-                                "__user",
+                                "__app_user",
                                 fostlib::coerce<fostlib::string>(
                                         jwt.value().payload["sub"]));
+                        // select
+                        static const fostlib::string sql(
+                                "SELECT identity_id FROM "
+                                "odin.app_user "
+                                "WHERE app_id=$1 AND app_user_id=$2");   
+
+                        auto app =  fostlib::coerce<fostlib::string>(
+                                    jwt.value().payload["iss"])
+                                    .substr(odin::c_app_namespace.value()
+                                    .code_points());
+
+                        auto user = fostlib::coerce<fostlib::string>(
+                                    jwt.value().payload["sub"]);
+
+                        auto data = fostgres::sql(
+                                cnx, sql,
+                                std::vector<fostlib::string>{app, user});  
+
+                        auto &rs = data.second;
+                        
+                        auto row = rs.begin();
+                        if (row == rs.end()) {
+                          return respond("App user does not exists.", 401);
+                        }
+
+                        auto record = *row;
+                        fostlib::json app_json;
+                        for (std::size_t index{0}; index < record.size(); ++index) {
+                                const auto parts = fostlib::split(data.first[index], "__");
+                                if (parts.size() && parts[parts.size() - 1] == "tableoid") {
+                                continue;
+                                }
+                                fostlib::jcursor pos;
+                                for (const auto &p : parts) pos /= p;
+                                fostlib::insert(app_json, pos, record[index]);
+                        }
+                        req.headers().set(
+                                "__user",
+                                fostlib::coerce<fostlib::string>(
+                                    app_json["identity_id"]
+                                ));
                     }
                     req.headers().set(
                             "__app",
