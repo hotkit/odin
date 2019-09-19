@@ -68,7 +68,6 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app-secure/app-user /app01/ref-0 405
 
 PUT test/app-secure/app-user /app01/ref-1 {} 200
-
 GET test/get/app-user /app01/ref-1 200 {
     "app_id": "app01",
     "app_user_id": "ref-1"
@@ -76,6 +75,15 @@ GET test/get/app-user /app01/ref-1 200 {
 
 # Test parameters valid size
 PUT test/app-secure/app-user /app01/ref-2 {} 200
+GET test/get/app-user /app01/ref-2 200 {
+    "app_id": "app01",
+    "app_user_id": "ref-2"
+}
+
+# Test return correct jwt
+set odin.jwt (PUT test/app-secure/app-user /app01/ref-2 {} 200)
+set payload (odin.jwt.payload "app01")
+contains (lookup payload) {"sub": "ref-2", "iss": "http://odin.felspar.com/app/app01"}
 
 # Test parameters invalid size
 # PUT test/app-secure/app-user /app01/ref-1/ {} 400 # should failed case

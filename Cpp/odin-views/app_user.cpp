@@ -19,23 +19,6 @@
 
 namespace {
 
-
-    std::optional<fostlib::string>
-            bearer_jwt(fostlib::http::server::request const &req) {
-        if (req.headers().exists("Authorization")) {
-            auto parts = fostlib::partition(
-                    req.headers()["Authorization"].value(), " ");
-            if (parts.first == "Bearer" && parts.second) {
-                return parts.second;
-            } else {
-                fostlib::log::warning(odin::c_odin)(
-                        "", "Invalid Authorization scheme")(
-                        "scheme", parts.first)("data", parts.second);
-            }
-        }
-        return {};
-    }
-
     fostlib::json get_app_user(
             fostlib::pg::connection &cnx, const f5::u8view app_id, const f5::u8view app_user_id) {
         static const f5::u8view sql(
@@ -73,13 +56,13 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-            if (not req.headers().exists("__user")) {
+            if (not req.headers().exists("__app")) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
                         "The odin.app_user view must be wrapped by an "
-                        "odin.app.secure or odin.secure"
+                        "odin.app.secure"
                         "view on the secure path so that there is a valid JWT "
-                        "to find App ID and User ID in");
+                        "to find App ID");
             }
 
 
@@ -98,8 +81,8 @@ namespace {
                         L"text/plain"));
                 return std::make_pair(response, 400);
             }
-            auto app_id = parameters[0];
-            auto app_user_id = parameters[1];
+            auto const app_id = parameters[0];
+            auto const app_user_id = parameters[1];
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto app_user = get_app_user(cnx, parameters[0], parameters[1]);
             if (app_user.isnull()) {
@@ -114,30 +97,19 @@ namespace {
                 cnx.commit();
             }
 
-            auto const jwt_body = bearer_jwt(req);
-            // Check whether it is APP JWT or non APP JWT
-            fostlib::string secret;
-            if (req.headers().exists("__app")) {
-                auto const app_id = req.headers()["__app"].value();
-                secret = odin::c_jwt_secret.value() + app_id;
-            } else {
-                secret = odin::c_jwt_secret.value();
-            }
-
-            auto const new_jwt =
-                    odin::renew_jwt(jwt_body.value(), secret, config);
-            auto const token = new_jwt.first;
-            auto const exp = new_jwt.second;
-
+            auto jwt = odin::app::mint_user_jwt(
+                    app_user_id,
+                    app_id,
+                    fostlib::coerce<fostlib::timediff>(config["expires"]));
             fostlib::mime::mime_headers headers;
             headers.add(
                     "Expires",
-                    fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
                             .underlying()
                             .underlying());
 
-            boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(token, headers, L"application/jwt"));
+            boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                    jwt.first, headers, L"application/jwt"));
 
             return std::make_pair(response, 200);
         }
