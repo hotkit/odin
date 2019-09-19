@@ -63,17 +63,35 @@ namespace {
 
 
             auto const jwt_body = bearer_jwt(req);
+            std::pair<fostlib::utf8_string, fostlib::timestamp> new_jwt;
             // Check whether it is APP JWT or non APP JWT
             fostlib::string secret;
             if (req.headers().exists("__app")) {
                 auto const app_id = req.headers()["__app"].value();
                 secret = odin::c_jwt_secret.value() + app_id;
+                new_jwt =
+                    odin::renew_jwt(jwt_body.value(), secret, config);
+            } else if (config["app_id"].isnull()) {
+                secret = odin::c_jwt_secret.value();
+                new_jwt =
+                    odin::renew_jwt(jwt_body.value(), secret, config);
             } else {
                 secret = odin::c_jwt_secret.value();
+                fostlib::nullable<fostlib::jwt::token> jwt_token =
+                    fostlib::jwt::token::load(secret, jwt_body.value());
+                fostlib::json payload = jwt_token.value().payload;
+                auto identity_id = fostlib::coerce<f5::u8view>(payload["sub"]);
+                const fostlib::jcursor sub("sub");
+                if (payload.has_key(sub)) { sub.del_key(payload); }
+                const fostlib::jcursor exp("exp");
+                if (payload.has_key(exp)) { exp.del_key(payload); }
+                new_jwt = odin::app::mint_user_jwt(
+                    identity_id,
+                    fostlib::coerce<f5::u8view>(config["app_id"]),
+                    fostlib::coerce<fostlib::timediff>(config["expires"]),
+                    payload);
             }
 
-            auto const new_jwt =
-                    odin::renew_jwt(jwt_body.value(), secret, config);
             auto const token = new_jwt.first;
             auto const exp = new_jwt.second;
 

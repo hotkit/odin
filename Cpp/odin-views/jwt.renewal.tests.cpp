@@ -20,6 +20,13 @@ namespace {
         return config;
     }
 
+    fostlib::json configuration_with_app_id() {
+        fostlib::json config;
+        fostlib::insert(config, "expires", "hours", 72);
+        fostlib::insert(config, "app_id", "app02");
+        return config;
+    }
+
     const fostlib::timestamp c_epoch(1970, 1, 1);
 }
 
@@ -47,6 +54,39 @@ FSL_TEST_FUNCTION(check_can_renew_jwt_with_non_app_jwt) {
             fostlib::jwt::token::load(odin::c_jwt_secret.value(), jwt_token);
 
     FSL_CHECK(load_jwt.has_value());
+    FSL_CHECK_EQ(load_jwt->payload["sub"], payload["sub"]);
+    FSL_CHECK_EQ(load_jwt->payload["fullname"], payload["fullname"]);
+    FSL_CHECK_NEQ(load_jwt->payload["exp"], payload["exp"]);
+    FSL_CHECK_EQ(response.second, 200);
+}
+
+
+FSL_TEST_FUNCTION(check_return_app_jwt_when_renew_non_app_jwt_with_app_id_is_set) {
+
+    fostlib::json payload;
+    fostlib::insert(payload, "sub", "user01");
+    fostlib::insert(payload, "fullname", "test01");
+    const auto old_exp =
+            fostlib::timestamp::now() + boost::posix_time::hours(24);
+    fostlib::insert(payload, "exp", (old_exp - c_epoch).total_seconds());
+    fostlib::jwt::mint jwt(fostlib::jwt::alg::HS256, payload);
+
+    fostlib::http::server::request req("GET", "/");
+    req.headers().set(
+            "Authorization",
+            ("Bearer " + jwt.token(odin::c_jwt_secret.value().data())).c_str());
+    req.headers().set("__user", "user01");
+
+    auto response =
+            odin::view::jwt_renewal(configuration_with_app_id(), "/", req, fostlib::host());
+    auto &rs = response.first;
+    auto jwt_token = rs->body_as_string();
+    auto app_id = fostlib::coerce<fostlib::string>(configuration_with_app_id()["app_id"]);
+    auto load_jwt =
+            fostlib::jwt::token::load(odin::c_jwt_secret.value() + app_id, jwt_token);
+
+    FSL_CHECK(load_jwt.has_value());
+    FSL_CHECK_EQ(load_jwt->payload["iss"], "http://odin.felspar.com/app/" + app_id);
     FSL_CHECK_EQ(load_jwt->payload["sub"], payload["sub"]);
     FSL_CHECK_EQ(load_jwt->payload["fullname"], payload["fullname"]);
     FSL_CHECK_NEQ(load_jwt->payload["exp"], payload["exp"]);
