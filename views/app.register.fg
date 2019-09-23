@@ -6,14 +6,17 @@ odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 
 # Setup application
 sql.insert odin.identity {"id": "bowling-app"}
@@ -44,8 +47,14 @@ sql.insert odin.app_user_installation_id_ledger {
     "identity_id": "installation_ref",
     "installation_id": "fred-mobile"
 }
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref01",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref",
+    "app_user_id": "app_user_id01"
+}
 
-set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
+set app_jwt (odin.jwt.mint {"sub": "app_user_id01", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 
 # Not pass the validation should return 422
@@ -128,7 +137,14 @@ sql.insert odin.app_user_installation_id_ledger {
     "identity_id": "installation_ref2",
     "installation_id": "fred-mobile2"
 }
-set app_jwt (odin.jwt.mint {"sub": "installation_ref2", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref02",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref2",
+    "app_user_id": "app_user_id02"
+}
+
+set app_jwt (odin.jwt.mint {"sub": "app_user_id02", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 POST odin/app/register / {
     "username": "fred",
@@ -155,8 +171,14 @@ sql.insert odin.app_user_installation_id_ledger {
     "identity_id": "installation_ref3",
     "installation_id": "fred-mobile"
 }
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref03",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref3",
+    "app_user_id": "app_user_id03"
+}
 
-set app_jwt (odin.jwt.mint {"sub": "installation_ref3", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
+set app_jwt (odin.jwt.mint {"sub": "app_user_id03", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 
 # Register with app_data

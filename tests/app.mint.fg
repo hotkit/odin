@@ -10,6 +10,7 @@ odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 
 sql.insert odin.identity {"id": "bowling"}
 sql.insert odin.app_ledger {
@@ -29,8 +30,15 @@ sql.insert odin.app_user_installation_id_ledger {
     "identity_id": "bowling01",
     "installation_id": "bowling01"
 }
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref1",
+    "app_id": "bowling",
+    "identity_id": "bowling01",
+    "app_user_id": "app_user_id01"
+}
 set-path testserver.headers ["__app"] "bowling"
 set-path testserver.headers ["__user"] "bowling01"
+set-path testserver.headers ["__app_user"] "app_user_id01"
 # This should merge bowling01 -> fred
 POST test/app/mint / {"username": "fred", "password": "password1234"} 200
 GET test/app/mint/validate /identity/bowling01 404
@@ -38,3 +46,15 @@ GET test/app/mint/validate /merge_record/bowling01/fred 200
 
 # If the merge failed, just returns the identity_id that corresponse with the credentials
 POST test/app/mint / {"username": "fred", "password": "password1234"} 200
+
+setting webserver views/test/sec {
+        "view": "odin.app.secure",
+        "configuration": {
+            "secure": "fost.response.200",
+            "unsecure": "fost.response.403"
+        }
+    }
+
+POST test/sec / {} 403
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/app/mint / {"username": "fred", "password": "password1234"} 200))
+POST test/sec / {} 200

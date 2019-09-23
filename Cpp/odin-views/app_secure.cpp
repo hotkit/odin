@@ -20,6 +20,11 @@
 
 namespace {
 
+    static fostlib::string const get_app_user_identity_id_sql(
+            "SELECT identity_id FROM "
+            "odin.app_user "
+            "WHERE app_id=$1 AND app_user_id=$2");
+
     inline std::pair<boost::shared_ptr<fostlib::mime>, int>
             respond(fostlib::string message, int code = 403) {
         fostlib::json ret;
@@ -40,7 +45,7 @@ namespace {
                     __PRETTY_FUNCTION__, "No issuer in the JWT");
         }
         auto const jwt_iss = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
-        if (jwt_iss.find(odin::c_app_namespace.value()) == std::string::npos) {
+        if (!jwt_iss.startswith(odin::c_app_namespace.value())) {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "App namespace prefix does not match");
         }
@@ -103,45 +108,32 @@ namespace {
                                 fostlib::coerce<fostlib::string>(
                                         jwt.value().payload["sub"]));
                         // select
-                        static const fostlib::string sql(
-                                "SELECT identity_id FROM "
-                                "odin.app_user "
-                                "WHERE app_id=$1 AND app_user_id=$2");   
 
-                        auto app =  fostlib::coerce<fostlib::string>(
+                        auto const app_id =  fostlib::coerce<fostlib::string>(
                                     jwt.value().payload["iss"])
                                     .substr(odin::c_app_namespace.value()
                                     .code_points());
 
-                        auto user = fostlib::coerce<fostlib::string>(
+                        auto const app_user_id = fostlib::coerce<fostlib::string>(
                                     jwt.value().payload["sub"]);
 
-                        auto data = fostgres::sql(
-                                cnx, sql,
-                                std::vector<fostlib::string>{app, user});  
+                        auto const identity_id_set = fostgres::sql(
+                                cnx, get_app_user_identity_id_sql,
+                                std::vector<fostlib::string>{app_id, app_user_id});
 
-                        auto &rs = data.second;
-                        
+                        auto &rs = identity_id_set.second;
+
                         auto row = rs.begin();
                         if (row == rs.end()) {
                           return respond("App user does not exists.", 401);
                         }
 
-                        auto record = *row;
-                        fostlib::json app_json;
-                        for (std::size_t index{0}; index < record.size(); ++index) {
-                                const auto parts = fostlib::split(data.first[index], "__");
-                                if (parts.size() && parts[parts.size() - 1] == "tableoid") {
-                                continue;
-                                }
-                                fostlib::jcursor pos;
-                                for (const auto &p : parts) pos /= p;
-                                fostlib::insert(app_json, pos, record[index]);
-                        }
+                        auto first_row = *row;
+
                         req.headers().set(
                                 "__user",
                                 fostlib::coerce<fostlib::string>(
-                                    app_json["identity_id"]
+                                    first_row[0]
                                 ));
                     }
                     req.headers().set(

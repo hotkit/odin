@@ -55,7 +55,8 @@ namespace {
                 return execute(config, path, req, host);
             }
             if (not req.headers().exists("__app")
-                || not req.headers().exists("__user")) {
+                || not req.headers().exists("__user")
+                || not req.headers().exists("__app_user")) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
                         "The odin.app.facebook.login view must be wrapped by "
@@ -64,6 +65,7 @@ namespace {
             }
             logger("__app", req.headers()["__app"]);
             logger("__user", req.headers()["__user"]);
+            logger("__app_user", req.headers()["__app_user"]);
 
             auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
@@ -89,10 +91,12 @@ namespace {
             auto const facebook_user_id =
                     fostlib::coerce<f5::u8view>(user_detail["id"]);
             auto const reference = odin::reference();
+            f5::u8view const app_id = req.headers()["__app"].value();
             auto facebook_user =
-                    odin::facebook::credentials(cnx, facebook_user_id);
+                    odin::facebook::app_credentials(cnx, facebook_user_id, app_id);
             logger("facebook_user", facebook_user);
             fostlib::string identity_id;
+            fostlib::string app_user_id;
             if (facebook_user.isnull()) {
                 /// We've never seen this Facebook identity before,
                 /// we take as a new user registration. If this is a new
@@ -100,6 +104,7 @@ namespace {
                 /// the JWT represents an existing user then this links
                 /// their Facebook a/c to their pre-existing identity.
                 identity_id = req.headers()["__user"].value();
+                app_user_id = req.headers()["__app_user"].value();
                 if (user_detail.has_key("name")) {
                     auto const facebook_user_name =
                             fostlib::coerce<f5::u8view>(user_detail["name"]);
@@ -125,10 +130,9 @@ namespace {
             } else if (
                     facebook_user["identity"]["id"]
                     == req.headers()["__user"].value()) {
-                /// Not sure what to do here. Certainly OK for now.
-                /// Probably should allow updates of email and name
-                identity_id = fostlib::coerce<fostlib::string>(
-                        facebook_user["identity"]["id"]);
+                /// An existing user has logging in on a same device.
+                app_user_id = fostlib::coerce<fostlib::string>(
+                        facebook_user["app_user"]["app_id"]);
             } else {
                 /// An existing user has logged in to a new device. Probably
                 /// there are two cases here:
@@ -149,13 +153,17 @@ namespace {
                     /// Case 1 above
                     cnx.insert("odin.merge_ledger", merge);
                     cnx.commit();
+                    auto facebook_user =
+                      odin::facebook::app_credentials(cnx, facebook_user_id, app_id);
+                    app_user_id = fostlib::coerce<fostlib::string>(
+                      facebook_user["app_user"]["app_user_id"]);
                 } catch (const pqxx::unique_violation &e) {
                     /// We replace the identity with the new one -- case 2 above
                 } catch (...) { throw; }
             }
 
             auto jwt = odin::app::mint_user_jwt(
-                    identity_id, req.headers()["__app"].value(),
+                    app_user_id, req.headers()["__app"].value(),
                     fostlib::coerce<fostlib::timediff>(config["expires"]));
             fostlib::mime::mime_headers headers;
             headers.add(

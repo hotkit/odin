@@ -10,6 +10,7 @@ odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 
 # Set up apps
 sql.insert odin.identity {"id": "invited-only-app"}
@@ -33,6 +34,7 @@ sql.insert odin.app_ledger {
     "access_policy": "OPEN",
     "data_sharing_policy": "ALL"
 }
+sql.insert odin.app_user_app_user_id_ledger {"reference": "ref01", "app_id": "open-app", "identity_id": "open-app", "app_user_id": "open-app-user-id"}
 
 setting webserver views/test/app/installation {
             "view": "odin.app.installation",
@@ -61,7 +63,7 @@ setting webserver views/test/sec/installation {
         }
     }
 
-set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app-user-id", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 POST test/sec/installation / {"installation_id": "ins01"} 201
 
 # Support only OPEN access policy
@@ -102,6 +104,6 @@ setting webserver views/test/app/installation/validate {
             }
         }
 
-set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app)
+set app_jwt (odin.jwt.mint {"sub": "open-app-user-id", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/installation/validate / 200

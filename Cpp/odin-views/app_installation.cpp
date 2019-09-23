@@ -90,8 +90,11 @@ namespace {
             auto const reference = odin::reference();
             /// Using reference as an identity_id
             auto const identity_id = reference;
+            auto const app_user_id = odin::reference();
             odin::app::set_installation_id(
                     cnx, reference, app_id, identity_id, installation_id);
+            odin::app::set_app_user_id(
+                    cnx, reference, app_id, identity_id, app_user_id);
             cnx.commit();
             auto jwt = odin::app::mint_user_jwt(
                     app_user_id, app_id,

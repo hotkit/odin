@@ -7,6 +7,12 @@ odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 
+# Enable OPEN app access policy + app installation ID
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 
 # TODO: Test GET that serve static file
 # GET odin/app /login/invite-only-app/ 200
@@ -27,8 +33,12 @@ sql.insert odin.app_ledger {
     "access_policy": "INVITE_ONLY",
     "data_sharing_policy": "ALL"
 }
-
-sql.insert odin.app_user_ledger {"reference": "ref1", "app_id": "invite-only-app", "identity_id": "invited1"}
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref1",
+    "app_id": "invite-only-app",
+    "identity_id": "invited1",
+    "app_user_id": "app_user_invited1"
+}
 
 # Validate payload
 POST odin/app /login/invite-only-app/ {} 501
@@ -49,12 +59,6 @@ POST odin/app /login/invite-only-app/ {"username": "invited1", "password": "pass
 # Return error to uninvited user
 POST odin/app /login/invite-only-app/ {"username": "player2", "password": "password1234"} 501
 
-# Enable OPEN app access policy + app installation ID
-odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
-odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
-
 sql.insert odin.identity {"id": "open-app"}
 sql.insert odin.app_ledger {
     "reference": "ref1",
@@ -68,3 +72,29 @@ sql.insert odin.app_ledger {
 
 odin.user random-player random-player password1234
 POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200
+
+
+# Set JWT by app login
+# set-path testserver.headers ["Authorization"] (
+#     cat "Bearer "
+#     (echo (POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200) | sed -n "s/^.*\(\"k2\":\"\)\s*\([^\"]*\).*$/\2/p")
+# )
+# set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200))
+# setting webserver views/test/app-sec {
+#     "view": "odin.app.secure",
+#     "configuration": {
+#         "secure": {
+#             "view": "fostgres.sql",
+#             "configuration": {
+#                 "sql": [{
+#                     "path": [],
+#                     "return": "object",
+#                     "GET": "SELECT 1"
+#                 }]
+#             }
+#         },
+#         "unsecure": "fost.response.403"
+#     }
+# }
+# # Try request to app secure view
+# GET test/app-sec / 200

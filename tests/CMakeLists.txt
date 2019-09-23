@@ -134,6 +134,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/005-alter-ledgers.blue.sql
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
@@ -535,6 +536,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/005-alter-ledgers.blue.sql
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
                 ../Configuration/odin-views.json
                 app-installation.fg
         )
@@ -567,6 +569,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/005-alter-ledgers.blue.sql
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
                 ../Configuration/odin-views.json
                 app.mint-test.json
                 app.mint.fg
@@ -599,6 +602,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             ../Configuration/odin-views.json
             app-login.fg
     )
@@ -633,11 +637,13 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/004-merge-account-function.blue.sql
-                ../Schema/opts/installation-id/001-initial.blue.sql
-                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
-                ../Schema/opts/google/001-initial.blue.sql
-                ../Schema/opts/google/003-alter-ledgers.blue.sql
-                ../Schema/opts/google/004-merge-account-function.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
                 app-login-facebook.fg
@@ -674,13 +680,13 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/004-merge-account-function.blue.sql
-                ../Schema/opts/facebook/001-initial.blue.sql
-                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
-                ../Schema/opts/facebook/004-merge-account-function.blue.sql
-                ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
-                ../Schema/opts/installation-id/001-initial.blue.sql
-                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
-                ../Schema/opts/installation-id/004-merge-account-function.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
                 app-login-google.fg
@@ -711,7 +717,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
-            ../Schema/app/008-app-user-appuserid.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             app-secure-test-view.json
             app-secure.fg
     )
@@ -742,6 +748,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             app-verify.fg
     )
 
@@ -767,6 +774,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             app-data-test.json
             app_user-app_data.fg
     )
@@ -803,6 +811,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/full-name/003-alter-ledgers.blue.sql
             ../Schema/opts/full-name/004-merge-account-function.blue.sql
@@ -834,10 +843,13 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
-                ../Schema/authz/001-initial.blue.sql
-                ../Schema/authz/002-view-user_permission.blue.sql
-                ../Schema/authz/003-alter-ledgers.blue.sql
-                ../Schema/authz/004-merge-account-function.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
                 ../Configuration/odin-views.json
                 jwt-renewal.fg
         )
@@ -869,7 +881,7 @@ if(TARGET stress OR TARGET pgtest)
             test-login-google
             test-link-facebook
             test-expire-user
-            test-jwt-renewal
+	        test-jwt-renewal
         )
     if(TARGET stress)
         add_dependencies(stress odin-tests)

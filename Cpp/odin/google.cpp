@@ -34,6 +34,48 @@ fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
 }
 
 
+fostlib::json odin::google::app_credentials(
+        fostlib::pg::connection &cnx, const f5::u8view &user_id, const f5::u8view &app_id) {
+    static const fostlib::string sql(
+            "SELECT "
+            "odin.identity.tableoid AS identity__tableoid, "
+            "odin.google_credentials.tableoid AS google_credentials__tableoid, "
+            "odin.app_user.tableoid AS app_user__tableoid, "
+            "odin.identity.*, odin.google_credentials.*, odin.app_user.* "
+            "FROM odin.google_credentials "
+            "JOIN odin.identity ON "
+            "odin.identity.id=odin.google_credentials.identity_id "
+            "LEFT JOIN odin.app_user ON "
+            "odin.app_user.identity_id=odin.google_credentials.identity_id AND "
+            "odin.app_user.app_id=$1 "
+            "WHERE odin.google_credentials.google_user_id = $2");
+    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id, user_id});
+    auto &rs = data.second;
+    auto row = rs.begin();
+    if (row == rs.end()) {
+        fostlib::log::warning(c_odin)("", "Google user not found")(
+                "google_user_id", user_id);
+        return fostlib::json();
+    }
+    auto record = *row;
+    if (++row != rs.end()) {
+        fostlib::log::error(c_odin)("", "More than one google user returned")(
+                "google_user_id", user_id);
+        return fostlib::json();
+    }
+
+    fostlib::json user;
+    for (std::size_t index{}; index < record.size(); ++index) {
+        const auto parts = fostlib::split(data.first[index], "__");
+        if (parts.size() && parts[parts.size() - 1] == "tableoid") continue;
+        fostlib::jcursor pos;
+        for (const auto &p : parts) pos /= p;
+        fostlib::insert(user, pos, record[index]);
+    }
+    return user;
+}
+
+
 fostlib::json odin::google::credentials(
         fostlib::pg::connection &cnx, const f5::u8view &user_id) {
     static const fostlib::string sql(
