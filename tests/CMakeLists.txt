@@ -752,14 +752,14 @@ if(TARGET stress OR TARGET pgtest)
             app-verify.fg
     )
 
-    add_custom_command(OUTPUT test-app-handover
-        COMMAND fostgres-test odin-test-app-handover -o test-app-handover
+    add_custom_command(OUTPUT test-app-user-app-data
+        COMMAND fostgres-test odin-test-app-user-app-data -o test-app-user-app-data
             $<TARGET_SONAME_FILE:odin-fg>
             $<TARGET_SONAME_FILE:odin-views>
             ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
             ${CMAKE_CURRENT_SOURCE_DIR}/app-data-test.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/app_user-app_data.fg
-        MAIN_DEPENDENCY app-handover.fg
+            ${CMAKE_CURRENT_SOURCE_DIR}/app-user-app-data.fg
+        MAIN_DEPENDENCY app-user-app-data.fg
         DEPENDS
             fostgres-test
             fostgres
@@ -776,7 +776,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/007-app-user-data.blue.sql
             ../Schema/app/008-app-user-id.blue.sql
             app-data-test.json
-            app_user-app_data.fg
+            app-user-app-data.fg
     )
 
     add_custom_command(OUTPUT test-app-handover
@@ -890,6 +890,38 @@ if(TARGET stress OR TARGET pgtest)
                 registration-app-user.fg
         )
 
+    add_custom_command(OUTPUT test-merge-account-view
+            COMMAND fostgres-test odin-test-merge-account-view -o test-merge-account-view
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/merge-account-view.fg
+            MAIN_DEPENDENCY merge-account-view.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Configuration/odin-views.json
+                merge-account-view.fg
+        )
+
     ## Because of the way cmake works we need this stuff at the end to
     ## actually make the above commands run when things change.
     add_custom_target(odin-tests DEPENDS
@@ -897,6 +929,7 @@ if(TARGET stress OR TARGET pgtest)
             test-app-installation
             test-app-mint
             test-app-login
+            test-app-user-app-data
             odin-test-app-login-facebook
             odin-test-app-login-google
             test-app-secure
@@ -919,6 +952,7 @@ if(TARGET stress OR TARGET pgtest)
             test-expire-user
             test-jwt-renewal
             test-registration-app-user
+            test-merge-account-view
         )
     if(TARGET stress)
         add_dependencies(stress odin-tests)

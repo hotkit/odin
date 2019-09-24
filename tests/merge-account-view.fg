@@ -1,0 +1,101 @@
+# Set up the modules we need
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+
+setting odin "JWT secret" <JWT_SECRET>
+sql.insert odin.identity {"id": "app-01"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "app-01",
+    "app_name": "app-01",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+sql.insert odin.identity {"id": "app-02"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "app-02",
+    "app_name": "app-02",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+sql.insert odin.identity {"id": "guest1"}
+sql.insert odin.identity {"id": "guest2"}
+sql.insert odin.identity {"id": "guest3"}
+odin.user registerd1 registerd1 password1234
+odin.user registerd2 registerd2 password1234
+
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref1",
+    "app_id": "app-01",
+    "identity_id": "guest1",
+    "app_user_id": "guest1-app-01"
+}
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref1",
+    "app_id": "app-02",
+    "identity_id": "guest2",
+    "app_user_id": "guest2-app-02"
+}
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref1",
+    "app_id": "app-01",
+    "identity_id": "guest3",
+    "app_user_id": "guest3-app-01"
+}
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref1",
+    "app_id": "app-02",
+    "identity_id": "guest4",
+    "app_user_id": "guest4-app-02"
+}
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref1",
+    "app_id": "app-02",
+    "identity_id": "registerd1",
+    "app_user_id": "registerd1-app-02"
+}
+sql.insert odin.app_user_app_user_id_ledger {
+    "reference": "ref1",
+    "app_id": "app-02",
+    "identity_id": "registerd2",
+    "app_user_id": "registerd2-app-02"
+}
+
+setting webserver views/test/merge-account {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [
+            {
+                "return": "object",
+                "path": [1],
+                "POST": {
+                    "table": "odin.identity",
+                    "columns": {
+                        "id": {
+                            "key": true,
+                            "source": 1
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}
+
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "guest2-app-02", "iss": "http://odin.felspar.com/app/app-02"} <JWT_SECRET>app-02))
+PUT test/merge-account (cat "/" (odin.jwt.mint {"sub": "guest2-app-02", "iss": "http://odin.felspar.com/app/app-02"} <JWT_SECRET>app-02)) 200
