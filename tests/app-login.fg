@@ -72,29 +72,3 @@ sql.insert odin.app_ledger {
 
 odin.user random-player random-player password1234
 POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200
-
-
-# Set JWT by app login
-# set-path testserver.headers ["Authorization"] (
-#     cat "Bearer "
-#     (echo (POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200) | sed -n "s/^.*\(\"k2\":\"\)\s*\([^\"]*\).*$/\2/p")
-# )
-# set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200))
-# setting webserver views/test/app-sec {
-#     "view": "odin.app.secure",
-#     "configuration": {
-#         "secure": {
-#             "view": "fostgres.sql",
-#             "configuration": {
-#                 "sql": [{
-#                     "path": [],
-#                     "return": "object",
-#                     "GET": "SELECT 1"
-#                 }]
-#             }
-#         },
-#         "unsecure": "fost.response.403"
-#     }
-# }
-# # Try request to app secure view
-# GET test/app-sec / 200
