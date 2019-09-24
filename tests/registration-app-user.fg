@@ -42,9 +42,22 @@ setting webserver views/test/get/app-user {
                 "path": [1, 2],
                 "GET": "SELECT
                         app_id,
-                        app_user_id
+                        app_user_id,
+                        app_data
                     FROM odin.app_user
                     WHERE app_id=$1 AND app_user_id=$2"
+            }]
+        }
+    }
+
+setting webserver views/test/get/app-user/identity {
+       "view": "fostgres.sql",
+        "configuration": {
+            "sql": [
+            {
+                "return": "object",
+                "path": [1, 2],
+                "GET": "SELECT identity_id FROM odin.app_user WHERE app_id=$1 AND app_user_id=$2"
             }]
         }
     }
@@ -84,6 +97,26 @@ GET test/get/app-user /app01/ref-2 200 {
 set odin.jwt (PUT test/app-secure/app-user /app01/ref-2 {} 200)
 set payload (odin.jwt.payload "app01")
 contains (lookup payload) {"sub": "ref-2", "iss": "http://odin.felspar.com/app/app01"}
+
+#Test can put app data
+PUT test/app-secure/app-user /app01/ref-3 {"test_data": "test_data_02"} 200
+GET test/get/app-user /app01/ref-3 200 {
+    "app_id": "app01",
+    "app_user_id": "ref-3",
+    "app_data": {"test_data": "test_data_02"}
+}
+set old_identity_id (GET test/get/app-user/identity /app01/ref-3 200)
+
+#Can update app data
+PUT test/app-secure/app-user /app01/ref-3 {"test_data": "test_data_03", "test_key": "test_key_01"} 200
+GET test/get/app-user /app01/ref-3 200 {
+    "app_id": "app01",
+    "app_user_id": "ref-3",
+    "app_data": {"test_data": "test_data_03", "test_key": "test_key_01"}
+}
+
+#Test identity_id doesn't change
+contains (lookup old_identity_id) (GET test/get/app-user/identity /app01/ref-3 200)
 
 # Test parameters invalid size
 # PUT test/app-secure/app-user /app01/ref-1/ {} 400 # should failed case

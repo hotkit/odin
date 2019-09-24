@@ -83,19 +83,42 @@ namespace {
             }
             auto const app_id = parameters[0];
             auto const app_user_id = parameters[1];
+            auto const body_str = fostlib::coerce<fostlib::string>(
+                    fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
+            auto const app_data = fostlib::json::parse(body_str);
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto app_user = get_app_user(cnx, parameters[0], parameters[1]);
             if (app_user.isnull()) {
                 auto identity_id = odin::reference();
+                auto const reference = odin::reference();
                 odin::create_user(cnx, identity_id);
                 fostlib::json new_app_user;
+                const fostlib::jcursor app_user_id_cursor("app_user_id");
                 fostlib::insert(new_app_user, "app_id", app_id);
                 fostlib::insert(new_app_user, "app_user_id", app_user_id);
                 fostlib::insert(new_app_user, "identity_id", identity_id);
-                fostlib::insert(new_app_user, "reference", odin::reference());
+                fostlib::insert(new_app_user, "reference", reference);
                 cnx.insert("odin.app_user_app_user_id_ledger", new_app_user);
+
+                fostlib::json new_app_data;
+                fostlib::insert(new_app_data, "app_id", app_id);
+                fostlib::insert(new_app_data, "identity_id", identity_id);
+                fostlib::insert(new_app_data, "app_data", app_data);
+                fostlib::insert(new_app_data, "reference", reference);
+                cnx.insert("odin.app_user_app_data_ledger", new_app_data);
+                cnx.commit();
+            } else {
+                auto const reference = odin::reference();
+                fostlib::json new_app_data;
+                fostlib::insert(new_app_data, "app_id", app_id);
+                fostlib::insert(new_app_data, "identity_id", app_user["identity_id"]);
+                fostlib::insert(new_app_data, "app_data", app_data);
+                fostlib::insert(new_app_data, "reference", reference);
+                cnx.insert("odin.app_user_app_data_ledger", new_app_data);
                 cnx.commit();
             }
+
+
 
             auto jwt = odin::app::mint_user_jwt(
                     app_user_id,
