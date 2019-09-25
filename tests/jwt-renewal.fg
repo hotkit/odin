@@ -48,13 +48,12 @@ sql.insert odin.app_ledger {
     "access_policy": "OPEN",
     "data_sharing_policy": "ALL"
 }
-sql.insert odin.app_user_app_user_id_ledger {
+sql.insert odin.app_user_ledger {
     "reference": "ref1",
     "app_id": "app01",
     "identity_id": "app01",
     "app_user_id": "app_user_id01"
 }
-
 
 odin.user user01 user01 password1234
 set app_jwt (odin.jwt.mint {"sub": "app_user_id01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
@@ -105,7 +104,7 @@ sql.insert odin.app_ledger {
     "access_policy": "OPEN",
     "data_sharing_policy": "ALL"
 }
-sql.insert odin.app_user_app_user_id_ledger {
+sql.insert odin.app_user_ledger {
     "reference": "ref2",
     "app_id": "app02",
     "identity_id": "app02",

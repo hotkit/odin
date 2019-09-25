@@ -62,15 +62,15 @@ std::pair<fostlib::utf8_string, fostlib::timestamp> odin::app::mint_user_jwt(
 void odin::app::save_app_user(
         fostlib::pg::connection &cnx,
         f5::u8view reference,
+        const f5::u8view app_id,
         const f5::u8view identity_id,
-        const f5::u8view app_user_id,
-        const f5::u8view app_id) {
+        const f5::u8view app_user_id) {
     fostlib::json app_user_values;
     fostlib::insert(app_user_values, "reference", reference);
+    fostlib::insert(app_user_values, "app_id", app_id);
     fostlib::insert(app_user_values, "identity_id", identity_id);
     fostlib::insert(app_user_values, "app_user_id", app_user_id);
-    fostlib::insert(app_user_values, "app_id", app_id);
-    cnx.insert("odin.app_user_app_user_id_ledger", app_user_values);
+    cnx.insert("odin.app_user_ledger", app_user_values);
 }
 
 
@@ -119,19 +119,4 @@ void odin::app::set_installation_id(
     fostlib::insert(user_values, "identity_id", identity_id);
     fostlib::insert(user_values, "installation_id", installation_id);
     cnx.insert("odin.app_user_installation_id_ledger", user_values);
-}
-
-
-void odin::app::set_app_user_id(
-        fostlib::pg::connection &cnx,
-        f5::u8view reference,
-        f5::u8view app_id,
-        f5::u8view identity_id,
-        f5::u8view app_user_id) {
-    fostlib::json user_values;
-    fostlib::insert(user_values, "reference", reference);
-    fostlib::insert(user_values, "app_id", app_id);
-    fostlib::insert(user_values, "identity_id", identity_id);
-    fostlib::insert(user_values, "app_user_id", app_user_id);
-    cnx.insert("odin.app_user_app_user_id_ledger", user_values);
 }

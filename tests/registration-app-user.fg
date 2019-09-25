@@ -72,7 +72,7 @@ sql.insert odin.app_ledger {
     "access_policy": "OPEN",
     "data_sharing_policy": "ALL"
 }
-sql.insert odin.app_user_app_user_id_ledger {
+sql.insert odin.app_user_ledger {
     "reference": "ref1",
     "app_id": "app01",
     "identity_id": "user01",

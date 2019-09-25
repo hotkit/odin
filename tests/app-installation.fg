@@ -34,7 +34,12 @@ sql.insert odin.app_ledger {
     "access_policy": "OPEN",
     "data_sharing_policy": "ALL"
 }
-sql.insert odin.app_user_app_user_id_ledger {"reference": "ref01", "app_id": "open-app", "identity_id": "open-app", "app_user_id": "open-app-user-id"}
+sql.insert odin.app_user_ledger {
+    "reference": "ref01",
+    "app_id": "open-app",
+    "identity_id": "open-app",
+    "app_user_id": "open-app-user-id"
+}
 
 setting webserver views/test/app/installation {
             "view": "odin.app.installation",
@@ -75,6 +80,12 @@ set-path testserver.headers ["__app"] "open-app"
 POST test/app/installation / {} 501
 
 # Cannot claim the same installation_id
+sql.insert odin.app_user_ledger {
+    "reference": "test-app-installation",
+    "app_id": "open-app",
+    "identity_id": "claimed-installation",
+    "app_user_id": "claimed-installation"
+}
 sql.insert odin.app_user_installation_id_ledger {
     "reference": "test-app-installation",
     "app_id": "open-app",

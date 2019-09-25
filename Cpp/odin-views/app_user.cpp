@@ -98,7 +98,7 @@ namespace {
                 fostlib::insert(new_app_user, "app_user_id", app_user_id);
                 fostlib::insert(new_app_user, "identity_id", identity_id);
                 fostlib::insert(new_app_user, "reference", reference);
-                cnx.insert("odin.app_user_app_user_id_ledger", new_app_user);
+                cnx.insert("odin.app_user_ledger", new_app_user);
 
                 fostlib::json new_app_data;
                 fostlib::insert(new_app_data, "app_id", app_id);

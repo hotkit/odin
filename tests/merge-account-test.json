@@ -13,8 +13,7 @@
                         }, {
                             "return": "object",
                             "path": ["/merge_ledger", 1, 2],
-                            "GET": "SELECT * FROM odin.merge_ledger
-                                WHERE from_identity_id=$1 AND to_identity_id=$2;",
+                            "GET": "SELECT * FROM odin.merge_ledger WHERE from_identity_id=$1 AND to_identity_id=$2;",
                             "PUT": {
                                 "table": "odin.merge_ledger",
                                 "columns": {
@@ -114,16 +113,16 @@
                             "GET": {
                                 "command": "SELECT * FROM odin.google_credentials WHERE identity_id=$1 AND google_user_id=$2;",
                                 "arguments": [1, 2]
-                            }                          
+                            }
                         }, {
                             "return": "object",
                             "path": ["/request_reset_password_ledger", 1, 2],
                             "GET": {
                                 "command": "SELECT * FROM odin.request_reset_password_ledger WHERE reference=$1 AND email=$2;",
                                 "arguments": [1, 2]
-                            }                              
+                            }
                         }]
-                    }                            
+                    }
                 },
                 "": "fost.response.500"
             }

@@ -41,17 +41,17 @@ POST odin/app/register / {
 
 # Call the odin.app.installation API
 sql.insert odin.identity {"id": "installation_ref"}
+sql.insert odin.app_user_ledger {
+    "reference": "ref01",
+    "app_id": "bowling-app",
+    "identity_id": "installation_ref",
+    "app_user_id": "app_user_id01"
+}
 sql.insert odin.app_user_installation_id_ledger {
     "reference": "reference1",
     "app_id": "bowling-app",
     "identity_id": "installation_ref",
     "installation_id": "fred-mobile"
-}
-sql.insert odin.app_user_app_user_id_ledger {
-    "reference": "ref01",
-    "app_id": "bowling-app",
-    "identity_id": "installation_ref",
-    "app_user_id": "app_user_id01"
 }
 
 set app_jwt (odin.jwt.mint {"sub": "app_user_id01", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
@@ -110,94 +110,94 @@ POST odin/app/register / {
     "email": "fred@bowling.com"
 } 200
 
-# TODO: Register second time should return error
+# # TODO: Register second time should return error
+# # POST odin/app/register / {
+# #     "username": "fred",
+# #     "password": "mercury2",
+# #     "password2": "mercury2",
+# #     "full-name": "Fred",
+# #     "email": "fred@bowling.com"
+# # } 500
+
+# # The same installation_id try to register 2 username should return error
+# POST odin/app/register / {
+#     "username": "brian",
+#     "password": "mercury22",
+#     "password2": "mercury22",
+#     "full-name": "Brian",
+#     "email": "brian@bowling.com"
+# } 500
+
+
+# # Existing username register twice should failed
+# sql.insert odin.identity {"id": "installation_ref2"}
+# sql.insert odin.app_user_ledger {
+#     "reference": "ref02",
+#     "app_id": "bowling-app",
+#     "identity_id": "installation_ref2",
+#     "app_user_id": "app_user_id02"
+# }
+# sql.insert odin.app_user_installation_id_ledger {
+#     "reference": "reference2",
+#     "app_id": "bowling-app",
+#     "identity_id": "installation_ref2",
+#     "installation_id": "fred-mobile2"
+# }
+
+# set app_jwt (odin.jwt.mint {"sub": "app_user_id02", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
+# set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 # POST odin/app/register / {
 #     "username": "fred",
 #     "password": "mercury2",
 #     "password2": "mercury2",
-#     "full-name": "Fred",
-#     "email": "fred@bowling.com"
+#     "full-name": "Barney",
+#     "email": "fred2@bowling.com"
 # } 500
 
-# The same installation_id try to register 2 username should return error
-POST odin/app/register / {
-    "username": "brian",
-    "password": "mercury22",
-    "password2": "mercury22",
-    "full-name": "Brian",
-    "email": "brian@bowling.com"
-} 500
+# # Check database validity, the identity_id should be the identity that installation API generated
+# GET odin/test/validate-register /fred 200 {
+#     "id": "installation_ref",
+#     "email": "fred@bowling.com",
+#     "full_name": "Fred",
+#     "login": "fred",
+#     "app_id": "bowling-app"
+# }
 
+# # Set up new user for register
+# sql.insert odin.identity {"id": "installation_ref3"}
+# sql.insert odin.app_user_ledger {
+#     "reference": "ref03",
+#     "app_id": "bowling-app",
+#     "identity_id": "installation_ref3",
+#     "app_user_id": "app_user_id03"
+# }
+# sql.insert odin.app_user_installation_id_ledger {
+#     "reference": "reference2",
+#     "app_id": "bowling-app",
+#     "identity_id": "installation_ref3",
+#     "installation_id": "fred-mobile"
+# }
 
-# Existing username register twice should failed
-sql.insert odin.identity {"id": "installation_ref2"}
-sql.insert odin.app_user_installation_id_ledger {
-    "reference": "reference2",
-    "app_id": "bowling-app",
-    "identity_id": "installation_ref2",
-    "installation_id": "fred-mobile2"
-}
-sql.insert odin.app_user_app_user_id_ledger {
-    "reference": "ref02",
-    "app_id": "bowling-app",
-    "identity_id": "installation_ref2",
-    "app_user_id": "app_user_id02"
-}
+# set app_jwt (odin.jwt.mint {"sub": "app_user_id03", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
+# set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 
-set app_jwt (odin.jwt.mint {"sub": "app_user_id02", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
-set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
-POST odin/app/register / {
-    "username": "fred",
-    "password": "mercury2",
-    "password2": "mercury2",
-    "full-name": "Barney",
-    "email": "fred2@bowling.com"
-} 500
+# # Register with app_data
+# # Successfully register
+# POST odin/app/register / {
+#     "username": "fred_ad",
+#     "password": "mercury2_ad",
+#     "password2": "mercury2_ad",
+#     "full-name": "Fred_ad",
+#     "email": "fred_ad@bowling.com",
+#     "app_data": {"key": "value"}
+# } 200
 
-# Check database validity, the identity_id should be the identity that installation API generated
-GET odin/test/validate-register /fred 200 {
-    "id": "installation_ref",
-    "email": "fred@bowling.com",
-    "full_name": "Fred",
-    "login": "fred",
-    "app_id": "bowling-app"
-}
-
-# Set up new user for register
-sql.insert odin.identity {"id": "installation_ref3"}
-sql.insert odin.app_user_installation_id_ledger {
-    "reference": "reference2",
-    "app_id": "bowling-app",
-    "identity_id": "installation_ref3",
-    "installation_id": "fred-mobile"
-}
-sql.insert odin.app_user_app_user_id_ledger {
-    "reference": "ref03",
-    "app_id": "bowling-app",
-    "identity_id": "installation_ref3",
-    "app_user_id": "app_user_id03"
-}
-
-set app_jwt (odin.jwt.mint {"sub": "app_user_id03", "iss": "http://odin.felspar.com/app/bowling-app"} <JWT_SECRET>bowling-app)
-set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
-
-# Register with app_data
-# Successfully register
-POST odin/app/register / {
-    "username": "fred_ad",
-    "password": "mercury2_ad",
-    "password2": "mercury2_ad",
-    "full-name": "Fred_ad",
-    "email": "fred_ad@bowling.com",
-    "app_data": {"key": "value"}
-} 200
-
-# Validate app data
-GET odin/test/validate-register /fred_ad 200 {
-    "id": "installation_ref3",
-    "email": "fred_ad@bowling.com",
-    "full_name": "Fred_ad",
-    "login": "fred_ad",
-    "app_id": "bowling-app",
-    "app_data": {"key": "value"}
-}
+# # Validate app data
+# GET odin/test/validate-register /fred_ad 200 {
+#     "id": "installation_ref3",
+#     "email": "fred_ad@bowling.com",
+#     "full_name": "Fred_ad",
+#     "login": "fred_ad",
+#     "app_id": "bowling-app",
+#     "app_data": {"key": "value"}
+# }

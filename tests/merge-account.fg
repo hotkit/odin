@@ -178,125 +178,133 @@ sql.insert odin.app_role_ledger {"reference": "ref2", "app_id": "app3", "role": 
 # Case user has duplicate app
 odin.user app_user1 app_user1
 odin.user app_user2 app_user2
-sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app1", "identity_id": "app_user1"}
-sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app3", "identity_id": "app_user1"}
-sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app2", "identity_id": "app_user2"}
-sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app3", "identity_id": "app_user2"}
-PUT test/merge-account/validate /merge_ledger/app_user1/app_user2 {} 500
-# Case user has no duplicate app
-odin.user app_user3 app_user3
-odin.user app_user4 app_user4
-sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app1", "identity_id": "app_user3"}
-sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app2", "identity_id": "app_user4"}
-sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app1", "identity_id": "app_user3", "role": "role1"}
-sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app2", "identity_id": "app_user4", "role": "role2"}
-sql.insert odin.app_user_installation_id_ledger {"reference": "ref4", "app_id": "app1", "identity_id": "app_user3", "installation_id": "install01"}
-sql.insert odin.merge_ledger {"from_identity_id": "app_user3", "to_identity_id": "app_user4"}
-GET test/merge-account/validate /identity/app_user3 404
-GET test/merge-account/validate /app-user/app_user3/app1 404
-GET test/merge-account/validate /app-user-role/app_user3/app1/role1 404
-GET test/merge-account/validate /app-user/app_user4/app1 200 {"identity_id": "app_user4", "app_id": "app1"}
-GET test/merge-account/validate /app-user/app_user4/app2 200 {"identity_id": "app_user4", "app_id": "app2"}
-GET test/merge-account/validate /app-user-role/app_user4/app1/role1 200 {"identity_id": "app_user4", "app_id": "app1", "role": "role1"}
-GET test/merge-account/validate /app-user-role/app_user4/app2/role2 200 {"identity_id": "app_user4", "app_id": "app2", "role": "role2"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app1", "identity_id": "app_user1", "app_user_id": "app1_app_user1"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app3", "identity_id": "app_user1", "app_user_id": "app3_app_user1"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app2", "identity_id": "app_user2", "app_user_id": "app2_app_user2"}
+sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app3", "identity_id": "app_user2", "app_user_id": "app3_app_user2"}
+# PUT test/merge-account/validate /merge_ledger/app_user1/app_user2 {} 200
+# GET test/merge-account/validate /identity/app_user1 404
+# GET test/merge-account/validate /app-user/app_user1/app1 404
+# GET test/merge-account/validate /app-user/app_user1/app2 404
+# GET test/merge-account/validate /app-user/app_user1/app3 404
+# GET test/merge-account/validate /app-user/app_user2/app1 200
+# GET test/merge-account/validate /app-user/app_user2/app2 200
+# GET test/merge-account/validate /app-user/app_user2/app3 200
 
-# Test module opts/email
-# Case email of merged to user must no be affect from another user
-odin.user t_email1 t_email1
-odin.user t_email2 t_email2
-sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "t_email1", "email": "t_email1@mail.com"}
-sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "t_email2", "email": "t_email2@mail.com"}
-GET test/merge-account/validate /identity/t_email2 200 {"id": "t_email2", "email": "t_email2@mail.com"}
-sql.insert odin.merge_ledger {"from_identity_id": "t_email1", "to_identity_id": "t_email2"}
-GET test/merge-account/validate /identity/t_email1 404
-GET test/merge-account/validate /identity/t_email2 200 {"id": "t_email2", "email": "t_email2@mail.com"}
+# # Case user has no duplicate app
+# odin.user app_user3 app_user3
+# odin.user app_user4 app_user4
+# sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app1", "identity_id": "app_user3", "app_user_id": "app1_app_user3"}
+# sql.insert odin.app_user_ledger {"reference": "ref3", "app_id": "app2", "identity_id": "app_user4", "app_user_id": "app2_app_user4"}
+# sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app1", "identity_id": "app_user3", "role": "role1"}
+# sql.insert odin.app_user_role_ledger {"reference": "ref4", "app_id": "app2", "identity_id": "app_user4", "role": "role2"}
+# sql.insert odin.app_user_installation_id_ledger {"reference": "ref4", "app_id": "app1", "identity_id": "app_user3", "installation_id": "install01"}
+# sql.insert odin.merge_ledger {"from_identity_id": "app_user3", "to_identity_id": "app_user4"}
+# GET test/merge-account/validate /identity/app_user3 404
+# GET test/merge-account/validate /app-user/app_user3/app1 404
+# GET test/merge-account/validate /app-user-role/app_user3/app1/role1 404
+# GET test/merge-account/validate /app-user/app_user4/app1 200 {"identity_id": "app_user4", "app_id": "app1"}
+# GET test/merge-account/validate /app-user/app_user4/app2 200 {"identity_id": "app_user4", "app_id": "app2"}
+# GET test/merge-account/validate /app-user-role/app_user4/app1/role1 200 {"identity_id": "app_user4", "app_id": "app1", "role": "role1"}
+# GET test/merge-account/validate /app-user-role/app_user4/app2/role2 200 {"identity_id": "app_user4", "app_id": "app2", "role": "role2"}
 
-# Test module opts/facebook
-# Case user can has multiple facebook_id
-odin.user facebook1 facebook1
-odin.user facebook2 facebook2
-sql.insert odin.facebook_credentials_ledger {"reference": "ref1", "identity_id": "facebook1", "facebook_user_id": "fu1"}
-sql.insert odin.facebook_credentials_ledger {"reference": "ref1", "identity_id": "facebook2", "facebook_user_id": "fu2"}
-# Case user has no duplicate facebook
-odin.user facebook3 facebook3
-odin.user facebook4 facebook4
-sql.insert odin.facebook_credentials_ledger {"reference": "ref2", "identity_id": "facebook3", "facebook_user_id": "fu3"}
-sql.insert odin.facebook_credentials_ledger {"reference": "ref2", "identity_id": "facebook4", "facebook_user_id": "fu4"}
-sql.insert odin.merge_ledger {"from_identity_id": "facebook3", "to_identity_id": "facebook4"}
-GET test/merge-account/validate /identity/facebook3 404
-GET test/merge-account/validate /facebook_credentials/facebook3/fu3 404
-GET test/merge-account/validate /facebook_credentials/facebook4/fu3 200 {"identity_id": "facebook4", "facebook_user_id": "fu3"}
-GET test/merge-account/validate /facebook_credentials/facebook4/fu4 200 {"identity_id": "facebook4", "facebook_user_id": "fu4"}
+# # Test module opts/email
+# # Case email of merged to user must no be affect from another user
+# odin.user t_email1 t_email1
+# odin.user t_email2 t_email2
+# sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "t_email1", "email": "t_email1@mail.com"}
+# sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "t_email2", "email": "t_email2@mail.com"}
+# GET test/merge-account/validate /identity/t_email2 200 {"id": "t_email2", "email": "t_email2@mail.com"}
+# sql.insert odin.merge_ledger {"from_identity_id": "t_email1", "to_identity_id": "t_email2"}
+# GET test/merge-account/validate /identity/t_email1 404
+# GET test/merge-account/validate /identity/t_email2 200 {"id": "t_email2", "email": "t_email2@mail.com"}
 
-# Test module opts/forgotten-password
-# Case request_reset_password of merged to user must no be affect from another user
-odin.user forgot1 forgot1
-odin.user forgot2 forgot2 password2
-sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "forgot1", "email": "forgot1@mail.com"}
-sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "forgot2", "email": "forgot2@mail.com"}
-sql.insert odin.request_reset_password_ledger {"reference": "ref2", "email": "forgot1@mail.com"}
-sql.insert odin.request_reset_password_ledger {"reference": "ref3", "email": "forgot2@mail.com"}
-GET test/merge-account/validate /credentials/forgot1 404
-GET test/merge-account/validate /credentials_password_ledger/forgot2 200 {
-    "columns": ["identity_id"], "rows": [["forgot2"]]
-}
-GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot1@mail.com 200
-GET test/merge-account/validate /request_reset_password_ledger/ref3/forgot2@mail.com 200
-sql.insert odin.merge_ledger {"from_identity_id": "forgot1", "to_identity_id": "forgot2"}
-GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot1@mail.com 200
-GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot2@mail.com 404
-GET test/merge-account/validate /request_reset_password_ledger/ref3/forgot2@mail.com 200
-GET test/merge-account/validate /credentials_password_ledger/forgot2 200 {
-    "columns": ["identity_id"], "rows": [["forgot2"]]
-}
+# # Test module opts/facebook
+# # Case user can has multiple facebook_id
+# odin.user facebook1 facebook1
+# odin.user facebook2 facebook2
+# sql.insert odin.facebook_credentials_ledger {"reference": "ref1", "identity_id": "facebook1", "facebook_user_id": "fu1"}
+# sql.insert odin.facebook_credentials_ledger {"reference": "ref1", "identity_id": "facebook2", "facebook_user_id": "fu2"}
+# # Case user has no duplicate facebook
+# odin.user facebook3 facebook3
+# odin.user facebook4 facebook4
+# sql.insert odin.facebook_credentials_ledger {"reference": "ref2", "identity_id": "facebook3", "facebook_user_id": "fu3"}
+# sql.insert odin.facebook_credentials_ledger {"reference": "ref2", "identity_id": "facebook4", "facebook_user_id": "fu4"}
+# sql.insert odin.merge_ledger {"from_identity_id": "facebook3", "to_identity_id": "facebook4"}
+# GET test/merge-account/validate /identity/facebook3 404
+# GET test/merge-account/validate /facebook_credentials/facebook3/fu3 404
+# GET test/merge-account/validate /facebook_credentials/facebook4/fu3 200 {"identity_id": "facebook4", "facebook_user_id": "fu3"}
+# GET test/merge-account/validate /facebook_credentials/facebook4/fu4 200 {"identity_id": "facebook4", "facebook_user_id": "fu4"}
 
-# Test module opts/full-name
-# Case full-name of merged to user must no be affect from another user
-odin.user f_name1 f_name1
-odin.user f_name2 f_name2
-sql.insert odin.identity_full_name_ledger {"reference": "ref1", "identity_id": "f_name1", "full_name": "f1 l1"}
-sql.insert odin.identity_full_name_ledger {"reference": "ref1", "identity_id": "f_name2", "full_name": "f2 l2"}
-GET test/merge-account/validate /identity/f_name2 200 {"id": "f_name2", "full_name": "f2 l2"}
-sql.insert odin.merge_ledger {"from_identity_id": "f_name1", "to_identity_id": "f_name2"}
-GET test/merge-account/validate /identity/f_name1 404
-GET test/merge-account/validate /identity/f_name2 200 {"id": "f_name2", "full_name": "f2 l2"}
+# # Test module opts/forgotten-password
+# # Case request_reset_password of merged to user must no be affect from another user
+# odin.user forgot1 forgot1
+# odin.user forgot2 forgot2 password2
+# sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "forgot1", "email": "forgot1@mail.com"}
+# sql.insert odin.identity_email_ledger {"reference": "ref1", "identity_id": "forgot2", "email": "forgot2@mail.com"}
+# sql.insert odin.request_reset_password_ledger {"reference": "ref2", "email": "forgot1@mail.com"}
+# sql.insert odin.request_reset_password_ledger {"reference": "ref3", "email": "forgot2@mail.com"}
+# GET test/merge-account/validate /credentials/forgot1 404
+# GET test/merge-account/validate /credentials_password_ledger/forgot2 200 {
+#     "columns": ["identity_id"], "rows": [["forgot2"]]
+# }
+# GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot1@mail.com 200
+# GET test/merge-account/validate /request_reset_password_ledger/ref3/forgot2@mail.com 200
+# sql.insert odin.merge_ledger {"from_identity_id": "forgot1", "to_identity_id": "forgot2"}
+# GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot1@mail.com 200
+# GET test/merge-account/validate /request_reset_password_ledger/ref2/forgot2@mail.com 404
+# GET test/merge-account/validate /request_reset_password_ledger/ref3/forgot2@mail.com 200
+# GET test/merge-account/validate /credentials_password_ledger/forgot2 200 {
+#     "columns": ["identity_id"], "rows": [["forgot2"]]
+# }
 
-# Test module opts/google
-# Case user can has multiple facebook_id
-odin.user google1 google1
-odin.user google2 google2
-sql.insert odin.google_credentials_ledger {"reference": "ref1", "identity_id": "google1", "google_user_id": "go1"}
-sql.insert odin.google_credentials_ledger {"reference": "ref1", "identity_id": "google2", "google_user_id": "go2"}
-# Case user has no duplicate google
-odin.user google3 google3
-odin.user google4 google4
-sql.insert odin.google_credentials_ledger {"reference": "ref2", "identity_id": "google3", "google_user_id": "go3"}
-sql.insert odin.google_credentials_ledger {"reference": "ref2", "identity_id": "google4", "google_user_id": "go4"}
-sql.insert odin.merge_ledger {"from_identity_id": "google3", "to_identity_id": "google4"}
-GET test/merge-account/validate /identity/google3 404
-GET test/merge-account/validate /google_credentials/google3/go3 404
-GET test/merge-account/validate /google_credentials/google4/go3 200 {"identity_id": "google4", "google_user_id": "go3"}
-GET test/merge-account/validate /google_credentials/google4/go4 200 {"identity_id": "google4", "google_user_id": "go4"}
+# # Test module opts/full-name
+# # Case full-name of merged to user must no be affect from another user
+# odin.user f_name1 f_name1
+# odin.user f_name2 f_name2
+# sql.insert odin.identity_full_name_ledger {"reference": "ref1", "identity_id": "f_name1", "full_name": "f1 l1"}
+# sql.insert odin.identity_full_name_ledger {"reference": "ref1", "identity_id": "f_name2", "full_name": "f2 l2"}
+# GET test/merge-account/validate /identity/f_name2 200 {"id": "f_name2", "full_name": "f2 l2"}
+# sql.insert odin.merge_ledger {"from_identity_id": "f_name1", "to_identity_id": "f_name2"}
+# GET test/merge-account/validate /identity/f_name1 404
+# GET test/merge-account/validate /identity/f_name2 200 {"id": "f_name2", "full_name": "f2 l2"}
 
-# Test module opts/installation-id
-# Case installation-id of merged to user must no be affect from another user
-odin.user install1 install1
-odin.user install2 install2
-sql.insert odin.identity_installation_id_ledger {"reference": "ref1", "identity_id": "install1", "installation_id": "il001"}
-sql.insert odin.identity_installation_id_ledger {"reference": "ref1", "identity_id": "install2", "installation_id": "il002"}
-GET test/merge-account/validate /identity/install2 200 {"id": "install2", "installation_id": "il002"}
-sql.insert odin.merge_ledger {"from_identity_id": "install1", "to_identity_id": "install2"}
-GET test/merge-account/validate /identity/install1 404
-GET test/merge-account/validate /identity/install2 200 {"id": "install2", "installation_id": "il002"}
+# # Test module opts/google
+# # Case user can has multiple facebook_id
+# odin.user google1 google1
+# odin.user google2 google2
+# sql.insert odin.google_credentials_ledger {"reference": "ref1", "identity_id": "google1", "google_user_id": "go1"}
+# sql.insert odin.google_credentials_ledger {"reference": "ref1", "identity_id": "google2", "google_user_id": "go2"}
+# # Case user has no duplicate google
+# odin.user google3 google3
+# odin.user google4 google4
+# sql.insert odin.google_credentials_ledger {"reference": "ref2", "identity_id": "google3", "google_user_id": "go3"}
+# sql.insert odin.google_credentials_ledger {"reference": "ref2", "identity_id": "google4", "google_user_id": "go4"}
+# sql.insert odin.merge_ledger {"from_identity_id": "google3", "to_identity_id": "google4"}
+# GET test/merge-account/validate /identity/google3 404
+# GET test/merge-account/validate /google_credentials/google3/go3 404
+# GET test/merge-account/validate /google_credentials/google4/go3 200 {"identity_id": "google4", "google_user_id": "go3"}
+# GET test/merge-account/validate /google_credentials/google4/go4 200 {"identity_id": "google4", "google_user_id": "go4"}
 
-# Test module opts/logout
-# Case logout_count of merged to user must no be affect from another user
-odin.user logout1 logout1
-odin.user logout2 logout2 password1
-sql.insert odin.logout_ledger {"reference": "ref1", "identity_id": "logout1"}
-sql.insert odin.logout_ledger {"reference": "ref1", "identity_id": "logout2"}
-sql.insert odin.logout_ledger {"reference": "ref2", "identity_id": "logout2"}
-GET test/merge-account/validate /credentials/logout2 200 {"identity_id": "logout2", "logout_count": 2}
-sql.insert odin.merge_ledger {"from_identity_id": "logout1", "to_identity_id": "logout2"}
-GET test/merge-account/validate /identity/logout1 404
-GET test/merge-account/validate /credentials/logout2 200 {"identity_id": "logout2", "logout_count": 2}
+# # Test module opts/installation-id
+# # Case installation-id of merged to user must no be affect from another user
+# odin.user install1 install1
+# odin.user install2 install2
+# sql.insert odin.identity_installation_id_ledger {"reference": "ref1", "identity_id": "install1", "installation_id": "il001"}
+# sql.insert odin.identity_installation_id_ledger {"reference": "ref1", "identity_id": "install2", "installation_id": "il002"}
+# GET test/merge-account/validate /identity/install2 200 {"id": "install2", "installation_id": "il002"}
+# sql.insert odin.merge_ledger {"from_identity_id": "install1", "to_identity_id": "install2"}
+# GET test/merge-account/validate /identity/install1 404
+# GET test/merge-account/validate /identity/install2 200 {"id": "install2", "installation_id": "il002"}
+
+# # Test module opts/logout
+# # Case logout_count of merged to user must no be affect from another user
+# odin.user logout1 logout1
+# odin.user logout2 logout2 password1
+# sql.insert odin.logout_ledger {"reference": "ref1", "identity_id": "logout1"}
+# sql.insert odin.logout_ledger {"reference": "ref1", "identity_id": "logout2"}
+# sql.insert odin.logout_ledger {"reference": "ref2", "identity_id": "logout2"}
+# GET test/merge-account/validate /credentials/logout2 200 {"identity_id": "logout2", "logout_count": 2}
+# sql.insert odin.merge_ledger {"from_identity_id": "logout1", "to_identity_id": "logout2"}
+# GET test/merge-account/validate /identity/logout1 404
+# GET test/merge-account/validate /credentials/logout2 200 {"identity_id": "logout2", "logout_count": 2}

@@ -12,7 +12,12 @@ odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 sql.insert odin.identity {"id": "user01"}
 sql.insert odin.identity {"id": "app01"}
 sql.insert odin.app {"app_id": "app01", "app_name": "app01", "access_policy": "INVITE_ONLY", "data_sharing_policy": "ALL"}
-sql.insert odin.app_user {"app_id": "app01", "identity_id": "user01"}
+sql.insert odin.app_user_ledger {
+    "reference": "ref01",
+    "app_id": "app01",
+    "identity_id": "user01",
+    "app_user_id": "app_user_01"
+}
 
 # Insert app_data
 sql.insert odin.app_user_app_data_ledger {

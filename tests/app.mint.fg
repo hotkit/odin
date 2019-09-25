@@ -24,18 +24,19 @@ sql.insert odin.app_ledger {
 }
 odin.user fred fred password1234
 
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "bowling",
+    "identity_id": "bowling01",
+    "app_user_id": "app_user_id01"
+}
 sql.insert odin.app_user_installation_id_ledger {
     "reference": "test-app-mint",
     "app_id": "bowling",
     "identity_id": "bowling01",
     "installation_id": "bowling01"
 }
-sql.insert odin.app_user_app_user_id_ledger {
-    "reference": "ref1",
-    "app_id": "bowling",
-    "identity_id": "bowling01",
-    "app_user_id": "app_user_id01"
-}
+
 set-path testserver.headers ["__app"] "bowling"
 set-path testserver.headers ["__user"] "bowling01"
 set-path testserver.headers ["__app_user"] "app_user_id01"

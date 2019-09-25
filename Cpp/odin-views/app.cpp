@@ -96,7 +96,7 @@ namespace {
                             __PRETTY_FUNCTION__, "Forbidden");
                 } else if (access_policy == "OPEN") {
                     odin::app::save_app_user(
-                            cnx, odin::reference(), identity_id, app_user_id, app_id);
+                            cnx, odin::reference(), app_id, identity_id, app_user_id);
                     cnx.commit();
                 }
             } else {

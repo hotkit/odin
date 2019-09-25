@@ -46,8 +46,8 @@ sql.insert odin.app_ledger {
 sql.insert odin.app_role_ledger {"reference": "test-app-verify", "app_id": "app01", "role": "pro-player"}
 
 # Invite players to app01
-sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player1"}
-sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player3"}
+sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player1", "app_user_id": "app01_player01"}
+sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player3", "app_user_id": "app01_player03"}
 
 sql.insert odin.app_user_role_ledger {"reference": "test-app-verify", "identity_id": "player1", "app_id": "app01", "role": "pro-player"}
 
