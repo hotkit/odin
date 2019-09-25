@@ -110,11 +110,10 @@ FSL_TEST_FUNCTION(check_can_renew_jwt_with_app_jwt) {
     req.headers().set("__user", "user01");
     req.headers().set("__app", app_id);
 
-    auto response =
+    auto const [response, http_status_code] =
             odin::view::jwt_renewal(configuration(), "/", req, fostlib::host());
 
-    auto &rs = response.first;
-    auto jwt_token = rs->body_as_string();
+    auto jwt_token = response->body_as_string();
     auto load_jwt = fostlib::jwt::token::load(secret, jwt_token);
 
     FSL_CHECK(load_jwt.has_value());
@@ -122,5 +121,5 @@ FSL_TEST_FUNCTION(check_can_renew_jwt_with_app_jwt) {
     FSL_CHECK_EQ(load_jwt->payload["sub"], payload["sub"]);
     FSL_CHECK_EQ(load_jwt->payload["app"], payload["app"]);
     FSL_CHECK_EQ(load_jwt->payload["exp"], load_jwt->payload["exp"]);
-    FSL_CHECK_EQ(response.second, 200);
+    FSL_CHECK_EQ(http_status_code, 200);
 }

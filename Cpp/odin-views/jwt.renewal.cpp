@@ -63,17 +63,18 @@ namespace {
 
 
             auto const jwt_body = bearer_jwt(req);
-            std::pair<fostlib::utf8_string, fostlib::timestamp> new_jwt;
-            // Check whether it is APP JWT or non APP JWT
-            fostlib::string secret;
-            if (req.headers().exists("__app")) {
+            fostlib::utf8_string new_jwt; fostlib::timestamp new_exp;
+            // Check whether it is APP JWT or non APP JWT.
+            // non APP JWT will be changed to APP JWT if app_id is set,
+            // otherwise just renew it.
+            if (fostlib::string secret; req.headers().exists("__app")) {
                 auto const app_id = req.headers()["__app"].value();
                 secret = odin::c_jwt_secret.value() + app_id;
-                new_jwt =
+                std::tie(new_jwt, new_exp) =
                     odin::renew_jwt(jwt_body.value(), secret, config);
             } else if (config["app_id"].isnull()) {
                 secret = odin::c_jwt_secret.value();
-                new_jwt =
+                std::tie(new_jwt, new_exp) =
                     odin::renew_jwt(jwt_body.value(), secret, config);
             } else {
                 secret = odin::c_jwt_secret.value();
@@ -85,25 +86,22 @@ namespace {
                 if (payload.has_key(sub)) { sub.del_key(payload); }
                 const fostlib::jcursor exp("exp");
                 if (payload.has_key(exp)) { exp.del_key(payload); }
-                new_jwt = odin::app::mint_user_jwt(
+                std::tie(new_jwt, new_exp) = odin::app::mint_user_jwt(
                     identity_id,
                     fostlib::coerce<f5::u8view>(config["app_id"]),
                     fostlib::coerce<fostlib::timediff>(config["expires"]),
                     payload);
             }
 
-            auto const token = new_jwt.first;
-            auto const exp = new_jwt.second;
-
             fostlib::mime::mime_headers headers;
             headers.add(
                     "Expires",
-                    fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(new_exp)
                             .underlying()
                             .underlying());
 
             boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(token, headers, L"application/jwt"));
+                    new fostlib::text_body(new_jwt, headers, L"application/jwt"));
 
             return std::make_pair(response, 200);
         }
