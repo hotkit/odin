@@ -1,32 +1,42 @@
 {
     "webserver": {
         "views/odin/merge-account": {
-            "view": "fostgres.control.pg-error",
+            "view": "odin.app.secure",
             "configuration": {
-                "execute": {
-                    "view": "fostgres.sql",
+                "secure": {
+                    "view": "fostgres.control.pg-error",
                     "configuration": {
-                        "sql": [{
-                            "return": "object",
-                            "path": ["/merge_ledger", 1, 2],
-                            "GET": "SELECT * FROM odin.merge_ledger WHERE from_identity_id=$1 AND to_identity_id=$2;",
-                            "POST": {
-                                "table": "odin.merge_ledger",
-                                "columns": {
-                                    "from_identity_id": {
-                                        "key": true,
-                                        "source": 1
-                                    },
-                                    "to_identity_id": {
-                                        "key": true,
-                                        "source": 2
+                        "execute": {
+                            "view": "fostgres.sql",
+                            "configuration": {
+                                "sql": [{
+                                    "return": "object",
+                                    "path": [],
+                                    "POST": {
+                                        "table": "odin.merge_ledger",
+                                        "columns": {
+                                            "from_identity_id": {
+                                                "key": true
+                                            },
+                                            "to_identity_id": {
+                                                "key": true
+                                            }
+                                        }
                                     }
-                                }
+                                }]
                             }
-                        }]
+                        },
+                        "": "fost.response.500"
                     }
                 },
-                "": "fost.response.500"
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
             }
         }
     }

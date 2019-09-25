@@ -112,6 +112,8 @@ if(TARGET stress OR TARGET pgtest)
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/log-show-all.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../views/merge.account.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/merge-account-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/merge-account.fg
             MAIN_DEPENDENCY merge-account.fg
@@ -164,6 +166,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Schema/opts/logout/005-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
+                ../views/merge.account.json
                 merge-account.fg
         )
 
