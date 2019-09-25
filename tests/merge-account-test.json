@@ -14,7 +14,7 @@
                             "return": "object",
                             "path": ["/merge_ledger", 1, 2],
                             "GET": "SELECT * FROM odin.merge_ledger WHERE from_identity_id=$1 AND to_identity_id=$2;",
-                            "PUT": {
+                            "POST": {
                                 "table": "odin.merge_ledger",
                                 "columns": {
                                     "from_identity_id": {

@@ -1,0 +1,33 @@
+{
+    "webserver": {
+        "views/odin/merge-account": {
+            "view": "fostgres.control.pg-error",
+            "configuration": {
+                "execute": {
+                    "view": "fostgres.sql",
+                    "configuration": {
+                        "sql": [{
+                            "return": "object",
+                            "path": ["/merge_ledger", 1, 2],
+                            "GET": "SELECT * FROM odin.merge_ledger WHERE from_identity_id=$1 AND to_identity_id=$2;",
+                            "POST": {
+                                "table": "odin.merge_ledger",
+                                "columns": {
+                                    "from_identity_id": {
+                                        "key": true,
+                                        "source": 1
+                                    },
+                                    "to_identity_id": {
+                                        "key": true,
+                                        "source": 2
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                },
+                "": "fost.response.500"
+            }
+        }
+    }
+}
