@@ -120,9 +120,9 @@ sql.insert odin.app_user {"app_id": "test_app01", "identity_id": "test_user01", 
 ## Should authorized by app_user_id
 set app_jwt (odin.jwt.mint {"sub": "test_app_user_id01", "iss": "http://odin.felspar.com/app/test_app01"} <JWT_SECRET>test_app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
-GET test/app/secureb /me 200 {"user": "test_user01", "app_user": "test_app_user_id01"}
+GET test/app/secure/identity /me 200 {"user": "test_user01", "app_user": "test_app_user_id01"}
 
 ## Not found app_user_id
 set app_jwt (odin.jwt.mint {"sub": "test_app_user_id02", "iss": "http://odin.felspar.com/app/test_app01"} <JWT_SECRET>test_app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
-GET test/app/secureb /me 401
+GET test/app/secure/identity /me 401

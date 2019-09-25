@@ -117,23 +117,20 @@ namespace {
                         auto const app_user_id = fostlib::coerce<fostlib::string>(
                                     jwt.value().payload["sub"]);
 
-                        auto const identity_id_set = fostgres::sql(
-                                cnx, get_app_user_identity_id_sql,
-                                std::vector<fostlib::string>{app_id, app_user_id});
+                        auto const identity_id_set = cnx.exec(
+                                "SELECT identity_id FROM "
+                                "odin.app_user "
+                                "WHERE app_id='" + app_id + "'AND app_user_id='" + app_user_id + "';");
 
-                        auto &rs = identity_id_set.second;
-
-                        auto row = rs.begin();
-                        if (row == rs.end()) {
+                        auto row = identity_id_set.begin();
+                        if (row == identity_id_set.end()) {
                           return respond("App user does not exists.", 401);
                         }
-
-                        auto first_row = *row;
 
                         req.headers().set(
                                 "__user",
                                 fostlib::coerce<fostlib::string>(
-                                    first_row[0]
+                                    (*row)[0]
                                 ));
                     }
                     req.headers().set(

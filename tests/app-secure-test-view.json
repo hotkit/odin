@@ -3,7 +3,7 @@
     "JWT secret": "<JWT_SECRET>"
   },
   "webserver": {
-    "views/test/app/secureb": {
+    "views/test/app/secure/identity": {
       "view": "odin.app.secure",
       "configuration": {
         "secure": {
