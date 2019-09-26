@@ -101,8 +101,7 @@ GET test/get/app-user /app01/ref-2 200 {
 }
 
 # Test return correct jwt
-set odin.jwt (PUT test/app-secure/app-user /app01/ref-2 {} 200)
-set payload (odin.jwt.payload "app01")
+set payload (odin.jwt.payload (PUT test/app-secure/app-user /app01/ref-2 {} 200) "app01")
 contains (lookup payload) {"sub": "ref-2", "iss": "http://odin.felspar.com/app/app01"}
 
 #Test can put app data
