@@ -98,7 +98,6 @@ namespace {
                 fostlib::insert(new_app_data, "app_data", app_data);
                 fostlib::insert(new_app_data, "reference", reference);
                 cnx.insert("odin.app_user_app_data_ledger", new_app_data);
-                cnx.commit();
             } else {
                 auto const reference = odin::reference();
                 fostlib::json new_app_data;
@@ -107,8 +106,8 @@ namespace {
                 fostlib::insert(new_app_data, "app_data", app_data);
                 fostlib::insert(new_app_data, "reference", reference);
                 cnx.insert("odin.app_user_app_data_ledger", new_app_data);
-                cnx.commit();
             }
+            cnx.commit();
 
 
 
