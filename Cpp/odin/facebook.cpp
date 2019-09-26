@@ -152,7 +152,7 @@ fostlib::json odin::facebook::get_user_detail(
 
 fostlib::json odin::facebook::app_credentials(
         fostlib::pg::connection &cnx, const f5::u8view &user_id, const f5::u8view &app_id) {
-    static const fostlib::string sql(
+    const fostlib::string sql(
             "SELECT "
             "odin.identity.tableoid AS identity__tableoid, "
             "odin.facebook_credentials.tableoid AS "

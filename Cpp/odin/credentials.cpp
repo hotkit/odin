@@ -22,7 +22,7 @@ fostlib::json odin::app_credentials(
         const fostlib::string &app_id,
         const fostlib::nullable<fostlib::host> &source,
         const fostlib::json &annotation) {
-    static const fostlib::string sql(
+    const fostlib::string sql(
             "SELECT "
             "odin.identity.expires <= now() AS expired, "
             "odin.identity.tableoid AS identity__tableoid, "

@@ -36,7 +36,7 @@ fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
 
 fostlib::json odin::google::app_credentials(
         fostlib::pg::connection &cnx, const f5::u8view &user_id, const f5::u8view &app_id) {
-    static const fostlib::string sql(
+    const fostlib::string sql(
             "SELECT "
             "odin.identity.tableoid AS identity__tableoid, "
             "odin.google_credentials.tableoid AS google_credentials__tableoid, "
