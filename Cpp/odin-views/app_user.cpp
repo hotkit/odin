@@ -71,11 +71,9 @@ namespace {
 
             auto parameters = fostlib::split(path, '/');
             if (parameters.size() != 2) {
-                boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(fostlib::string("400 Bad Request\n"),
-                        fostlib::mime::mime_headers(),
-                        L"text/plain"));
-                return std::make_pair(response, 400);
+                fostlib::json config;
+                fostlib::insert(config, "view", "fost.response.404");
+                return execute(config, path, req, host);
             }
             auto const app_id = parameters[0];
             auto const app_user_id = parameters[1];

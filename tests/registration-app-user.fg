@@ -126,5 +126,5 @@ contains (lookup old_identity_id) (GET test/get/app-user/identity /app01/ref-3 2
 
 # Test parameters invalid size
 # PUT test/app-secure/app-user /app01/ref-1/ {} 400 # should failed case
-PUT test/app-secure/app-user /app01/ref-2/t-1 {} 400
-PUT test/app-secure/app-user /app01 {} 400
+PUT test/app-secure/app-user /app01/ref-2/t-1 {} 404
+PUT test/app-secure/app-user /app01 {} 404
