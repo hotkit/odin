@@ -14,7 +14,7 @@
                 "return": "object",
                 "path": ["/me"],
                 "GET": {
-                  "command": "SELECT $1 AS user, $2 AS app_user;",
+                  "command": "SELECT $1::TEXT AS user, $2::TEXT AS app_user;",
                   "arguments": [
                     ["request", "headers", "__user"],
                     ["request", "headers", "__app_user"]
