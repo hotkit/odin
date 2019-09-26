@@ -13,12 +13,23 @@
 
 #include <fost/crypto>
 #include <fost/insert>
+#include <fost/json>
 #include <fost/log>
 #include <fostgres/sql.hpp>
 
 
 namespace {
 
+    inline std::pair<boost::shared_ptr<fostlib::mime>, int>
+            respond(fostlib::string message, int code = 403) {
+        fostlib::json ret;
+        if (not message.empty())
+            fostlib::insert(ret, "message", std::move(message));
+        fostlib::mime::mime_headers headers;
+        boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                fostlib::json::unparse(ret, true), headers, "application/json"));
+        return std::make_pair(response, code);
+    }
 
     std::vector<f5::byte> load_key(
             fostlib::pg::connection &cnx,
@@ -29,7 +40,7 @@ namespace {
                     __PRETTY_FUNCTION__, "No issuer in the JWT");
         }
         auto const jwt_iss = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
-        if (jwt_iss.find(odin::c_app_namespace.value()) == std::string::npos) {
+        if (not jwt_iss.startswith(odin::c_app_namespace.value())) {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "App namespace prefix does not match");
         }
@@ -88,9 +99,34 @@ namespace {
                     if (jwt.value().payload.has_key("sub")) {
                         req.headers().set("__jwt", jwt.value().payload, "sub");
                         req.headers().set(
-                                "__user",
+                                "__app_user",
                                 fostlib::coerce<fostlib::string>(
                                         jwt.value().payload["sub"]));
+                        // select
+
+                        auto const app_id =  fostlib::coerce<fostlib::string>(
+                                    jwt.value().payload["iss"])
+                                    .substr(odin::c_app_namespace.value()
+                                    .code_points());
+
+                        auto const app_user_id = fostlib::coerce<fostlib::string>(
+                                    jwt.value().payload["sub"]);
+
+                        auto const identity_id_set = cnx.exec(
+                                "SELECT identity_id FROM "
+                                "odin.app_user "
+                                "WHERE app_id='" + app_id + "'AND app_user_id='" + app_user_id + "';");
+
+                        auto row = identity_id_set.begin();
+                        if (row == identity_id_set.end()) {
+                          return respond("App user does not exist.", 401);
+                        }
+
+                        req.headers().set(
+                                "__user",
+                                fostlib::coerce<fostlib::string>(
+                                    (*row)[0]
+                                ));
                     }
                     req.headers().set(
                             "__app",

@@ -30,6 +30,14 @@ namespace odin {
                 fostlib::pg::connection &cnx,
                 const f5::u8view &facebook_user_id);
 
+        /// Return the database row for the identity together with the
+        /// facebook credentials  and app_user. If the credentials failed to match an empty
+        /// JSON instance (null) is returned.
+        fostlib::json app_credentials(
+                fostlib::pg::connection &cnx,
+                const f5::u8view &facebook_user_id,
+                const f5::u8view &app_id);
+
         /// Insert Facebook credential of the given user to database, this does
         /// not commit the transaction
         void set_facebook_credentials(

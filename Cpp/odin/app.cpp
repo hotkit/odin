@@ -62,12 +62,14 @@ std::pair<fostlib::utf8_string, fostlib::timestamp> odin::app::mint_user_jwt(
 void odin::app::save_app_user(
         fostlib::pg::connection &cnx,
         f5::u8view reference,
+        const f5::u8view app_id,
         const f5::u8view identity_id,
-        const f5::u8view app_id) {
+        const f5::u8view app_user_id) {
     fostlib::json app_user_values;
     fostlib::insert(app_user_values, "reference", reference);
-    fostlib::insert(app_user_values, "identity_id", identity_id);
     fostlib::insert(app_user_values, "app_id", app_id);
+    fostlib::insert(app_user_values, "identity_id", identity_id);
+    fostlib::insert(app_user_values, "app_user_id", app_user_id);
     cnx.insert("odin.app_user_ledger", app_user_values);
 }
 

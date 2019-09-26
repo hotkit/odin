@@ -4,12 +4,14 @@ odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 
 # Set up new users and apps
 odin.user owner owner password1234
@@ -45,8 +47,8 @@ sql.insert odin.app_ledger {
 sql.insert odin.app_role_ledger {"reference": "test-app-verify", "app_id": "app01", "role": "pro-player"}
 
 # Invite players to app01
-sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player1"}
-sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player3"}
+sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player1", "app_user_id": "app01_player01"}
+sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player3", "app_user_id": "app01_player03"}
 
 sql.insert odin.app_user_role_ledger {"reference": "test-app-verify", "identity_id": "player1", "app_id": "app01", "role": "pro-player"}
 
@@ -76,4 +78,3 @@ set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "http://odin.felspar.com/a
 set payload {}
 set-path payload ["token"] (lookup user_jwt)
 POST odin/app /verify/app01/ (lookup payload) 501
-

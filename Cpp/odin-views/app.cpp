@@ -77,31 +77,33 @@ namespace {
             const auto password =
                     fostlib::coerce<fostlib::string>(body["password"]);
 
-
             auto user = odin::credentials(
                     cnx, username, password, req.remote_address());
             if (user.isnull()) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "User not found");
             }
+
             auto const access_policy = fostlib::coerce<fostlib::string>(
                     app["app"]["access_policy"]);
             auto const identity_id =
                     fostlib::coerce<f5::u8view>(user["identity"]["id"]);
             auto app_user = odin::app::get_app_user(cnx, app_id, identity_id);
+            auto app_user_id = odin::reference();;
             if (app_user.isnull()) {
                 if (access_policy == "INVITE_ONLY") {
                     throw fostlib::exceptions::not_implemented(
                             __PRETTY_FUNCTION__, "Forbidden");
                 } else if (access_policy == "OPEN") {
                     odin::app::save_app_user(
-                            cnx, odin::reference(), identity_id, app_id);
+                            cnx, odin::reference(), app_id, identity_id, app_user_id);
                     cnx.commit();
                 }
+            } else {
+                app_user_id = fostlib::coerce<f5::u8view>(app_user["app"]["app_user_id"]);
             }
-
             auto jwt = odin::app::mint_user_jwt(
-                    identity_id, app_id,
+                    app_user_id, app_id,
                     fostlib::coerce<fostlib::timediff>(config["expires"]));
             const auto redirect_url = fostlib::coerce<fostlib::string>(
                     app["app"]["redirect_url"]);
@@ -226,6 +228,7 @@ namespace {
             }
 
             cnx.commit();
+
             auto jwt(odin::mint_login_jwt(fed_response_data));
             auto exp = jwt.expires(
                     fostlib::coerce<fostlib::timediff>(config["expires"]),

@@ -100,10 +100,13 @@ namespace {
                     fostlib::coerce<f5::u8view>(user_detail["sub"]);
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto const reference = odin::reference();
-            auto google_user = odin::google::credentials(cnx, google_user_id);
+            f5::u8view const app_id = req.headers()["__app"].value();
+            auto google_user =
+                    odin::google::app_credentials(cnx, google_user_id, app_id);
             logger("google_user", google_user);
 
             fostlib::string identity_id;
+            fostlib::string app_user_id;
             if (google_user.isnull()) {
                 /// We've never seen this Google identity before,
                 /// we take as a new user registration. If this is a new
@@ -111,6 +114,7 @@ namespace {
                 /// the JWT represents an existing user then this links
                 /// their Google a/c to their pre-existing identity.
                 identity_id = req.headers()["__user"].value();
+                app_user_id = req.headers()["__app_user"].value();
                 if (user_detail.has_key("name")) {
                     const auto google_user_name =
                             fostlib::coerce<f5::u8view>(user_detail["name"]);
@@ -139,7 +143,10 @@ namespace {
                     == req.headers()["__user"].value()) {
                 /// Not sure what to do here. Certainly OK for now.
                 /// Probably should allow updates of email and name
-                identity_id = req.headers()["__user"].value();
+
+                /// An existing user has logging in on a same device.
+                app_user_id = fostlib::coerce<fostlib::string>(
+                        google_user["app_user"]["app_id"]);
             } else {
                 /// An existing user has logged in to a new device. Probably
                 /// there are two cases here:
@@ -152,20 +159,25 @@ namespace {
                         merge, "from_identity_id",
                         req.headers()["__user"].value());
                 fostlib::insert(
-                        merge, "to_identity_id", google_user["identity"]["id"]);
+                        merge, "to_identity_id",
+                        google_user["identity"]["id"]);
                 fostlib::insert(
                         merge, "annotation", "app", req.headers()["__app"]);
                 try {
                     /// Case 1 above
                     cnx.insert("odin.merge_ledger", merge);
                     cnx.commit();
+                    auto google_user =
+                      odin::google::app_credentials(cnx, google_user_id, app_id);
+                    app_user_id = fostlib::coerce<fostlib::string>(
+                      google_user["app_user"]["app_user_id"]);
                 } catch (const pqxx::unique_violation &e) {
                     /// We replace the identity with the new one -- case 2 above
                 } catch (...) { throw; }
             }
 
             auto jwt = odin::app::mint_user_jwt(
-                    identity_id, req.headers()["__app"].value(),
+                    app_user_id, req.headers()["__app"].value(),
                     fostlib::coerce<fostlib::timediff>(config["expires"]));
             fostlib::mime::mime_headers headers;
             headers.add(
