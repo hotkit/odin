@@ -20,11 +20,6 @@
 
 namespace {
 
-    static fostlib::string const get_app_user_identity_id_sql(
-            "SELECT identity_id FROM "
-            "odin.app_user "
-            "WHERE app_id=$1 AND app_user_id=$2");
-
     inline std::pair<boost::shared_ptr<fostlib::mime>, int>
             respond(fostlib::string message, int code = 403) {
         fostlib::json ret;
@@ -124,7 +119,7 @@ namespace {
 
                         auto row = identity_id_set.begin();
                         if (row == identity_id_set.end()) {
-                          return respond("App user does not exists.", 401);
+                          return respond("App user does not exist.", 401);
                         }
 
                         req.headers().set(

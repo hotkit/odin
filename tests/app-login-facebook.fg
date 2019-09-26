@@ -275,7 +275,7 @@ GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 ## Login with Facebook ID that *has* been seen before
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
 
-## There is no new Facebook user and merge new installation user to registerd user
+## There is no new Facebook user and merge new installation user to registered user
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
