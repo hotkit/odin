@@ -21,11 +21,11 @@ namespace {
 
     fostlib::json get_app_user(
             fostlib::pg::connection &cnx, const f5::u8view app_id, const f5::u8view app_user_id) {
-        static const f5::u8view sql(
+        const f5::u8view sql{
                 "SELECT "
                 "* "
                 "FROM odin.app_user "
-                "WHERE odin.app_user.app_id = $1 AND odin.app_user.app_user_id = $2; ");
+                "WHERE odin.app_user.app_id = $1 AND odin.app_user.app_user_id = $2; "};
 
         auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id, app_user_id});
         auto &rs = data.second;
@@ -37,11 +37,7 @@ namespace {
         auto record = *row;
         fostlib::json app;
         for (std::size_t index{0}; index < record.size(); ++index) {
-            const auto parts = fostlib::split(data.first[index], "__");
-            // if (parts.size() && parts[parts.size() - 1] == "tableoid") continue;
-            fostlib::jcursor pos;
-            for (const auto &p : parts) pos /= p;
-            fostlib::insert(app, pos, record[index]);
+            fostlib::insert(app, data.first[index], record[index]);
         }
         return app;
     }
@@ -83,11 +79,9 @@ namespace {
             }
             auto const app_id = parameters[0];
             auto const app_user_id = parameters[1];
-            auto const body_str = fostlib::coerce<fostlib::string>(
-                    fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
-            auto const app_data = fostlib::json::parse(body_str);
+            auto const app_data = fostlib::json::parse(req.data()->body_as_string());
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            auto app_user = get_app_user(cnx, parameters[0], parameters[1]);
+            auto app_user = get_app_user(cnx, app_id, app_user_id);
             if (app_user.isnull()) {
                 auto identity_id = odin::reference();
                 auto const reference = odin::reference();
