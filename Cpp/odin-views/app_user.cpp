@@ -80,9 +80,14 @@ namespace {
             auto const app_data = fostlib::json::parse(req.data()->body_as_string());
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto app_user = get_app_user(cnx, app_id, app_user_id);
+            fostlib::string reference;
+            if (req.headers().exists("__odin_reference")) {
+                reference = req.headers()["__odin_reference"].value();
+            } else {
+                reference = odin::reference();
+            }
             if (app_user.isnull()) {
                 auto identity_id = odin::reference();
-                auto const reference = odin::reference();
                 odin::create_user(cnx, identity_id);
                 fostlib::json new_app_user;
                 const fostlib::jcursor app_user_id_cursor("app_user_id");
@@ -99,7 +104,6 @@ namespace {
                 fostlib::insert(new_app_data, "reference", reference);
                 cnx.insert("odin.app_user_app_data_ledger", new_app_data);
             } else {
-                auto const reference = odin::reference();
                 fostlib::json new_app_data;
                 fostlib::insert(new_app_data, "app_id", app_id);
                 fostlib::insert(new_app_data, "identity_id", app_user["identity_id"]);
