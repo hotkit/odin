@@ -744,6 +744,22 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
             ../Schema/app/008-app-user-id.blue.sql
+            ../Schema/opts/email/001-initial.blue.sql
+            ../Schema/opts/email/003-alter-ledgers.blue.sql
+            ../Schema/opts/email/004-merge-account-function.blue.sql
+            ../Schema/opts/facebook/001-initial.blue.sql
+            ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+            ../Schema/opts/facebook/004-merge-account-function.blue.sql
+            ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+            ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+            ../Schema/opts/full-name/004-merge-account-function.blue.sql
+            ../Schema/opts/facebook/001-initial.blue.sql
+            ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+            ../Schema/opts/facebook/004-merge-account-function.blue.sql
+            ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+            ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
             app-secure-test-view.json
             app-secure.fg
     )

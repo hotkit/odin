@@ -57,6 +57,10 @@ sql.insert odin.app_user_ledger {
 }
 
 odin.user user01 user01 password1234
+set app_jwt (odin.jwt.mint {"sub": "user01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+set new_app_jwt (GET test/app-secure/renew-jwt / 401)
+
 set app_jwt (odin.jwt.mint {"sub": "app_user_id01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 

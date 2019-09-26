@@ -28,7 +28,7 @@ set-path testserver.headers ["Authorization"] ""
 GET odin/api / 401
 
 # Check that the default JWT contains the subject key
-set payload (odin.jwt.payload (lookup odin.jwt))
+set payload (odin.jwt.payload)
 contains (lookup payload) {"sub": "test", "http://odin.felspar.com/p": ["p1"]}
 
 # Check that the database controls access to the APIs

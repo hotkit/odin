@@ -68,7 +68,8 @@ setting webserver views/test/sec/installation {
             "unsecure": "fost.response.403"
         }
     }
-
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+POST test/sec/installation / {"installation_id": "ins01"} 401
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app-user-id", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 POST test/sec/installation / {"installation_id": "ins01"} 201
 
@@ -116,6 +117,9 @@ setting webserver views/test/app/installation/validate {
             }
         }
 
+set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET test/app/installation/validate / 401
 set app_jwt (odin.jwt.mint {"sub": "open-app-user-id", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/installation/validate / 200

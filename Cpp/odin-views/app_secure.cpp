@@ -40,7 +40,7 @@ namespace {
                     __PRETTY_FUNCTION__, "No issuer in the JWT");
         }
         auto const jwt_iss = fostlib::coerce<fostlib::string>(jwt_body["iss"]);
-        if (!jwt_iss.startswith(odin::c_app_namespace.value())) {
+        if (not jwt_iss.startswith(odin::c_app_namespace.value())) {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "App namespace prefix does not match");
         }

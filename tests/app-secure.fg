@@ -12,6 +12,17 @@ odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
 
 ## Set up new users and apps
 odin.user owner owner password1234
@@ -27,8 +38,14 @@ sql.insert odin.app_ledger {
     "app_name": "MyApp",
     "token": "APP_TOKEN",
     "redirect_url": "http://example.com",
-    "access_policy": "INVITE_ONLY",
+    "access_policy": "OPEN",
     "data_sharing_policy": "ALL"
+}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "app01",
+    "app_user_id": "app_user_app01"
 }
 
 ## Register app02
@@ -41,6 +58,12 @@ sql.insert odin.app_ledger {
     "redirect_url": "http://example.com",
     "access_policy": "INVITE_ONLY",
     "data_sharing_policy": "ALL"
+}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app02",
+    "identity_id": "app02",
+    "app_user_id": "app_user_app02"
 }
 
 sql.insert odin.identity {"id": "some_user"}
@@ -56,6 +79,9 @@ GET test/app/secure / 401
 ## ## Bearer Authorization header
 
 ## Mint App jwt
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET test/app/secure / 401
 set app_jwt (odin.jwt.mint {"sub": "app_user_some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure / 200
@@ -88,6 +114,9 @@ GET {
     } / 501
 
 ## Get a valid JWT and set it as a cookie value
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
+set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
+GET test/app/secure/cookie / 401
 set app_jwt (odin.jwt.mint {"sub": "app_user_some_user", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
 GET test/app/secure/cookie / 200
@@ -100,6 +129,9 @@ GET test/app/secure/cookie / 200
 GET test/app/secure/cookie /test 200
 
 ## Wrong App jwt should return 302
+set app_jwt (odin.jwt.mint {"sub": "some_user", "iss": "http://odin.felspar.com/app/app02"} <JWT_SECRET>app01)
+set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
+GET test/app/secure/cookie / 302
 set app_jwt (odin.jwt.mint {"sub": "app_user_some_user", "iss": "http://odin.felspar.com/app/app02"} <JWT_SECRET>app01)
 set-path testserver.cookies ["test-auth-cookie"] (lookup app_jwt)
 GET test/app/secure/cookie / 302
@@ -116,7 +148,6 @@ sql.insert odin.identity {"id": "test_app01"}
 sql.insert odin.app {"app_id": "test_app01", "app_name": "test_app01", "access_policy": "OPEN", "data_sharing_policy": "ALL"}
 sql.insert odin.app_user {"app_id": "test_app01", "identity_id": "test_user01", "app_user_id": "test_app_user_id01"}
 
-## See login flow for request app.secure view in app.mint.fg line 50
 ## Should authorized by app_user_id
 set app_jwt (odin.jwt.mint {"sub": "test_app_user_id01", "iss": "http://odin.felspar.com/app/test_app01"} <JWT_SECRET>test_app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
@@ -126,3 +157,82 @@ GET test/app/secure/identity /me 200 {"user": "test_user01", "app_user": "test_a
 set app_jwt (odin.jwt.mint {"sub": "test_app_user_id02", "iss": "http://odin.felspar.com/app/test_app01"} <JWT_SECRET>test_app01)
 set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
 GET test/app/secure/identity /me 401
+
+## real use case
+# Register installatin
+# Login facebook
+# Request some spp_secure view
+setting webserver views/test/app/installation {
+            "view": "odin.app.installation",
+            "configuration": {
+                "expires": {
+                    "hours": 72
+                }
+            }
+        }
+setting webserver views/test/sec/installation {
+        "view": "odin.app.secure",
+        "configuration": {
+            "secure": "test/app/installation",
+            "unsecure": "fost.response.403"
+        }
+    }
+
+## odin.app.login not just return jwt then can't use response body as jwt
+setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
+setting odin "Facebook" {
+    "main": "111111111111111",
+    "allowed": ["111111111111111", "222222222222222"]
+}
+setting webserver views/test/facebook/login {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "112233445566778",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://caveman-club/",
+                                        "name": "Caveman Club",
+                                        "id": "111111111111111"
+                                    }
+                                },
+                                {
+                                    "id": "778899112233445",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "Fred Flintstone",
+                            "id": "112233445566778"
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+odin.user user-test01 user-test01
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_app01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins-user-test"} 201))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/facebook/login / {"access_token": "user-test01"} 200))
+GET test/app/secure/identity /me 200 {}

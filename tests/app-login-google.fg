@@ -62,6 +62,8 @@ setting webserver views/test/sec/installation {
     }
 
 ## ## Registration of new user
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 401))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 201))
 
@@ -106,6 +108,8 @@ GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 ## Create a new installation ID. This should simulate our existing FB
 ## user switching to a new device. Go back to the application JWT
 ## and then use that to register the new device.
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins02"} 401))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins02"} 201))
 
@@ -147,6 +151,8 @@ sql.insert odin.app_user_ledger {
 
 ## As before, we set up an application JWT to be used to bootstrap
 ## the process, and our user then starts to use it (anonymously).
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "new-app", "iss": "http://odin.felspar.com/app/new-app"} <JWT_SECRET>new-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins03"} 401))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_new_app", "iss": "http://odin.felspar.com/app/new-app"} <JWT_SECRET>new-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins03"} 201))
 
