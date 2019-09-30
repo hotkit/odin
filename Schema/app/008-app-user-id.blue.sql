@@ -6,7 +6,7 @@ ALTER TABLE odin.app_user ADD COLUMN app_user_id TEXT;
 UPDATE odin.app_user SET app_user_id = identity_id;
 ALTER TABLE odin.app_user ALTER COLUMN app_user_id SET NOT NULL;
 
-ALTER TABLE odin.app_user ADD CONSTRAINT constraint_name UNIQUE (app_user_id, app_id);
+ALTER TABLE odin.app_user ADD CONSTRAINT app_user_app_user_id_unique UNIQUE (app_user_id, app_id);
 
 ALTER TABLE odin.app_user_ledger ADD COLUMN app_user_id TEXT;
 UPDATE odin.app_user_ledger SET app_user_id = identity_id;
