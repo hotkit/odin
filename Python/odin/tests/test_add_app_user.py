@@ -23,3 +23,9 @@ def test_addappuser_should_add_app_user():
 
     app_user = cnx.select("SELECT EXISTS (SELECT 1 FROM odin.app_user WHERE app_id = 'app_01' AND identity_id = 'user01');")
     assert app_user[0][0] == True
+
+    createuser(cnx, "user02", "pass1234")
+    addappuser(cnx, "app_01", "user02")
+
+    app_user = cnx.select("SELECT EXISTS (SELECT 1 FROM odin.app_user WHERE app_id = 'app_01' AND identity_id = 'user02');")
+    assert app_user[0][0] == True

@@ -52,7 +52,7 @@ def createapprole(cnx, app_id, role):
 
 def addappuser(cnx, app_id, identity_id):
     cnx.assert_module('app')
-    cnx.execute(ADD_APP_USER, (cnx.reference, app_id, identity_id, cnx.reference))
+    cnx.execute(ADD_APP_USER, (cnx.reference, app_id, identity_id, cnx.create_reference()))
     print('{} is an app user of {}'.format(identity_id, app_id))
 
 
