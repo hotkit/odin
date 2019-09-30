@@ -20,18 +20,23 @@
 namespace {
 
     fostlib::json get_app_user(
-            fostlib::pg::connection &cnx, const f5::u8view app_id, const f5::u8view app_user_id) {
+            fostlib::pg::connection &cnx,
+            const f5::u8view app_id,
+            const f5::u8view app_user_id) {
         const f5::u8view sql{
                 "SELECT "
                 "* "
                 "FROM odin.app_user "
-                "WHERE odin.app_user.app_id = $1 AND odin.app_user.app_user_id = $2; "};
+                "WHERE odin.app_user.app_id = $1 AND odin.app_user.app_user_id "
+                "= $2; "};
 
-        auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id, app_user_id});
+        auto data = fostgres::sql(
+                cnx, sql, std::vector<fostlib::string>{app_id, app_user_id});
         auto &rs = data.second;
         auto row = rs.begin();
         if (row == rs.end()) {
-            fostlib::log::warning(odin::c_odin)("", "App not found")("app_id", app_id)("app_user_id", app_user_id);
+            fostlib::log::warning(odin::c_odin)("", "App not found")(
+                    "app_id", app_id)("app_user_id", app_user_id);
             return fostlib::json();
         }
         auto record = *row;
@@ -77,7 +82,8 @@ namespace {
             }
             auto const app_id = parameters[0];
             auto const app_user_id = parameters[1];
-            auto const app_data = fostlib::json::parse(req.data()->body_as_string());
+            auto const app_data =
+                    fostlib::json::parse(req.data()->body_as_string());
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto app_user = get_app_user(cnx, app_id, app_user_id);
             fostlib::string reference;
@@ -106,7 +112,8 @@ namespace {
             } else {
                 fostlib::json new_app_data;
                 fostlib::insert(new_app_data, "app_id", app_id);
-                fostlib::insert(new_app_data, "identity_id", app_user["identity_id"]);
+                fostlib::insert(
+                        new_app_data, "identity_id", app_user["identity_id"]);
                 fostlib::insert(new_app_data, "app_data", app_data);
                 fostlib::insert(new_app_data, "reference", reference);
                 cnx.insert("odin.app_user_app_data_ledger", new_app_data);
@@ -114,10 +121,8 @@ namespace {
             cnx.commit();
 
 
-
             auto jwt = odin::app::mint_user_jwt(
-                    app_user_id,
-                    app_id,
+                    app_user_id, app_id,
                     fostlib::coerce<fostlib::timediff>(config["expires"]));
             fostlib::mime::mime_headers headers;
             headers.add(

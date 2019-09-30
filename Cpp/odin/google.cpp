@@ -35,7 +35,9 @@ fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
 
 
 fostlib::json odin::google::app_credentials(
-        fostlib::pg::connection &cnx, const f5::u8view &user_id, const f5::u8view &app_id) {
+        fostlib::pg::connection &cnx,
+        const f5::u8view &user_id,
+        const f5::u8view &app_id) {
     const fostlib::string sql(
             "SELECT "
             "odin.identity.tableoid AS identity__tableoid, "
@@ -49,7 +51,8 @@ fostlib::json odin::google::app_credentials(
             "odin.app_user.identity_id=odin.google_credentials.identity_id AND "
             "odin.app_user.app_id=$1 "
             "WHERE odin.google_credentials.google_user_id = $2");
-    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id, user_id});
+    auto data = fostgres::sql(
+            cnx, sql, std::vector<fostlib::string>{app_id, user_id});
     auto &rs = data.second;
     auto row = rs.begin();
     if (row == rs.end()) {

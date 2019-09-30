@@ -159,18 +159,17 @@ namespace {
                         merge, "from_identity_id",
                         req.headers()["__user"].value());
                 fostlib::insert(
-                        merge, "to_identity_id",
-                        google_user["identity"]["id"]);
+                        merge, "to_identity_id", google_user["identity"]["id"]);
                 fostlib::insert(
                         merge, "annotation", "app", req.headers()["__app"]);
                 try {
                     /// Case 1 above
                     cnx.insert("odin.merge_ledger", merge);
                     cnx.commit();
-                    auto google_user =
-                      odin::google::app_credentials(cnx, google_user_id, app_id);
+                    auto google_user = odin::google::app_credentials(
+                            cnx, google_user_id, app_id);
                     app_user_id = fostlib::coerce<fostlib::string>(
-                      google_user["app_user"]["app_user_id"]);
+                            google_user["app_user"]["app_user_id"]);
                 } catch (const pqxx::unique_violation &e) {
                     /// We replace the identity with the new one -- case 2 above
                 } catch (...) { throw; }

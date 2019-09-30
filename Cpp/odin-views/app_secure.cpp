@@ -104,29 +104,31 @@ namespace {
                                         jwt.value().payload["sub"]));
                         // select
 
-                        auto const app_id =  fostlib::coerce<fostlib::string>(
-                                    jwt.value().payload["iss"])
-                                    .substr(odin::c_app_namespace.value()
-                                    .code_points());
+                        auto const app_id =
+                                fostlib::coerce<fostlib::string>(
+                                        jwt.value().payload["iss"])
+                                        .substr(odin::c_app_namespace.value()
+                                                        .code_points());
 
-                        auto const app_user_id = fostlib::coerce<fostlib::string>(
-                                    jwt.value().payload["sub"]);
+                        auto const app_user_id =
+                                fostlib::coerce<fostlib::string>(
+                                        jwt.value().payload["sub"]);
 
                         auto const identity_id_set = cnx.exec(
                                 "SELECT identity_id FROM "
                                 "odin.app_user "
-                                "WHERE app_id='" + app_id + "'AND app_user_id='" + app_user_id + "';");
+                                "WHERE app_id='"
+                                + app_id + "'AND app_user_id='" + app_user_id
+                                + "';");
 
                         auto row = identity_id_set.begin();
                         if (row == identity_id_set.end()) {
-                          return respond("App user does not exist.", 401);
+                            return respond("App user does not exist.", 401);
                         }
 
                         req.headers().set(
                                 "__user",
-                                fostlib::coerce<fostlib::string>(
-                                    (*row)[0]
-                                ));
+                                fostlib::coerce<fostlib::string>((*row)[0]));
                     }
                     req.headers().set(
                             "__app",

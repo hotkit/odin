@@ -42,7 +42,8 @@ fostlib::json odin::app_credentials(
     fostlib::insert(attempt, "source_address", source);
     fostlib::insert(attempt, "annotation", annotation);
 
-    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id, username});
+    auto data = fostgres::sql(
+            cnx, sql, std::vector<fostlib::string>{app_id, username});
     auto &rs = data.second;
     auto row = rs.begin();
     if (row == rs.end()) {

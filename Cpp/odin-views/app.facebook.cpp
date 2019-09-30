@@ -92,8 +92,8 @@ namespace {
                     fostlib::coerce<f5::u8view>(user_detail["id"]);
             auto const reference = odin::reference();
             f5::u8view const app_id = req.headers()["__app"].value();
-            auto facebook_user =
-                    odin::facebook::app_credentials(cnx, facebook_user_id, app_id);
+            auto facebook_user = odin::facebook::app_credentials(
+                    cnx, facebook_user_id, app_id);
             logger("facebook_user", facebook_user);
             fostlib::string identity_id;
             fostlib::string app_user_id;
@@ -153,10 +153,10 @@ namespace {
                     /// Case 1 above
                     cnx.insert("odin.merge_ledger", merge);
                     cnx.commit();
-                    auto facebook_user =
-                      odin::facebook::app_credentials(cnx, facebook_user_id, app_id);
+                    auto facebook_user = odin::facebook::app_credentials(
+                            cnx, facebook_user_id, app_id);
                     app_user_id = fostlib::coerce<fostlib::string>(
-                      facebook_user["app_user"]["app_user_id"]);
+                            facebook_user["app_user"]["app_user_id"]);
                 } catch (const pqxx::unique_violation &e) {
                     /// We replace the identity with the new one -- case 2 above
                 } catch (...) { throw; }

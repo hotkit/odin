@@ -77,7 +77,8 @@ namespace {
             }
             const auto jwt_user = req.headers()["__user"].value();
             fostlib::string app_user_id;
-            if (user["app_user"]["app_user_id"] != req.headers()["__app_user"].value()) {
+            if (user["app_user"]["app_user_id"]
+                != req.headers()["__app_user"].value()) {
                 // identity_id mismatch, triggering merge account
                 fostlib::json merge_value;
                 fostlib::insert(merge_value, "from_identity_id", jwt_user);
@@ -87,8 +88,10 @@ namespace {
                     cnx.insert("odin.merge_ledger", merge_value);
                     cnx.commit();
                     auto user = odin::app_credentials(
-                            cnx, username, password, app_id, req.remote_address());
-                    app_user_id = fostlib::coerce<fostlib::string>(user["app_user"]["app_user_id"]);
+                            cnx, username, password, app_id,
+                            req.remote_address());
+                    app_user_id = fostlib::coerce<fostlib::string>(
+                            user["app_user"]["app_user_id"]);
 
                 } catch (const pqxx::unique_violation &e) {
                     // Cannot merge, abandon the unregistered identity.

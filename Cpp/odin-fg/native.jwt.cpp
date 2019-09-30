@@ -70,14 +70,16 @@ const fg::frame::builtin odin::lib::jwt_payload =
            fg::json::const_iterator pos,
            fg::json::const_iterator end) {
             fostlib::string jwt;
-            if (pos!=end) {
+            if (pos != end) {
                 jwt = stack.resolve_string(stack.argument("jwt", pos, end));
             } else {
-                jwt = fostlib::coerce<fostlib::string>(stack.lookup("odin.jwt"));
+                jwt = fostlib::coerce<fostlib::string>(
+                        stack.lookup("odin.jwt"));
             }
             auto secret = odin::c_jwt_secret.value();
-            if (pos!=end) {
-                auto app_id = stack.resolve_string(stack.argument("app_id", pos, end));
+            if (pos != end) {
+                auto app_id = stack.resolve_string(
+                        stack.argument("app_id", pos, end));
                 secret = odin::c_jwt_secret.value() + app_id;
             }
             auto token = fostlib::jwt::token::load(secret, jwt);

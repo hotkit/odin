@@ -151,7 +151,9 @@ fostlib::json odin::facebook::get_user_detail(
 
 
 fostlib::json odin::facebook::app_credentials(
-        fostlib::pg::connection &cnx, const f5::u8view &user_id, const f5::u8view &app_id) {
+        fostlib::pg::connection &cnx,
+        const f5::u8view &user_id,
+        const f5::u8view &app_id) {
     const fostlib::string sql(
             "SELECT "
             "odin.identity.tableoid AS identity__tableoid, "
@@ -163,10 +165,12 @@ fostlib::json odin::facebook::app_credentials(
             "JOIN odin.identity ON "
             "odin.identity.id=odin.facebook_credentials.identity_id "
             "LEFT JOIN odin.app_user ON "
-            "odin.app_user.identity_id=odin.facebook_credentials.identity_id AND "
+            "odin.app_user.identity_id=odin.facebook_credentials.identity_id "
+            "AND "
             "odin.app_user.app_id=$1 "
             "WHERE odin.facebook_credentials.facebook_user_id = $2");
-    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{app_id, user_id});
+    auto data = fostgres::sql(
+            cnx, sql, std::vector<fostlib::string>{app_id, user_id});
     auto &rs = data.second;
     auto row = rs.begin();
     if (row == rs.end()) {

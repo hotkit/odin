@@ -89,18 +89,21 @@ namespace {
             auto const identity_id =
                     fostlib::coerce<f5::u8view>(user["identity"]["id"]);
             auto app_user = odin::app::get_app_user(cnx, app_id, identity_id);
-            auto app_user_id = odin::reference();;
+            auto app_user_id = odin::reference();
+            ;
             if (app_user.isnull()) {
                 if (access_policy == "INVITE_ONLY") {
                     throw fostlib::exceptions::not_implemented(
                             __PRETTY_FUNCTION__, "Forbidden");
                 } else if (access_policy == "OPEN") {
                     odin::app::save_app_user(
-                            cnx, odin::reference(), app_id, identity_id, app_user_id);
+                            cnx, odin::reference(), app_id, identity_id,
+                            app_user_id);
                     cnx.commit();
                 }
             } else {
-                app_user_id = fostlib::coerce<f5::u8view>(app_user["app"]["app_user_id"]);
+                app_user_id = fostlib::coerce<f5::u8view>(
+                        app_user["app"]["app_user_id"]);
             }
             auto jwt = odin::app::mint_user_jwt(
                     app_user_id, app_id,

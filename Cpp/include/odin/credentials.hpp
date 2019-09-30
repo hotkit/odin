@@ -29,8 +29,8 @@ namespace odin {
             const fostlib::json &annotation = fostlib::json::object_t());
 
     /// Return the database row for the identity together with the
-    /// credentials and app_user, but only if the supplied password is correct. If the
-    /// credentials failed to match an empty JSON instance (null) is
+    /// credentials and app_user, but only if the supplied password is correct.
+    /// If the credentials failed to match an empty JSON instance (null) is
     /// returned.
     fostlib::json app_credentials(
             fostlib::pg::connection &cnx,
