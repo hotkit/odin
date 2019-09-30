@@ -10,9 +10,7 @@ from odin.user import createuser
 
 
 def test_addappuser_should_add_app_user():
-    optlist, args = gnu_getopt(sys.argv, SHORTOPTS)
-    opts = dict(optlist)
-    dsn = makedsn(opts, args)
+    dsn = makedsn({}, None)
     cnx = Connection(dsn)
     enablemodules(cnx, "authn", "app")
     migrate(cnx)
