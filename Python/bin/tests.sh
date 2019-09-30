@@ -2,8 +2,4 @@
 set -eux
 cd $(dirname $0)
 
-cd ..
-export PYTHONPATH=$(pwd)/odin
-cd ..
-export ODIN_SCHEMA_PATH=$(pwd)/Schema
-pytest ./Python/odin/tests
+PYTHONPATH=$(pwd)/../odin ODIN_SCHEMA_PATH=$(pwd)/../../Schema PGDBNAME=test_odin_python pytest ../odin/tests
