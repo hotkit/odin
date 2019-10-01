@@ -73,6 +73,8 @@ sql.insert odin.app_user_ledger {
     "identity_id": "user2",
     "app_user_id": "app_user2"
 }
+GET test/merge-account/validate /app-user-ledger/user2 200 {"count": 1}
+
 POST odin/merge-account / {"from_identity_id": "user1", "to_identity_id": "user2"} 401
 setting odin "JWT secret" <JWT_SECRET>
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user2", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))

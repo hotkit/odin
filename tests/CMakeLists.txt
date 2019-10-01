@@ -112,7 +112,6 @@ if(TARGET stress OR TARGET pgtest)
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/log-show-all.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../views/merge.account.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/merge-account-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/merge-account.fg
