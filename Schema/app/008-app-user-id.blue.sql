@@ -19,7 +19,7 @@ BEGIN
     INSERT INTO odin.app_user (app_id, identity_id, app_user_id)
         VALUES (NEW.app_id, NEW.identity_id, NEW.app_user_id)
         ON CONFLICT (app_id, identity_id) DO NOTHING;
-    RETURN NULL;
+    RETURN NEW;
 END;
 $body$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = odin;
 
