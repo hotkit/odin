@@ -15,3 +15,11 @@ mkvirtualenv --python=python3 odin
 pip install -e ..
 ```
 
+Run unittest you need prerequisite install:
+```bash
+apt-get install postgresql
+pip install psycopg2
+pytest ./Python/odin/tests
+```
+
+TODO: python uniitest in stress test
