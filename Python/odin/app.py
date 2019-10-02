@@ -12,7 +12,9 @@ CREATE_APP = """
     INSERT INTO odin.app_ledger (reference, app_id, app_name,
         access_policy, data_sharing_policy, token, redirect_url)
     VALUES (%(reference)s, %(app_id)s, %(app_name)s,
-        %(access_policy)s, %(data_sharing_policy)s, %(token)s, %(redirect_url)s)
+        %(access_policy)s, %(data_sharing_policy)s, %(token)s, %(redirect_url)s);
+    INSERT INTO odin.app_user_ledger (reference, app_id, identity_id, app_user_id)
+    VALUES (%(reference)s, %(app_id)s, %(app_id)s, %(app_id)s);
 """
 
 CREATE_APP_ROLE = """
