@@ -41,6 +41,7 @@ def createapp(cnx, app_id, app_name, access_policy='INVITE_ONLY', data_sharing_p
         data_sharing_policy=data_sharing_policy, token=token,
         redirect_url=redirect_url)
     )
+    addappuser(cnx, app_id, app_id)
     print('{} app created'.format(app_id))
 
 
