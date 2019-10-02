@@ -375,6 +375,7 @@ if(TARGET stress OR TARGET pgtest)
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/link.account.fg
             MAIN_DEPENDENCY link.account.fg
             DEPENDS
@@ -395,6 +396,16 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Schema/app/007-app-user-data.blue.sql
                 ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+                ../Schema/opts/facebook/004-merge-account-function.blue.sql
+                ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
+                ../Schema/opts/google/001-initial.blue.sql
+                ../Schema/opts/google/003-alter-ledgers.blue.sql
+                ../Schema/opts/google/004-merge-account-function.blue.sql
+                ../Schema/opts/google/005-google-credentials-insert.blue.sql
+                ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Configuration/odin-views.json
                 link.account.fg
         )
@@ -967,7 +978,33 @@ if(TARGET stress OR TARGET pgtest)
     ## Because of the way cmake works we need this stuff at the end to
     ## actually make the above commands run when things change.
     add_custom_target(odin-tests DEPENDS
+            test-app-handover
+            test-app-installation
+            test-app-mint
+            test-app-login
+            odin-test-app-login-facebook
+            odin-test-app-login-google
+            test-app-secure
+            test-app-verify
+            test-authnz
+            test-db-bypass
+            test-login
+            test-logout
+            test-merge-account
+            test-no-auth
+            test-password
+            test-permissions
+            test-permissions-cookie
+            test-registration-self
+            test-session
+            test-forgotten-password
             test-link-account
+            test-login-facebook
+            test-login-google
+            test-link-facebook
+            test-expire-user
+            test-jwt-renewal
+            test-registration-app-user
         )
     if(TARGET stress)
         add_dependencies(stress odin-tests)
