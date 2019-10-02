@@ -16,8 +16,6 @@
 #include <fost/log>
 #include <fostgres/sql.hpp>
 
-#include <pqxx/except>
-
 
 namespace {
 
@@ -28,11 +26,11 @@ namespace {
             fostlib::insert(ret, "message", std::move(message));
         fostlib::mime::mime_headers headers;
         boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                fostlib::json::unparse(ret, true), headers, "application/json"));
+                fostlib::json::unparse(ret, true), headers, "text/plain"));
         return std::make_pair(response, code);
     }
 
-    bool has_account_registerd(
+    bool has_account_registered(
             fostlib::pg::connection &cnx, fostlib::string const identity_id) {
         auto const credentials = cnx.exec(
             "SELECT 1 FROM "
@@ -156,10 +154,10 @@ namespace {
         link_account() : view("odin.link.account") {}
 
         std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
-                const fostlib::json &config,
-                const fostlib::string &path,
+                fostlib::json const &config,
+                fostlib::string const &path,
                 fostlib::http::server::request &req,
-                const fostlib::host &host) const {
+                fostlib::host const &host) const {
 
             if (req.method() != "POST") {
                 return respond("Link Account require POST.", 405);
@@ -180,9 +178,11 @@ namespace {
                             "Must pass from_account and to_account field");
                 }
 
+                // from_account jwt should be app_token
                 auto const from_account_jwt = load_app_jwt(
                         cnx,
                         fostlib::coerce<fostlib::string>(body["from_account"]));
+                // from_account jwt should be user_token
                 auto const to_account_jwt = load_jwt(
                         cnx,
                         fostlib::coerce<fostlib::string>(body["to_account"]));
@@ -194,6 +194,7 @@ namespace {
                 to_identity_id = fostlib::coerce<fostlib::string>(
                         to_account_jwt.value().payload["sub"]);
 
+                // Two user already merged
                 if (from_identity_id == to_identity_id) {
                     fostlib::mime::mime_headers headers;
                     boost::shared_ptr<fostlib::mime> response(
@@ -215,16 +216,16 @@ namespace {
                             "The to_account has been linked with app.");
                 }
 
-                if (has_account_registerd(cnx, from_identity_id)) {
+                if (has_account_registered(cnx, from_identity_id)) {
                     throw fostlib::exceptions::not_implemented(
                             __PRETTY_FUNCTION__,
-                            "The from_account has been registerd.");
+                            "The from_account has been registered.");
                 }
 
-                if (not has_account_registerd(cnx, to_identity_id)) {
+                if (not has_account_registered(cnx, to_identity_id)) {
                     throw fostlib::exceptions::not_implemented(
                             __PRETTY_FUNCTION__,
-                            "The to_account has not been registerd.");
+                            "The to_account has not been registered.");
                 }
             } catch (fostlib::exceptions::not_implemented &e) {
                 return respond(
@@ -235,12 +236,9 @@ namespace {
             fostlib::json merge;
             fostlib::insert(merge, "from_identity_id", from_identity_id);
             fostlib::insert(merge, "to_identity_id", to_identity_id);
-            try {
-                cnx.insert("odin.merge_ledger", merge);
-                cnx.commit();
-            } catch (const pqxx::unique_violation &e) {
+            cnx.insert("odin.merge_ledger", merge);
+            cnx.commit();
 
-            } catch (...) { throw; }
 
             fostlib::mime::mime_headers headers;
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
