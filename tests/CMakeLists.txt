@@ -369,6 +369,36 @@ if(TARGET stress OR TARGET pgtest)
                 forgotten-password.fg
         )
 
+    add_custom_command(OUTPUT test-link-account
+            COMMAND fostgres-test odin-test-link-account -o test-link-account
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/link.account.fg
+            MAIN_DEPENDENCY link.account.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Configuration/odin-views.json
+                link.account.fg
+        )
+
     add_custom_command(OUTPUT test-login-facebook
             COMMAND fostgres-test odin-test-login-facebook -o test-login-facebook
                 $<TARGET_SONAME_FILE:odin-fg>
@@ -937,32 +967,7 @@ if(TARGET stress OR TARGET pgtest)
     ## Because of the way cmake works we need this stuff at the end to
     ## actually make the above commands run when things change.
     add_custom_target(odin-tests DEPENDS
-            test-app-handover
-            test-app-installation
-            test-app-mint
-            test-app-login
-            odin-test-app-login-facebook
-            odin-test-app-login-google
-            test-app-secure
-            test-app-verify
-            test-authnz
-            test-db-bypass
-            test-login
-            test-logout
-            test-merge-account
-            test-no-auth
-            test-password
-            test-permissions
-            test-permissions-cookie
-            test-registration-self
-            test-session
-            test-forgotten-password
-            test-login-facebook
-            test-login-google
-            test-link-facebook
-            test-expire-user
-            test-jwt-renewal
-            test-registration-app-user
+            test-link-account
         )
     if(TARGET stress)
         add_dependencies(stress odin-tests)

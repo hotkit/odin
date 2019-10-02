@@ -7,11 +7,6 @@ odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
-# module Authz
-odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
-odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
 # module App
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
@@ -21,7 +16,7 @@ odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sq
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 
-setting webserver views/test/link/acoount {
+setting webserver views/test/link/account {
     "view": "odin.link.account"
 }
 
@@ -36,46 +31,46 @@ setting webserver views/test/link/validate {
     }
 }
 
-# Guest is non credentials account
+# Guest is no credentials account
 # user token - user token
-# Guest - Guest
+# Guest - Guest -> passed
 odin.user guest1 guest1
 odin.user guest2 guest2
-POST test/link/account {
+POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvIn0.OpF1Vk9ecPHDy1vWPrybTqwni600d8ngoJ3WLMmnnYE",
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDIiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvIn0.MgEhgpOzMt4b_xb4-WGIB16oUxq3gChycVKuwN943s8"
-} 500
-GET test/link/validate /merge_ledger/guest1/guest2 200 {"from_identity_id": "", "to_identity_id": ""}
+} 200
+GET test/link/validate /merge_ledger/guest1/guest2 200 {"from_identity_id": "guest1", "to_identity_id": "guest2"}
 
 # user token - user token
-# Guest - Registered
+# Guest - Registered -> passed
 odin.user guest3 guest3
 odin.user registered4 registered4 password1234
-POST test/link/account {
+POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDMiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvIn0.1GQ6_MDoV2jVzpgnBlABgQcbC-yRgjrp2MJV3-Htspk",
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkNCIsImV4cGlyZXMiOjcyNTgwODAyMDMsImlzcyI6Imh0dHA6Ly9vZGluLmZlbHNwYXIuY29tL2FwcC8ifQ.nBV1TxmP1wy0ZvkNym1J6E4XLqlfA_XGhjxyco8_KeE"
-} 500
-GET test/link/validate /merge_ledger/guest3/registered4 200 {"from_identity_id": "", "to_identity_id": ""}
+} 200
+GET test/link/validate /merge_ledger/guest3/registered4 200 {"from_identity_id": "guest3", "to_identity_id": "registered4"}
 
 # user token - user token
-# Registered - Guest
+# Registered - Guest -> failed
 odin.user registered5 registered5 password1234
 odin.user guest6 guest6
-POST test/link/account {
+POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkNSIsImV4cGlyZXMiOjcyNTgwODAyMDMsImlzcyI6Imh0dHA6Ly9vZGluLmZlbHNwYXIuY29tL2FwcC8ifQ.59SX2Gb_lfoGSju9dYm2H5YeIvnzepfI98ALTAlz1FA",
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDYiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvIn0.V_A6Ja38kvhRRF4DHMIXZes5Q6bHre3MyyErULawj2o"
 } 500
-GET test/link/validate /merge_ledger/registered5/guest6 200 {"from_identity_id": "", "to_identity_id": ""}
+GET test/link/validate /merge_ledger/registered5/guest6 404
 
 # user token - user token
-# Registered - Registered
+# Registered - Registered -> failed
 odin.user registered7 registered7 password1234
 odin.user registered8 registered8 password1234
-POST test/link/account {
+POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkNyIsImV4cGlyZXMiOjcyNTgwODAyMDMsImlzcyI6Imh0dHA6Ly9vZGluLmZlbHNwYXIuY29tL2FwcC8ifQ.RhJTMmwbaqwjpMfV483UIp1amBivQI857SipPN5GoL8",
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkOCIsImV4cGlyZXMiOjcyNTgwODAyMDMsImlzcyI6Imh0dHA6Ly9vZGluLmZlbHNwYXIuY29tL2FwcC8ifQ.bBZZHkMPlnv-u5Sccmc5vF3bvAdV9koFgrRxqXvlm_k"
 } 500
-GET test/link/validate /merge_ledger/registered7/registered8 200 {"from_identity_id": "", "to_identity_id": ""}
+GET test/link/validate /merge_ledger/registered7/registered8 404
 
 sql.insert odin.identity {"id": "app01"}
 sql.insert odin.app_ledger {
@@ -89,55 +84,55 @@ sql.insert odin.app_ledger {
 }
 
 # app token - user token
-# Guest - Registered
+# Guest - Registered -> passed
 odin.uset guest9 guest9
 odin.user registered10 registered10 password1234
 sql.insert odin.app_user_ledger {
     "reference": "ref1",
     "app_id": "app01",
     "identity_id": "guest9",
-    "app_user_id": "guest9"
+    "app_user_id": "app_user_guest9"
 }
-POST test/link/account {
-    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDkiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.gKFuMNLhvrMfPu1hMed72EAEQ25b9vAXycZhPBIUX48",
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDkiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvIn0.JoXGaAaPDPVwGWzh93LP29RZVAgpv9BRhVoPH7Okx5w",
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMTAiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvIn0.5Efc55cAwfC3-Hgx4J3ROBksnNVtqvL6pSbqkcHL8wU"
-} 500
-GET test/link/validate /merge_ledger/guest9/registered10 200 {"from_identity_id": "", "to_identity_id": ""}
+} 200
+GET test/link/validate /merge_ledger/guest9/registered10 200 {"from_identity_id": "guest9", "to_identity_id": "registered10"}
 
 # user token - app token
-# Guest - Registered
+# Guest - Registered -> passed
 odin.uset guest11 guest11
 odin.user registered12 registered12 password1234
 sql.insert odin.app_user_ledger {
     "reference": "ref1",
     "app_id": "app01",
     "identity_id": "registered12",
-    "app_user_id": "registered12"
+    "app_user_id": "app_user_registered12"
 }
-POST test/link/account {
+POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDExIiwiZXhwaXJlcyI6NzI1ODA4MDIwMywiaXNzIjoiaHR0cDovL29kaW4uZmVsc3Bhci5jb20vYXBwLyJ9.9NqqZMrKn000Zo1VUYUZYHUF0YB4l3ZnKTkbM3cIza8",
-    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMTIiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.6SqDFqBYDcuMIq4ry0OuULrZ-ldQdAIIEk_teguj28M"
-} 500
-GET test/link/validate /merge_ledger/guest11/registered12 200 {"from_identity_id": "", "to_identity_id": ""}
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkMTIiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.VUGBEaH69KN0TJFFhiju42iyrdOFm58LhBrZqQTKCu4"
+} 200
+GET test/link/validate /merge_ledger/guest11/registered12 200 {"from_identity_id": "guest11", "to_identity_id": "registered12"}
 
 # app token - app token
-# Guest - Registered
+# Guest - Registered -> passed
 odin.uset guest13 guest13
 odin.user registered14 registered14 password1234
 sql.insert odin.app_user_ledger {
     "reference": "ref1",
     "app_id": "app01",
-    "identity_id": "guest13",
+    "identity_id": "app_user_guest13",
     "app_user_id": "guest13"
 }
 sql.insert odin.app_user_ledger {
     "reference": "ref1",
     "app_id": "app01",
     "identity_id": "registered14",
-    "app_user_id": "registered14"
+    "app_user_id": "app_user_registered14"
 }
-POST test/link/account {
-    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDEzIiwiZXhwaXJlcyI6NzI1ODA4MDIwMywiaXNzIjoiaHR0cDovL29kaW4uZmVsc3Bhci5jb20vYXBwL2FwcDAxIn0.hjpgLt3jLeFqpEKg-rGR9RlQcuFi99K05CgTlQefLVs",
-    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMTQiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.MXY7FocZo3XDRiS9RGvjN8on2WzQ2SfZIBj6FmVdcoQ"
-} 500
-GET test/link/validate /merge_ledger/guest13/registered14 200 {"from_identity_id": "", "to_identity_id": ""}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEzIiwiZXhwaXJlcyI6NzI1ODA4MDIwMywiaXNzIjoiaHR0cDovL29kaW4uZmVsc3Bhci5jb20vYXBwLyJ9.sm0qVvtIrvOpQGHBOYpdEbuUoVUcsOVVvgxKMdg66OA",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkMTQiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.dVs2JgMiW-4CXdk-7uJrRcynK_BbzejsIW22PVPyFrY"
+} 200
+GET test/link/validate /merge_ledger/guest13/registered14 200 {"from_identity_id": "guest13", "to_identity_id": "registered14"}
