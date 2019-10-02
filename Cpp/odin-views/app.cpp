@@ -90,7 +90,6 @@ namespace {
                     fostlib::coerce<f5::u8view>(user["identity"]["id"]);
             auto app_user = odin::app::get_app_user(cnx, app_id, identity_id);
             auto app_user_id = odin::reference();
-            ;
             if (app_user.isnull()) {
                 if (access_policy == "INVITE_ONLY") {
                     throw fostlib::exceptions::not_implemented(

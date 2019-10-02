@@ -33,8 +33,7 @@ namespace {
     }
 
     bool has_account_registerd(
-        fostlib::pg::connection &cnx,
-        fostlib::string const identity_id) {
+            fostlib::pg::connection &cnx, fostlib::string const identity_id) {
         auto const credentials = cnx.exec(
             "SELECT 1 FROM "
             "odin.identity id "
@@ -94,17 +93,14 @@ namespace {
                 app_token.data().begin(), app_token.data().end());
     }
 
-    fostlib::nullable<fostlib::jwt::token> load_jwt(
-        fostlib::pg::connection &cnx,
-        fostlib::string jwt_string) {
+    fostlib::nullable<fostlib::jwt::token>
+            load_jwt(fostlib::pg::connection &cnx, fostlib::string jwt_string) {
         auto const jwt = fostlib::jwt::token::load(
-            jwt_string,
-            [&cnx](fostlib::json h, fostlib::json b) {
-                return load_key(cnx, h, b);
-            });
+                jwt_string, [&cnx](fostlib::json h, fostlib::json b) {
+                    return load_key(cnx, h, b);
+                });
         if (not jwt) {
-            fostlib::log::debug(odin::c_odin)(
-                    "detail", "JWT not valid")(
+            fostlib::log::debug(odin::c_odin)("detail", "JWT not valid")(
                     "jwt", jwt_string);
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "JWT not valid");
@@ -113,16 +109,13 @@ namespace {
     }
 
     fostlib::nullable<fostlib::jwt::token> load_app_jwt(
-        fostlib::pg::connection &cnx,
-        fostlib::string jwt_string) {
+            fostlib::pg::connection &cnx, fostlib::string jwt_string) {
         auto const jwt = fostlib::jwt::token::load(
-            jwt_string,
-            [&cnx](fostlib::json h, fostlib::json b) {
-                return load_app_key(cnx, h, b);
-            });
+                jwt_string, [&cnx](fostlib::json h, fostlib::json b) {
+                    return load_app_key(cnx, h, b);
+                });
         if (not jwt) {
-            fostlib::log::debug(odin::c_odin)(
-                    "detail", "JWT not valid")(
+            fostlib::log::debug(odin::c_odin)("detail", "JWT not valid")(
                     "jwt", jwt_string);
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "JWT not valid");
@@ -131,21 +124,18 @@ namespace {
     }
 
     fostlib::json app_user_detail_from_jwt(
-        fostlib::pg::connection &cnx,
-        fostlib::nullable<fostlib::jwt::token> jwt
-    ) {
-        auto const app_id = fostlib::coerce<fostlib::string>(
-                                jwt.value().payload["iss"])
-                                .substr(odin::c_app_namespace.value()
-                                                .code_points());
-        auto const app_user_id = fostlib::coerce<fostlib::string>(
-                                    jwt.value().payload["sub"]);
+            fostlib::pg::connection &cnx,
+            fostlib::nullable<fostlib::jwt::token> jwt) {
+        auto const app_id =
+                fostlib::coerce<fostlib::string>(jwt.value().payload["iss"])
+                        .substr(odin::c_app_namespace.value().code_points());
+        auto const app_user_id =
+                fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]);
         auto const identity_id_set = cnx.exec(
                 "SELECT identity_id FROM "
                 "odin.app_user "
                 "WHERE app_id='"
-                + app_id + "'AND app_user_id='" + app_user_id
-                + "';");
+                + app_id + "'AND app_user_id='" + app_user_id + "';");
 
         auto row = identity_id_set.begin();
         if (row == identity_id_set.end()) {
@@ -153,7 +143,9 @@ namespace {
                     __PRETTY_FUNCTION__, "App user not found");
         }
         fostlib::json app_user_detail;
-        fostlib::insert(app_user_detail, "identity_id", fostlib::coerce<fostlib::string>((*row)[0]));
+        fostlib::insert(
+                app_user_detail, "identity_id",
+                fostlib::coerce<fostlib::string>((*row)[0]));
         fostlib::insert(app_user_detail, "app_id", app_id);
         fostlib::insert(app_user_detail, "app_user_id", app_user_id);
         return app_user_detail;
@@ -181,28 +173,42 @@ namespace {
             fostlib::string to_identity_id;
 
             try {
-                if (not body.has_key("from_account") || not body.has_key("to_account")) {
+                if (not body.has_key("from_account")
+                    || not body.has_key("to_account")) {
                     throw fostlib::exceptions::not_implemented(
-                            __PRETTY_FUNCTION__, "Must pass from_account and to_account field");
+                            __PRETTY_FUNCTION__,
+                            "Must pass from_account and to_account field");
                 }
 
-                auto const from_account_jwt = load_app_jwt(cnx, fostlib::coerce<fostlib::string>(body["from_account"]));
-                auto const to_account_jwt = load_jwt(cnx, fostlib::coerce<fostlib::string>(body["to_account"]));
-                fostlib::json from_account_detail = app_user_detail_from_jwt(cnx, from_account_jwt);
+                auto const from_account_jwt = load_app_jwt(
+                        cnx,
+                        fostlib::coerce<fostlib::string>(body["from_account"]));
+                auto const to_account_jwt = load_jwt(
+                        cnx,
+                        fostlib::coerce<fostlib::string>(body["to_account"]));
+                fostlib::json from_account_detail =
+                        app_user_detail_from_jwt(cnx, from_account_jwt);
 
-                from_identity_id = fostlib::coerce<fostlib::string>(from_account_detail["identity_id"]);
-                to_identity_id = fostlib::coerce<fostlib::string>(to_account_jwt.value().payload["sub"]);
+                from_identity_id = fostlib::coerce<fostlib::string>(
+                        from_account_detail["identity_id"]);
+                to_identity_id = fostlib::coerce<fostlib::string>(
+                        to_account_jwt.value().payload["sub"]);
 
                 if (from_identity_id == to_identity_id) {
                     fostlib::mime::mime_headers headers;
-                    boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                            fostlib::coerce<fostlib::string>(body["from_account"]), headers, L"application/jwt"));
+                    boost::shared_ptr<fostlib::mime> response(
+                            new fostlib::text_body(
+                                    fostlib::coerce<fostlib::string>(
+                                            body["from_account"]),
+                                    headers, L"application/jwt"));
                     return std::make_pair(response, 200);
                 }
 
                 auto const app_user = odin::app::get_app_user(
-                    cnx, fostlib::coerce<fostlib::string>(from_account_detail["app_id"]),
-                    to_identity_id);
+                        cnx,
+                        fostlib::coerce<fostlib::string>(
+                                from_account_detail["app_id"]),
+                        to_identity_id);
                 if (not app_user.isnull()) {
                     throw fostlib::exceptions::not_implemented(
                             __PRETTY_FUNCTION__,
@@ -221,7 +227,9 @@ namespace {
                             "The to_account has not been registerd.");
                 }
             } catch (fostlib::exceptions::not_implemented &e) {
-                return respond(fostlib::coerce<fostlib::string>(e.data()["message"]), 422);
+                return respond(
+                        fostlib::coerce<fostlib::string>(e.data()["message"]),
+                        422);
             }
 
             fostlib::json merge;
@@ -236,12 +244,12 @@ namespace {
 
             fostlib::mime::mime_headers headers;
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    fostlib::coerce<fostlib::string>(body["from_account"]), headers, L"application/jwt"));
+                    fostlib::coerce<fostlib::string>(body["from_account"]),
+                    headers, L"application/jwt"));
             return std::make_pair(response, 200);
         }
 
     } c_link_account;
 }
 
-const fostlib::urlhandler::view &odin::view::link_account =
-        c_link_account;
+const fostlib::urlhandler::view &odin::view::link_account = c_link_account;
