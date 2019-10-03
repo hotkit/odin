@@ -174,7 +174,7 @@ odin.user registered8 registered8 password1234
 sql.insert odin.app_user_ledger {
     "reference": "ref1",
     "app_id": "app01",
-    "identity_id": "registered4",
+    "identity_id": "registered8",
     "app_user_id": "app_user_registered8"
 }
 POST test/link/account / {

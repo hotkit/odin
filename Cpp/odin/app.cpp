@@ -107,6 +107,28 @@ fostlib::json odin::app::get_app_user(
 }
 
 
+fostlib::nullable<fostlib::string> odin::app::get_app_user_identity_id(
+        fostlib::pg::connection &cnx,
+        f5::u8view const app_id,
+        f5::u8view const app_user_id) {
+    static fostlib::string const sql(
+            "SELECT identity_id "
+            "FROM odin.app_user "
+            "WHERE odin.app_user.app_id=$1 "
+            "AND odin.app_user.app_user_id=$2;");
+
+    auto data = cnx.procedure(sql).exec(
+        std::vector<fostlib::string>{app_id, app_user_id});
+    auto row = data.begin();
+    if (row == data.end()) {
+        fostlib::log::warning(c_odin)("", "App user or App not found")(
+                "app_id", app_id)("app_user_id", app_user_id);
+        return fostlib::null;
+    }
+    return fostlib::coerce<fostlib::string>((*row)[0]);
+}
+
+
 void odin::app::set_installation_id(
         fostlib::pg::connection &cnx,
         f5::u8view reference,

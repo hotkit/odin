@@ -32,7 +32,7 @@ namespace {
 
     bool has_account_registered(
             fostlib::pg::connection &cnx, fostlib::string const identity_id) {
-        auto const credentials = cnx.exec(
+        auto const credentials = cnx.procedure(
             "SELECT 1 FROM "
             "odin.identity id "
             "LEFT JOIN odin.credentials cred "
@@ -41,11 +41,11 @@ namespace {
             "ON fb.identity_id = id.id "
             "LEFT JOIN odin.google_credentials gg "
             "ON gg.identity_id = id.id "
-            "WHERE id.id='" + identity_id + "' "
+            "WHERE id.id=$1 "
             "AND (cred.identity_id IS NOT NULL "
             "OR fb.identity_id IS NOT NULL "
             "OR gg.identity_id IS NOT NULL);"
-        );
+        ).exec(std::vector<fostlib::string>{identity_id});
         return credentials.begin() != credentials.end();
     }
 
@@ -129,21 +129,15 @@ namespace {
                         .substr(odin::c_app_namespace.value().code_points());
         auto const app_user_id =
                 fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]);
-        auto const identity_id_set = cnx.exec(
-                "SELECT identity_id FROM "
-                "odin.app_user "
-                "WHERE app_id='"
-                + app_id + "'AND app_user_id='" + app_user_id + "';");
+        auto const identity_id = odin::app::get_app_user_identity_id(
+            cnx, app_id, app_user_id);
 
-        auto row = identity_id_set.begin();
-        if (row == identity_id_set.end()) {
+        if (not identity_id) {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "App user not found");
         }
         fostlib::json app_user_detail;
-        fostlib::insert(
-                app_user_detail, "identity_id",
-                fostlib::coerce<fostlib::string>((*row)[0]));
+        fostlib::insert(app_user_detail, "identity_id", identity_id);
         fostlib::insert(app_user_detail, "app_id", app_id);
         fostlib::insert(app_user_detail, "app_user_id", app_user_id);
         return app_user_detail;
