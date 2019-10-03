@@ -9,6 +9,7 @@ add_library(odin-views
         facebook.cpp
         google.cpp
         jwt.renewal.cpp
+        link.account.cpp
         login.cpp
         logout.cpp
         middleware.reference.cpp

@@ -1,0 +1,229 @@
+# Set up the database
+# module Core
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+# module Authn
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+# module App
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+# module opts/facebook
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+# module opts/google
+odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
+
+setting odin "JWT secret" <JWT_SECRET>
+
+setting webserver views/test/link/account {
+    "view": "odin.link.account"
+}
+
+setting webserver views/test/link/validate {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [{
+            "return": "object",
+            "path": [1, 2],
+            "GET": "SELECT * FROM odin.merge_ledger WHERE  (from_identity_id = $1 AND to_identity_id = $2) OR (from_identity_id = $2 AND to_identity_id = $1);"
+        }]
+    }
+}
+
+sql.insert odin.identity {"id": "app01"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+# Guest is no credentials account
+# from_account must be app_token
+# to_account must be user_token
+
+# app token  user token -> passed
+# guest user - registered user -> passed
+odin.user guest1 guest1
+odin.user registered2 registered2 password1234
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "guest1",
+    "app_user_id": "app_user_guest1"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.i-kp53QIFDDKgooXrmRQgj2EUGXkQKJ_vrw7l2fkR8U",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.tyBXGNdToGtgzlDZdxgIkZDuIrOLeLJU3NdW-ak7LTw"
+} 200
+GET test/link/validate /guest1/registered2 200 {"from_identity_id": "guest1", "to_identity_id": "registered2"}
+
+# app token  user token -> passed
+# guest user - registered user -> passed
+odin.user guest_f_1 guest_f_1
+odin.user facebook1 facebook1
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "guest_f_1",
+    "app_user_id": "app_user_guest_f_1"
+}
+sql.insert odin.facebook_credentials_ledger {
+    "reference": "ref1",
+    "identity_id": "facebook1",
+    "facebook_user_id": "f_facebook1"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdF9mXzEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.naWta55AlcLUyeeRhaba1Yg1yDyMm3549mcv0nAzLRQ",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWNlYm9vazEiLCJleHBpcmVzIjo3MjU4MDgwMjAzfQ.5nV_q6uexkpmQA0J7Qg_B1GauBieydB-qDuYdU-13TE"
+} 200
+GET test/link/validate /guest_f_1/facebook1 200 {"from_identity_id": "guest_f_1", "to_identity_id": "facebook1"}
+
+# app token  user token -> passed
+# guest user - registered user -> passed
+odin.user guest_g_1 guest_g_1
+odin.user google1 google1
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "guest_g_1",
+    "app_user_id": "app_user_guest_g_1"
+}
+sql.insert odin.google_credentials_ledger {
+    "reference": "ref1",
+    "identity_id": "google1",
+    "google_user_id": "g_google1"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdF9nXzEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.swkAWWBHMaure768Ggfunn8Ve911r7Vhi4yeaYz5ANc",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnb29nbGUxIiwiZXhwaXJlcyI6NzI1ODA4MDIwM30.B6R22_Eb36JEVd9Af4CKYco4K7lhmD2D8kNCyQkgolo"
+} 200
+GET test/link/validate /guest_g_1/google1 200 {"from_identity_id": "guest_g_1", "to_identity_id": "google1"}
+
+# link between user that has been merged -> passed
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.i-kp53QIFDDKgooXrmRQgj2EUGXkQKJ_vrw7l2fkR8U",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.tyBXGNdToGtgzlDZdxgIkZDuIrOLeLJU3NdW-ak7LTw"
+} 200
+
+# link to user that has been merged with another app user -> failed
+odin.user guest2 guest2
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "guest2",
+    "app_user_id": "app_user_guest2"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDIiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.PAMlOXfk7mQUnPdVJWw-x-IDNUKf798S6GeFfZm-3OE",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.tyBXGNdToGtgzlDZdxgIkZDuIrOLeLJU3NdW-ak7LTw"
+} 422
+GET test/link/validate /guest2/registered2 404
+
+# app token - app token -> failed
+odin.user guest3 guest3
+odin.user registered4 registered4 password1234
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "guest3",
+    "app_user_id": "app_user_guest3"
+}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "registered4",
+    "app_user_id": "app_user_registered4"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDMiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.OBR5xfCEYA-P6YYDNkQYUTXKtK7b27mHrxCHWKTTIok",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkMTQiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.dVs2JgMiW-4CXdk-7uJrRcynK_BbzejsIW22PVPyFrY"
+} 422
+GET test/link/validate /guest3/registered4 404
+
+# user token - user token -> failed
+odin.user guest5 guest5
+odin.user registered6 registered6 password1234
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDUiLCJleHBpcmVzIjo3MjU4MDgwMjAzfQ.4rxHJ6CU3gLNHFvvFU-nGpVRndJOlyhL3sbr5vxWPNY",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDYiLCJleHBpcmVzIjo3MjU4MDgwMjAzfQ.dv0a_qOG4K3iDvcdRzo-JsZvBNUX2KrXLj2Ob7noAio"
+} 422
+GET test/link/validate /guest5/registered6 404
+
+# user token - app token -> failed
+odin.user guest7 guest7
+odin.user registered8 registered8 password1234
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "registered8",
+    "app_user_id": "app_user_registered8"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDciLCJleHBpcmVzIjo3MjU4MDgwMjAzfQ.l4k7fsG40wodMrhoTs5lA5ZWqBPzIWtukI-vhhVSk40",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkOCIsImV4cGlyZXMiOjcyNTgwODAyMDMsImlzcyI6Imh0dHA6Ly9vZGluLmZlbHNwYXIuY29tL2FwcC9hcHAwMSJ9.KmNPimyH9PhgwqzVTk_-Wb_kjRgk_Ej5QMYD5Tpm_Pw"
+} 422
+GET test/link/validate /guest7/registered8 404
+
+# guest user - guest user -> failed
+odin.user guest9 guest9
+odin.user guest10 guest10
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "guest9",
+    "app_user_id": "app_user_guest9"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDkiLCJleHBpcmVzIjo3MjU4MDgwMjAzfQ.T2RSK3q7YB9qfxYs0ZsCxgD2TIx4d7Xs3pkmL_66NpY",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDEwIiwiZXhwaXJlcyI6NzI1ODA4MDIwMywiaXNzIjoiaHR0cDovL29kaW4uZmVsc3Bhci5jb20vYXBwL2FwcDAxIn0.iYiKeNK9LoR1fNu6rGmISP9ZH0beRtzx6CCH2nvWX-0"
+} 422
+GET test/link/validate /guest9/guest10 404
+
+# registered user - guest user -> failed
+odin.user registered11 registered11 password1234
+odin.user guest12 guest12
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "registered11",
+    "app_user_id": "app_user_registered11"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkMTEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.QKLypEGHhy2LnUyA0tlRwU3qw3sE42v-pieS5PoSJ3g",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJndWVzdDEyIiwiZXhwaXJlcyI6NzI1ODA4MDIwM30.xg99Yy-qicN2iGbsuWyswY-l-yj_Ii87StsiIUC-Zkc"
+} 422
+GET test/link/validate /registered11/guest12 404
+
+# registered user - registered user -> failed
+odin.user registered13 registered13 password1234
+odin.user registered14 registered14 password1234
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "registered13",
+    "app_user_id": "app_user_registered13"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkMTMiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.OrpSvF-ecvYsaBwtojZgd2MEvNtmvTxwZcynG-6jDUo",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMTQiLCJleHBpcmVzIjo3MjU4MDgwMjAzfQ.KIt9lniaf7BLKU9GPJuDABvSMoMEbB0Qvo_9_c7EQ_0"
+} 422
+GET test/link/validate /registered11/registered14 404

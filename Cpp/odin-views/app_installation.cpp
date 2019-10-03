@@ -90,7 +90,7 @@ namespace {
             auto const reference = odin::reference();
             /// Using reference as an identity_id
             auto const identity_id = reference;
-            auto const app_user_id = odin::reference();
+            auto const app_user_id = reference;
             odin::app::save_app_user(
                     cnx, reference, app_id, identity_id, app_user_id);
             odin::app::set_installation_id(

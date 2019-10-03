@@ -46,6 +46,12 @@ namespace odin {
                 const f5::u8view app_id,
                 const f5::u8view identity_id);
 
+        /// Return app user identity_id
+        fostlib::nullable<fostlib::string> get_app_user_identity_id(
+                fostlib::pg::connection &cnx,
+                const f5::u8view app_id,
+                const f5::u8view app_user_id);
+
         /// Save installation ID if the given user to database, this does not
         /// commit the transaction
         void set_installation_id(

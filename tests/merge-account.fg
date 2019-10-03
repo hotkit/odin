@@ -146,6 +146,12 @@ GET test/merge-account/validate /credentials/authn5 200
 GET test/merge-account/validate /credentials/authn6 404
 POST odin/merge-account / {"from_identity_id": "authn5", "to_identity_id": "authn6"} 500
 
+odin.user authn7 authn7
+odin.user authn8 authn8
+odin.user authn9 authn9 password123
+POST odin/merge-account / {"from_identity_id": "authn7", "to_identity_id": "authn9"} 200
+POST odin/merge-account / {"from_identity_id": "authn8", "to_identity_id": "authn9"} 200
+
 # Test module AuthZ
 
 # Test superuser matrix

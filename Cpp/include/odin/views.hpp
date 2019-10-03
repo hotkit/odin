@@ -21,6 +21,7 @@ namespace odin {
         extern const fostlib::urlhandler::view &login, &logout, &secure,
                 &user_unsecure, &registration, &facebook, &facebook_link,
                 &google, &app_installation, &app_login, &app_mint, &app_secure,
-                &password_hash, &middleware_reference, &jwt_renewal, &app_user;
+                &password_hash, &middleware_reference, &jwt_renewal, &app_user,
+                &link_account;
     }
 }
