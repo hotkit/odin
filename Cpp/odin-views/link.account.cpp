@@ -81,7 +81,7 @@ namespace {
         }
         auto const app_id =
                 jwt_iss.substr(odin::c_app_namespace.value().code_points());
-        fostlib::json app = odin::app::get_detail(cnx, std::move(app_id));
+        fostlib::json app = odin::app::get_detail(cnx, app_id);
         if (app.isnull()) {
             throw fostlib::exceptions::not_implemented(
                     __PRETTY_FUNCTION__, "App not found");
