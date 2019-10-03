@@ -194,7 +194,7 @@ namespace {
                     boost::shared_ptr<fostlib::mime> response(
                             new fostlib::text_body(
                                     fostlib::coerce<fostlib::string>(
-                                            body["from_account"]),
+                                            body["to_account"]),
                                     headers, L"application/jwt"));
                     return std::make_pair(response, 200);
                 }
@@ -236,7 +236,7 @@ namespace {
 
             fostlib::mime::mime_headers headers;
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    fostlib::coerce<fostlib::string>(body["from_account"]),
+                    fostlib::coerce<fostlib::string>(body["to_account"]),
                     headers, L"application/jwt"));
             return std::make_pair(response, 200);
         }
