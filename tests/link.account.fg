@@ -74,6 +74,7 @@ POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.i-kp53QIFDDKgooXrmRQgj2EUGXkQKJ_vrw7l2fkR8U",
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.tyBXGNdToGtgzlDZdxgIkZDuIrOLeLJU3NdW-ak7LTw"
 } 200
+
 GET test/link/validate /guest1/registered2 200 {"from_identity_id": "guest1", "to_identity_id": "registered2"}
 
 # app token  user token -> passed
@@ -123,6 +124,41 @@ POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.i-kp53QIFDDKgooXrmRQgj2EUGXkQKJ_vrw7l2fkR8U",
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.tyBXGNdToGtgzlDZdxgIkZDuIrOLeLJU3NdW-ak7LTw"
 } 200
+
+setting webserver views/test/app/secure/identity {
+    "view": "odin.secure",
+      "configuration": {
+        "secure": {
+            "view": "fostgres.sql",
+                "configuration": {
+                "sql": [
+                    {
+                    "return": "object",
+                    "path": ["/me"],
+                    "GET": {
+                        "command": "SELECT $1::TEXT AS user;",
+                        "arguments": [
+                        ["request", "headers", "__user"]
+                        ]
+                    }
+                    }
+                ]
+            }
+        },
+        "unsecure": {
+          "view": "fost.response.401",
+          "configuration": {
+            "schemes": {
+              "Bearer": {}
+            }
+          }
+        }
+    }
+}
+
+# link should return to_account JWT
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/link/account / {"from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.i-kp53QIFDDKgooXrmRQgj2EUGXkQKJ_vrw7l2fkR8U","to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.tyBXGNdToGtgzlDZdxgIkZDuIrOLeLJU3NdW-ak7LTw"} 200))
+GET test/app/secure/identity /me 200 {"user": "registered2"}
 
 # link to user that has been merged with another app user -> failed
 odin.user guest2 guest2
