@@ -41,6 +41,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Schema/app/007-app-user-data.blue.sql
                 ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
                 app.register.json
                 app.register.fg
         )
