@@ -118,7 +118,7 @@ fostlib::nullable<fostlib::string> odin::app::get_app_user_identity_id(
             "AND odin.app_user.app_user_id=$2;");
 
     auto data = cnx.procedure(sql).exec(
-        std::vector<fostlib::string>{app_id, app_user_id});
+            std::vector<fostlib::string>{app_id, app_user_id});
     auto row = data.begin();
     if (row == data.end()) {
         fostlib::log::warning(c_odin)("", "App user or App not found")(

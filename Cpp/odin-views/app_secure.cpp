@@ -114,15 +114,15 @@ namespace {
                                 fostlib::coerce<fostlib::string>(
                                         jwt.value().payload["sub"]);
 
-                        auto const identity_id = odin::app::get_app_user_identity_id(
-                            cnx, app_id, app_user_id);
+                        auto const identity_id =
+                                odin::app::get_app_user_identity_id(
+                                        cnx, app_id, app_user_id);
 
                         if (not identity_id) {
                             return respond("App user does not exist.", 401);
                         }
 
-                        req.headers().set(
-                                "__user", identity_id);
+                        req.headers().set("__user", identity_id);
                     }
                     req.headers().set(
                             "__app",

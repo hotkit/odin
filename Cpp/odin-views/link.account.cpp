@@ -32,20 +32,21 @@ namespace {
 
     bool has_account_registered(
             fostlib::pg::connection &cnx, fostlib::string const identity_id) {
-        auto const credentials = cnx.procedure(
-            "SELECT 1 FROM "
-            "odin.identity id "
-            "LEFT JOIN odin.credentials cred "
-            "ON cred.identity_id = id.id "
-            "LEFT JOIN odin.facebook_credentials fb "
-            "ON fb.identity_id = id.id "
-            "LEFT JOIN odin.google_credentials gg "
-            "ON gg.identity_id = id.id "
-            "WHERE id.id=$1 "
-            "AND (cred.identity_id IS NOT NULL "
-            "OR fb.identity_id IS NOT NULL "
-            "OR gg.identity_id IS NOT NULL);"
-        ).exec(std::vector<fostlib::string>{identity_id});
+        auto const credentials =
+                cnx.procedure(
+                           "SELECT 1 FROM "
+                           "odin.identity id "
+                           "LEFT JOIN odin.credentials cred "
+                           "ON cred.identity_id = id.id "
+                           "LEFT JOIN odin.facebook_credentials fb "
+                           "ON fb.identity_id = id.id "
+                           "LEFT JOIN odin.google_credentials gg "
+                           "ON gg.identity_id = id.id "
+                           "WHERE id.id=$1 "
+                           "AND (cred.identity_id IS NOT NULL "
+                           "OR fb.identity_id IS NOT NULL "
+                           "OR gg.identity_id IS NOT NULL);")
+                        .exec(std::vector<fostlib::string>{identity_id});
         return credentials.begin() != credentials.end();
     }
 
@@ -129,8 +130,8 @@ namespace {
                         .substr(odin::c_app_namespace.value().code_points());
         auto const app_user_id =
                 fostlib::coerce<fostlib::string>(jwt.value().payload["sub"]);
-        auto const identity_id = odin::app::get_app_user_identity_id(
-            cnx, app_id, app_user_id);
+        auto const identity_id =
+                odin::app::get_app_user_identity_id(cnx, app_id, app_user_id);
 
         if (not identity_id) {
             throw fostlib::exceptions::not_implemented(
