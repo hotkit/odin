@@ -46,7 +46,7 @@ CREATE TRIGGER app_role_ledger_insert_trigger
 CREATE TABLE odin.app_user_role (
     app_id TEXT NOT NULL,
     identity_id TEXT NOT NULL,
-    FOREIGN KEY (app_id, identity_id)
+    CONSTRAINT app_user_role_app_id_fkey FOREIGN KEY (app_id, identity_id)
         REFERENCES odin.app_user (app_id, identity_id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
     role TEXT NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE odin.app_user_role_ledger (
     reference text NOT NULL,
     app_id text NOT NULL,
     identity_id TEXT NOT NULL,
-    FOREIGN KEY (app_id, identity_id)
+    CONSTRAINT app_user_role_ledger_app_id_fkey FOREIGN KEY (app_id, identity_id)
         REFERENCES odin.app_user (app_id, identity_id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE,
     role TEXT NOT NULL,
