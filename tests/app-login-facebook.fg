@@ -1,4 +1,4 @@
-# Set up the database
+## Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
@@ -343,7 +343,7 @@ setting webserver views/odin/test/sec/facebook/login/ok-allow-app {
                         "body": {
                             "data": [
                                 {
-                                    "id": "778899112233445",
+                                    "id": "g_first_app",
                                     "app": {
                                         "category": "Business",
                                         "link": "https://bowling-friday/",
@@ -352,7 +352,7 @@ setting webserver views/odin/test/sec/facebook/login/ok-allow-app {
                                     }
                                 },
                                 {
-                                    "id": "112233445566778",
+                                    "id": "g_second_app",
                                     "app": {
                                         "category": "Business",
                                         "link": "https://caveman-club/",
@@ -365,8 +365,9 @@ setting webserver views/odin/test/sec/facebook/login/ok-allow-app {
                     },
                     "me": {
                         "body": {
-                            "name": "Fred Flintstone",
-                            "id": "778899112233445"
+                            "name": "Gee g",
+                            "id": "g_second_app",
+                            "email": "gee@example.com"
                         }
                     }
                 }
@@ -379,6 +380,8 @@ setting webserver views/odin/test/sec/facebook/login/ok-allow-app {
 
 ## Login with Facebook ID that has not been seen before
 POST odin/test/sec/facebook/login/ok-allow-app / {"access_token": "user_1"} 200
+GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
 
 setting webserver views/validate-facebook-id {
     "view": "fostgres.sql",
@@ -393,9 +396,10 @@ setting webserver views/validate-facebook-id {
     }
 }
 
-GET validate-facebook-id /778899112233445 200 {
-    "facebook_user_id": "778899112233445",
-    "full_name": "Fred Flintstone"
+GET validate-facebook-id /g_second_app 200 {
+    "facebook_user_id": "g_second_app",
+    "full_name": "Gee g",
+    "email": "gee@example.com"
 }
 
 setting webserver views/odin/test/sec/facebook/login/ok-allow-app-only {
@@ -439,6 +443,8 @@ setting webserver views/odin/test/sec/facebook/login/ok-allow-app-only {
 
 ## Login with Facebook ID that has not been seen before
 POST odin/test/sec/facebook/login/ok-allow-app-only / {"access_token": "user_1"} 200
+GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
 
 GET validate-facebook-id /123412351236123 200 {
     "facebook_user_id": "123412351236123",
@@ -492,10 +498,242 @@ setting webserver views/odin/test/sec/facebook/login/ok-login-main-again {
     }
 }
 
-## Login with Facebook ID that has not been seen before
+## Login with Facebook ID that has been seen before
 POST odin/test/sec/facebook/login/ok-login-main-again / {"access_token": "user_1"} 200
+GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
 
 GET validate-facebook-id /123412351236123 200 {
     "facebook_user_id": "123412351236123",
     "full_name": "Barney"
 }
+
+## Login with Facebook ID that has not been seen before but email already exists 
+setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-user {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "222222222222222",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "test-user-email",
+                            "id": "222222222222222",
+                            "email": "duplicate-email-user@example.com"
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+sql.insert odin.identity {
+    "id": "duplicate-email-user",
+    "full_name": "duplicate-email-user",
+    "email": "duplicate-email-user@example.com"
+}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 4}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "open-app",
+    "identity_id": "duplicate-email-user",
+    "app_user_id": "app-duplicate-email-user"
+}
+
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "duplicate-email-user"} 201))
+GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
+
+## If user email already registered with Odin with no credential, return 200 add facebbok credential to that registered user 
+POST odin/test/sec/facebook/login/ok-login-duplicate-email-user / {"access_token": "duplicate-email-user"} 200
+GET validate-facebook-id /222222222222222 200 {
+    "id": "duplicate-email-user",
+    "facebook_user_id": "222222222222222",
+    "email": "duplicate-email-user@example.com",
+    "full_name": "test-user-email"
+}
+
+## merge new installation registered user to exists user
+GET odin/test/facebook/validate_login /count-users 200 {"count": 4}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
+
+setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-with-google-account {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "3333333333",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "test-user-email",
+                            "id": "3333333333",
+                            "email": "duplicate-email-with-google@example.com"
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
+
+POST odin/test/google/login/ok / {"access_token": "duplicate-email-with-google"} 200
+
+GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
+
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "duplicate-email-with-google"} 201))
+GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
+
+## If user email already registered with Odin by google, return 200 add facebbok credential to that registered user 
+POST odin/test/sec/facebook/login/ok-login-duplicate-email-with-google-account / {"access_token": "duplicate-email-with-google"} 200
+
+setting webserver views/validate-facebook-id {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [
+            {
+                "return": "object",
+                "path": [1],
+                "GET": "SELECT id.*, fc.facebook_user_id, gc.google_user_id FROM odin.google_credentials gc, odin.facebook_credentials fc, odin.identity id WHERE gc.identity_id=id.id AND fc.identity_id=id.id AND fc.facebook_user_id=$1"
+            }
+        ]
+    }
+}
+
+GET validate-facebook-id /3333333333 200 {
+    "google_user_id": "duplicate-email-with-google",
+    "facebook_user_id": "3333333333",
+    "email": "duplicate-email-with-google@example.com",
+    "full_name": "test-user-email"
+}
+
+## merge new installation registered user to exists user
+GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
+
+setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-with-username-account {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72},
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "4444444444",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "test-user-email",
+                            "id": "4444444444",
+                            "email": "duplicate-email-with-username-account@example.com"
+                        }
+                    }
+                }
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+POST odin/register / {"username": "exist_user", "password": "password1234", "email": "duplicate-email-with-username-account@example.com"} 201
+
+GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
+
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "duplicate-email-with-username-account"} 201))
+GET odin/test/facebook/validate_login /count-users 200 {"count": 7}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
+
+## If user email already registered with Odin by username, return 200 add facebbok credential to that registered user 
+POST odin/test/sec/facebook/login/ok-login-duplicate-email-with-username-account / {"access_token": "duplicate-email-with-username-account"} 200
+
+setting webserver views/validate-facebook-id {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [
+            {
+                "return": "object",
+                "path": [1],
+                "GET": "SELECT id.*, cr.login, fc.facebook_user_id FROM odin.facebook_credentials fc, odin.credentials cr, odin.identity id WHERE fc.identity_id=id.id AND cr.identity_id=id.id AND fc.facebook_user_id=$1"
+            }
+        ]
+    }
+}
+
+GET validate-facebook-id /4444444444 200 {
+    "login": "exist_user",
+    "facebook_user_id": "4444444444",
+    "email": "duplicate-email-with-username-account@example.com",
+    "full_name": "test-user-email"
+}
+
+## merge new installation registered user to exists user
+GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 6}

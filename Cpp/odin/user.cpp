@@ -9,10 +9,12 @@
 
 #include <odin/fg/native.hpp>
 #include <odin/nonce.hpp>
+#include <odin/odin.hpp>
 #include <odin/user.hpp>
 #include <odin/pwhashproc.hpp>
 
 #include <fost/insert>
+#include <fost/log>
 
 
 void odin::create_user(
@@ -126,3 +128,30 @@ bool odin::does_email_exist(fostlib::pg::connection &cnx, fostlib::string email)
     auto &rs = data.second;
     return rs.begin() != rs.end();
 }
+
+
+std::optional<f5::u8string> odin::email_owner_id(fostlib::pg::connection &cnx, fostlib::string email) {
+    static const fostlib::string sql(
+            "SELECT id FROM odin.identity WHERE email=$1");
+    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});
+    auto &rs = data.second;
+    auto row = rs.begin();
+    if (row == rs.end()) {
+        return {};
+    }
+    if (++row != rs.end()) {
+        fostlib::log::error(c_odin)("", "More than one email owner returned")(
+                "email", email);
+        return {};
+    }
+    return fostlib::coerce<f5::u8string>((*row)[std::size_t{0}]);
+}
+
+
+void odin::link_account(fostlib::pg::connection &cnx, f5::u8view from_identity_id, f5::u8view to_identity_id, fostlib::json annotation) {
+    fostlib::json merge_ledger_value;
+    fostlib::insert(merge_ledger_value, "from_identity_id", from_identity_id);
+    fostlib::insert(merge_ledger_value, "to_identity_id", to_identity_id);
+    fostlib::insert(merge_ledger_value, "annotation", annotation);
+    cnx.insert("odin.merge_ledger", merge_ledger_value);    
+};

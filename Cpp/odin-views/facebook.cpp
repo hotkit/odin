@@ -15,6 +15,7 @@
 #include <fost/exception/parse_error.hpp>
 #include <fost/insert>
 #include <fost/log>
+#include <fost/push_back>
 #include <fost/mailbox>
 #include <fostgres/sql.hpp>
 
@@ -43,11 +44,13 @@ namespace {
                 const fostlib::string &path,
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
-            if (req.method() != "POST")
-                throw fostlib::exceptions::not_implemented(
-                        __func__,
-                        "Facebook login requires POST. This should be a 405");
-
+            if (req.method() != "POST") {
+                fostlib::json config;
+                fostlib::insert(config, "view", "fost.response.405");
+                fostlib::push_back(config, "configuration", "allow", "POST");
+                return execute(config, path, req, host);
+            }
+            
             auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
@@ -69,26 +72,22 @@ namespace {
             auto facebook_user =
                     odin::facebook::credentials(cnx, facebook_user_id);
             auto identity_id = reference;
-            if (facebook_user.isnull()) {
-                odin::create_user(cnx, identity_id);
+            if (facebook_user.isnull()) {        
+                if (user_detail.has_key("email")) {
+                    auto const email_owner_id = odin::email_owner_id(cnx, fostlib::coerce<fostlib::string>(user_detail["email"]));
+                    if (email_owner_id.has_value()) {
+                        identity_id = email_owner_id.value();
+                    } else {
+                        odin::create_user(cnx, identity_id);
+                    }
+                    odin::set_email(
+                            cnx, reference, identity_id, fostlib::coerce<fostlib::email_address>(user_detail["email"]));
+                }
                 if (user_detail.has_key("name")) {
                     const auto facebook_user_name =
                             fostlib::coerce<f5::u8view>(user_detail["name"]);
                     odin::set_full_name(
                             cnx, reference, identity_id, facebook_user_name);
-                }
-                if (user_detail.has_key("email")) {
-                    const auto facebook_user_email =
-                            fostlib::coerce<fostlib::email_address>(
-                                    user_detail["email"]);
-                    if (odin::does_email_exist(
-                                cnx,
-                                fostlib::coerce<fostlib::string>(
-                                        user_detail["email"]))) {
-                        return respond("This email already exists", 422);
-                    }
-                    odin::set_email(
-                            cnx, reference, identity_id, facebook_user_email);
                 }
             } else {
                 const fostlib::jcursor id("identity", "id");

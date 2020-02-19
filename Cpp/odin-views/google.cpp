@@ -80,25 +80,21 @@ namespace {
             auto google_user = odin::google::credentials(cnx, google_user_id);
             auto identity_id = reference;
             if (google_user.isnull()) {
-                odin::create_user(cnx, identity_id);
+                if (user_detail.has_key("email")) {
+                    auto const email_owner_id = odin::email_owner_id(cnx, fostlib::coerce<fostlib::string>(user_detail["email"]));
+                    if (email_owner_id.has_value()) {
+                        identity_id = email_owner_id.value();
+                    } else {
+                        odin::create_user(cnx, identity_id);
+                    }
+                    odin::set_email(
+                            cnx, reference, identity_id, fostlib::coerce<fostlib::email_address>(user_detail["email"]));
+                } 
                 if (user_detail.has_key("name")) {
                     const auto google_user_name =
                             fostlib::coerce<f5::u8view>(user_detail["name"]);
                     odin::set_full_name(
                             cnx, reference, identity_id, google_user_name);
-                }
-                if (user_detail.has_key("email")) {
-                    const auto google_user_email =
-                            fostlib::coerce<fostlib::email_address>(
-                                    user_detail["email"]);
-                    if (odin::does_email_exist(
-                                cnx,
-                                fostlib::coerce<fostlib::string>(
-                                        user_detail["email"]))) {
-                        return respond("This email already exists", 422);
-                    }
-                    odin::set_email(
-                            cnx, reference, identity_id, google_user_email);
                 }
             } else {
                 const fostlib::jcursor id("identity", "id");
