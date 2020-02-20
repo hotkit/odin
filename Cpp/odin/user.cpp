@@ -130,22 +130,6 @@ bool odin::does_email_exist(fostlib::pg::connection &cnx, fostlib::string email)
 }
 
 
-std::optional<f5::u8string> odin::email_owner_id(
-        fostlib::pg::connection &cnx, fostlib::string email) {
-    const f5::u8string sql("SELECT id FROM odin.identity WHERE email=$1");
-    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});
-    auto &rs = data.second;
-    auto row = rs.begin();
-    if (row == rs.end()) { return {}; }
-    if (++row != rs.end()) {
-        fostlib::log::error(c_odin)("", "More than one email owner returned")(
-                "email", email);
-        return {};
-    }
-    return fostlib::coerce<f5::u8string>((*row)[std::size_t{0}]);
-}
-
-
 void odin::link_account(
         fostlib::pg::connection &cnx,
         f5::u8view from_identity_id,
