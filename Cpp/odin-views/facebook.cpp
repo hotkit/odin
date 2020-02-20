@@ -7,6 +7,7 @@
 
 #include <odin/credentials.hpp>
 #include <odin/facebook.hpp>
+#include <odin/google.hpp>
 #include <odin/odin.hpp>
 #include <odin/nonce.hpp>
 #include <odin/user.hpp>
@@ -74,7 +75,7 @@ namespace {
             auto identity_id = reference;
             if (facebook_user.isnull()) {        
                 if (user_detail.has_key("email")) {
-                    auto const email_owner_id = odin::email_owner_id(cnx, fostlib::coerce<fostlib::string>(user_detail["email"]));
+                    auto const email_owner_id = odin::google::email_owner_identity_id(cnx, fostlib::coerce<fostlib::string>(user_detail["email"]));
                     if (email_owner_id.has_value()) {
                         identity_id = email_owner_id.value();
                     } else {

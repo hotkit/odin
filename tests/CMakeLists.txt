@@ -437,6 +437,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
@@ -483,6 +484,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/004-merge-account-function.blue.sql
@@ -494,6 +496,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
                 ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
                 ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/004-merge-account-function.blue.sql
@@ -659,6 +662,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
@@ -709,6 +713,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/004-merge-account-function.blue.sql

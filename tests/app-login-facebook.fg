@@ -11,6 +11,7 @@ odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-funct
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
@@ -24,6 +25,11 @@ odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sq
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
 
 setting odin "JWT secret" <JWT_SECRET>
 setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
@@ -567,17 +573,15 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/inst
 GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
 
-## If user email already registered with Odin with no credential, return 200 add facebbok credential to that registered user 
+## If user email already registered with Odin with no credential, return 200 create new user
 POST odin/test/sec/facebook/login/ok-login-duplicate-email-user / {"access_token": "duplicate-email-user"} 200
 GET validate-facebook-id /222222222222222 200 {
-    "id": "duplicate-email-user",
     "facebook_user_id": "222222222222222",
     "email": "duplicate-email-user@example.com",
     "full_name": "test-user-email"
 }
 
-## merge new installation registered user to exists user
-GET odin/test/facebook/validate_login /count-users 200 {"count": 4}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
 
 setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-with-google-account {
@@ -619,20 +623,14 @@ setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-wi
     }
 }
 
-odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
-
 POST odin/test/google/login/ok / {"access_token": "duplicate-email-with-google"} 200
 
-GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
 
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "duplicate-email-with-google"} 201))
-GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 7}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
 
 ## If user email already registered with Odin by google, return 200 add facebbok credential to that registered user 
@@ -659,7 +657,7 @@ GET validate-facebook-id /3333333333 200 {
 }
 
 ## merge new installation registered user to exists user
-GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
 
 setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-with-username-account {
@@ -703,15 +701,15 @@ setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-wi
 
 POST odin/register / {"username": "exist_user", "password": "password1234", "email": "duplicate-email-with-username-account@example.com"} 201
 
-GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 7}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
 
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "duplicate-email-with-username-account"} 201))
-GET odin/test/facebook/validate_login /count-users 200 {"count": 7}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 8}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
 
-## If user email already registered with Odin by username, return 200 add facebbok credential to that registered user 
+## If user email already registered with Odin by username, return 200 create new user
 POST odin/test/sec/facebook/login/ok-login-duplicate-email-with-username-account / {"access_token": "duplicate-email-with-username-account"} 200
 
 setting webserver views/validate-facebook-id {
@@ -721,19 +719,18 @@ setting webserver views/validate-facebook-id {
             {
                 "return": "object",
                 "path": [1],
-                "GET": "SELECT id.*, cr.login, fc.facebook_user_id FROM odin.facebook_credentials fc, odin.credentials cr, odin.identity id WHERE fc.identity_id=id.id AND cr.identity_id=id.id AND fc.facebook_user_id=$1"
+                "GET": "SELECT id.*, cr.login, fc.facebook_user_id FROM odin.facebook_credentials fc, odin.identity id LEFT JOIN odin.credentials cr ON cr.identity_id=id.id WHERE fc.identity_id=id.id AND fc.facebook_user_id=$1"
             }
         ]
     }
 }
 
 GET validate-facebook-id /4444444444 200 {
-    "login": "exist_user",
+    "login": null,
     "facebook_user_id": "4444444444",
     "email": "duplicate-email-with-username-account@example.com",
     "full_name": "test-user-email"
 }
 
-## merge new installation registered user to exists user
-GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
+GET odin/test/facebook/validate_login /count-users 200 {"count": 8}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 6}

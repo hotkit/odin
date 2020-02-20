@@ -7,6 +7,7 @@
 
 
 #include <odin/app.hpp>
+#include <odin/facebook.hpp>
 #include <odin/google.hpp>
 #include <odin/nonce.hpp>
 #include <odin/user.hpp>
@@ -116,7 +117,7 @@ namespace {
                 identity_id = req.headers()["__user"].value();
                 app_user_id = req.headers()["__app_user"].value();
                 if (user_detail.has_key("email")) {
-                    auto const email_owner_id = odin::email_owner_id(cnx, fostlib::coerce<fostlib::string>(user_detail["email"]));
+                    auto const email_owner_id = odin::facebook::email_owner_identity_id(cnx, fostlib::coerce<fostlib::string>(user_detail["email"]));
                     if (email_owner_id.has_value()) {
                         fostlib::json merge_annotation;
                         fostlib::insert(merge_annotation, "app", req.headers()["__app"]);

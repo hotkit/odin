@@ -10,10 +10,16 @@ odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-funct
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
 
 setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
 setting odin "Facebook" {
@@ -48,7 +54,7 @@ POST odin/test/google/login/ok / {"access_token": "user_2"} 200
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 2}
 
-##  If user email already registered with Odin by username, add google credential to that registered user
+##  If user email already registered with Odin by username, create new user
 POST odin/register / {"username": "exist_user", "password": "password1234", "email": "exist_user@example.com"} 201
 
 GET odin/test/google/validate_login /count-users 200 {"count": 3}
@@ -63,27 +69,22 @@ setting webserver views/validate-google-id {
             {
                 "return": "object",
                 "path": [1],
-                "GET": "SELECT id.*, cr.login, gc.google_user_id FROM odin.google_credentials gc, odin.credentials cr, odin.identity id WHERE gc.identity_id=id.id AND cr.identity_id=id.id AND gc.google_user_id=$1"
+                "GET": "SELECT id.*, cr.login, gc.google_user_id FROM odin.google_credentials gc, odin.identity id LEFT JOIN odin.credentials cr ON cr.identity_id=id.id WHERE gc.identity_id=id.id AND gc.google_user_id=$1"
             }
         ]
     }
 }
 
 GET validate-google-id /exist_user 200 {
-    "login": "exist_user", 
+    "login": null, 
     "google_user_id": "exist_user",
     "email": "exist_user@example.com",
     "full_name": "Test User"
 }
 
 ##  google credentials added to exists user then number of users not increase
-GET odin/test/google/validate_login /count-users 200 {"count": 3}
+GET odin/test/google/validate_login /count-users 200 {"count": 4}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 3}
-
-odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
 
 setting webserver views/odin/test/facebook/login/ok {
     "view": "odin.facebook.login",
@@ -132,7 +133,7 @@ setting webserver views/odin/test/facebook/login/ok {
 ##  If user email already registered with Odin by facebook, return 200 add google credential to that registered user 
 POST odin/test/facebook/login/ok / {"access_token": "login_via_gp"} 200
 
-GET odin/test/google/validate_login /count-users 200 {"count": 4}
+GET odin/test/google/validate_login /count-users 200 {"count": 5}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 3}
 
 POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
@@ -158,7 +159,7 @@ GET validate-google-id /login_via_gp 200 {
 }
 
 ##  google credentials added to exists facebook user then number of users not increase
-GET odin/test/google/validate_login /count-users 200 {"count": 4}
+GET odin/test/google/validate_login /count-users 200 {"count": 5}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 4}
 
 sql.insert odin.identity {
@@ -167,10 +168,10 @@ sql.insert odin.identity {
     "email": "duplicate-email-user@example.com"
 }
 
-GET odin/test/google/validate_login /count-users 200 {"count": 5}
+GET odin/test/google/validate_login /count-users 200 {"count": 6}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 4}
 
-##  If user email already registered with Odin with no credential, return 200 add google credential to that registered user 
+##  If user email already registered with Odin with no credential, return 200 create new user 
 POST odin/test/google/login/ok / {"access_token": "duplicate-email-user"} 200
 
 setting webserver views/validate-google-id {
@@ -187,14 +188,13 @@ setting webserver views/validate-google-id {
 }
 
 GET validate-google-id /duplicate-email-user 200 {
-    "id": "duplicate-email-user",
     "google_user_id": "duplicate-email-user",
     "email": "duplicate-email-user@example.com",
     "full_name": "Test User"
 }
 
-##  google credentials added to exists user then number of users not increase
-GET odin/test/google/validate_login /count-users 200 {"count": 5}
+## create new user with new credentials
+GET odin/test/google/validate_login /count-users 200 {"count": 7}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 5}
 
 ##  Enable opts/installation-id

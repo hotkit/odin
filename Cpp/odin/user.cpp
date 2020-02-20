@@ -131,7 +131,7 @@ bool odin::does_email_exist(fostlib::pg::connection &cnx, fostlib::string email)
 
 
 std::optional<f5::u8string> odin::email_owner_id(fostlib::pg::connection &cnx, fostlib::string email) {
-    static const fostlib::string sql(
+    const f5::u8string sql(
             "SELECT id FROM odin.identity WHERE email=$1");
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});
     auto &rs = data.second;
