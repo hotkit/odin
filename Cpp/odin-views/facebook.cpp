@@ -51,7 +51,7 @@ namespace {
                 fostlib::push_back(config, "configuration", "allow", "POST");
                 return execute(config, path, req, host);
             }
-            
+
             auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
             fostlib::json body = fostlib::json::parse(body_str);
@@ -73,16 +73,22 @@ namespace {
             auto facebook_user =
                     odin::facebook::credentials(cnx, facebook_user_id);
             auto identity_id = reference;
-            if (facebook_user.isnull()) {        
+            if (facebook_user.isnull()) {
                 if (user_detail.has_key("email")) {
-                    auto const email_owner_id = odin::google::email_owner_identity_id(cnx, fostlib::coerce<fostlib::string>(user_detail["email"]));
+                    auto const email_owner_id =
+                            odin::google::email_owner_identity_id(
+                                    cnx,
+                                    fostlib::coerce<fostlib::string>(
+                                            user_detail["email"]));
                     if (email_owner_id.has_value()) {
                         identity_id = email_owner_id.value();
                     } else {
                         odin::create_user(cnx, identity_id);
                     }
                     odin::set_email(
-                            cnx, reference, identity_id, fostlib::coerce<fostlib::email_address>(user_detail["email"]));
+                            cnx, reference, identity_id,
+                            fostlib::coerce<fostlib::email_address>(
+                                    user_detail["email"]));
                 }
                 if (user_detail.has_key("name")) {
                     const auto facebook_user_name =

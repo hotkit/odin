@@ -251,15 +251,16 @@ void odin::facebook::set_facebook_credentials(
 }
 
 
-std::optional<f5::u8string> odin::facebook::email_owner_identity_id(fostlib::pg::connection &cnx, fostlib::string email) {
+std::optional<f5::u8string> odin::facebook::email_owner_identity_id(
+        fostlib::pg::connection &cnx, fostlib::string email) {
     const f5::u8string sql(
-            "SELECT oi.id FROM odin.identity oi INNER JOIN odin.facebook_credentials fc ON oi.id = fc.identity_id WHERE email=$1");
+            "SELECT oi.id FROM odin.identity oi INNER JOIN "
+            "odin.facebook_credentials fc ON oi.id = fc.identity_id WHERE "
+            "email=$1");
     auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});
     auto &rs = data.second;
     auto row = rs.begin();
-    if (row == rs.end()) {
-        return {};
-    }
+    if (row == rs.end()) { return {}; }
     if (++row != rs.end()) {
         fostlib::log::error(c_odin)("", "More than one email owner returned")(
                 "email", email);

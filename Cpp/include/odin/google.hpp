@@ -46,8 +46,7 @@ namespace odin {
         /// if that user has google credential
         /// If failed to match given email or multiple match return {}
         std::optional<f5::u8string> email_owner_identity_id(
-                fostlib::pg::connection &cnx, 
-                fostlib::string email);
+                fostlib::pg::connection &cnx, fostlib::string email);
 
 
     }

@@ -82,12 +82,16 @@ namespace odin {
     /// Check email already exists in the database
     bool does_email_exist(fostlib::pg::connection &cnx, fostlib::string email);
 
-    /// Return database identity_id what match with given email, 
+    /// Return database identity_id what match with given email,
     /// If failed to match given email retuen {}
-    std::optional<f5::u8string> email_owner_id(fostlib::pg::connection &cnx, fostlib::string email);
+    std::optional<f5::u8string>
+            email_owner_id(fostlib::pg::connection &cnx, fostlib::string email);
 
-    /// Save merge ledger between to given two user to database, this does not commit
-    /// the transaction
-    void link_account(fostlib::pg::connection &cnx, f5::u8view from_identity_id, f5::u8view to_identity_id, fostlib::json annotation);
+    /// Save merge ledger between to given two user to database, this does not
+    /// commit the transaction
+    void link_account(
+            fostlib::pg::connection &cnx,
+            f5::u8view from_identity_id,
+            f5::u8view to_identity_id,
+            fostlib::json annotation);
 }
- 

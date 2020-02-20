@@ -73,7 +73,7 @@ namespace {
             fostlib::json body = fostlib::json::parse(body_str);
             logger("body", body);
 
-            if (not body.has_key("access_token")) 
+            if (not body.has_key("access_token"))
                 throw fostlib::exceptions::not_implemented(
                         "odin.app.facebook.login",
                         "Must pass access_token field");
@@ -85,7 +85,7 @@ namespace {
             user_detail =
                     odin::facebook::get_user_detail(cnx, access_token, config);
             logger("user_detail", user_detail);
-            if (user_detail.isnull()) 
+            if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
                         "odin.app.facebook.login", "User not authenticated");
 
@@ -107,21 +107,33 @@ namespace {
                 identity_id = req.headers()["__user"].value();
                 app_user_id = req.headers()["__app_user"].value();
                 if (user_detail.has_key("email")) {
-                    auto const email_owner_id = odin::google::email_owner_identity_id(cnx, fostlib::coerce<fostlib::string>(user_detail["email"]));
+                    auto const email_owner_id =
+                            odin::google::email_owner_identity_id(
+                                    cnx,
+                                    fostlib::coerce<fostlib::string>(
+                                            user_detail["email"]));
                     if (email_owner_id.has_value()) {
                         fostlib::json merge_annotation;
-                        fostlib::insert(merge_annotation, "app", req.headers()["__app"]);
+                        fostlib::insert(
+                                merge_annotation, "app",
+                                req.headers()["__app"]);
                         try {
-                            odin::link_account(cnx, req.headers()["__user"].value(), email_owner_id.value(), merge_annotation);   
+                            odin::link_account(
+                                    cnx, req.headers()["__user"].value(),
+                                    email_owner_id.value(), merge_annotation);
                         } catch (const pqxx::unique_violation &e) {
-                            /// We replace the identity with the new one -- case 2 above
+                            /// We replace the identity with the new one -- case
+                            /// 2 above
                         } catch (...) { throw; }
-                        identity_id = fostlib::coerce<fostlib::string>(email_owner_id.value());    
+                        identity_id = fostlib::coerce<fostlib::string>(
+                                email_owner_id.value());
                     } else {
                         odin::set_email(
-                            cnx, reference, identity_id, fostlib::coerce<fostlib::email_address>(user_detail["email"]));
+                                cnx, reference, identity_id,
+                                fostlib::coerce<fostlib::email_address>(
+                                        user_detail["email"]));
                     }
-                } 
+                }
                 if (user_detail.has_key("name")) {
                     auto const facebook_user_name =
                             fostlib::coerce<f5::u8view>(user_detail["name"]);
@@ -146,11 +158,16 @@ namespace {
                 identity_id = fostlib::coerce<fostlib::string>(
                         facebook_user["identity"]["id"]);
                 fostlib::json merge_annotation;
-                fostlib::insert(merge_annotation, "app", req.headers()["__app"]);
-                
+                fostlib::insert(
+                        merge_annotation, "app", req.headers()["__app"]);
+
                 try {
                     /// Case 1 above
-                    odin::link_account(cnx, req.headers()["__user"].value(), fostlib::coerce<f5::u8view>(facebook_user["identity"]["id"]), merge_annotation);
+                    odin::link_account(
+                            cnx, req.headers()["__user"].value(),
+                            fostlib::coerce<f5::u8view>(
+                                    facebook_user["identity"]["id"]),
+                            merge_annotation);
                     cnx.commit();
                     auto facebook_user = odin::facebook::app_credentials(
                             cnx, facebook_user_id, app_id);
