@@ -62,12 +62,14 @@ std::pair<fostlib::utf8_string, fostlib::timestamp> odin::app::mint_user_jwt(
 void odin::app::save_app_user(
         fostlib::pg::connection &cnx,
         f5::u8view reference,
+        const f5::u8view app_id,
         const f5::u8view identity_id,
-        const f5::u8view app_id) {
+        const f5::u8view app_user_id) {
     fostlib::json app_user_values;
     fostlib::insert(app_user_values, "reference", reference);
-    fostlib::insert(app_user_values, "identity_id", identity_id);
     fostlib::insert(app_user_values, "app_id", app_id);
+    fostlib::insert(app_user_values, "identity_id", identity_id);
+    fostlib::insert(app_user_values, "app_user_id", app_user_id);
     cnx.insert("odin.app_user_ledger", app_user_values);
 }
 
@@ -102,6 +104,28 @@ fostlib::json odin::app::get_app_user(
         fostlib::insert(app_user, pos, record[index]);
     }
     return app_user;
+}
+
+
+fostlib::nullable<fostlib::string> odin::app::get_app_user_identity_id(
+        fostlib::pg::connection &cnx,
+        f5::u8view const app_id,
+        f5::u8view const app_user_id) {
+    static fostlib::string const sql(
+            "SELECT identity_id "
+            "FROM odin.app_user "
+            "WHERE odin.app_user.app_id=$1 "
+            "AND odin.app_user.app_user_id=$2;");
+
+    auto data = cnx.procedure(sql).exec(
+            std::vector<fostlib::string>{app_id, app_user_id});
+    auto row = data.begin();
+    if (row == data.end()) {
+        fostlib::log::warning(c_odin)("", "App user or App not found")(
+                "app_id", app_id)("app_user_id", app_user_id);
+        return fostlib::null;
+    }
+    return fostlib::coerce<fostlib::string>((*row)[0]);
 }
 
 

@@ -69,14 +69,16 @@ namespace {
             const auto password =
                     fostlib::coerce<fostlib::string>(body["password"]);
 
-            auto user = odin::credentials(
-                    cnx, username, password, req.remote_address());
+            auto user = odin::app_credentials(
+                    cnx, username, password, app_id, req.remote_address());
             if (user.isnull()) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "User not found");
             }
             const auto jwt_user = req.headers()["__user"].value();
-            if (user["identity"]["id"] != jwt_user) {
+            fostlib::string app_user_id;
+            if (user["app_user"]["app_user_id"]
+                != req.headers()["__app_user"].value()) {
                 // identity_id mismatch, triggering merge account
                 fostlib::json merge_value;
                 fostlib::insert(merge_value, "from_identity_id", jwt_user);
@@ -85,6 +87,12 @@ namespace {
                 try {
                     cnx.insert("odin.merge_ledger", merge_value);
                     cnx.commit();
+                    auto user = odin::app_credentials(
+                            cnx, username, password, app_id,
+                            req.remote_address());
+                    app_user_id = fostlib::coerce<fostlib::string>(
+                            user["app_user"]["app_user_id"]);
+
                 } catch (const pqxx::unique_violation &e) {
                     // Cannot merge, abandon the unregistered identity.
                     fostlib::log::info(odin::c_odin)(
@@ -92,11 +100,13 @@ namespace {
                             "to",
                             user["identity"]["id"])("abandoned", jwt_user);
                 }
+            } else {
+                app_user_id = req.headers()["__app_user"].value();
             }
             auto const identity_id =
                     fostlib::coerce<f5::u8view>(user["identity"]["id"]);
             auto jwt = odin::app::mint_user_jwt(
-                    identity_id, app_id,
+                    app_user_id, app_id,
                     fostlib::coerce<fostlib::timediff>(config["expires"]));
             fostlib::mime::mime_headers headers;
             headers.add(

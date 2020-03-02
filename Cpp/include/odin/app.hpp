@@ -36,8 +36,9 @@ namespace odin {
         void save_app_user(
                 fostlib::pg::connection &cnx,
                 f5::u8view reference,
+                const f5::u8view app_id,
                 const f5::u8view identity_id,
-                const f5::u8view app_id);
+                const f5::u8view app_user_id);
 
         /// Return app user detail
         fostlib::json get_app_user(
@@ -45,7 +46,13 @@ namespace odin {
                 const f5::u8view app_id,
                 const f5::u8view identity_id);
 
-        /// Save installation ID if the given user to datavase, this does not
+        /// Return app user identity_id
+        fostlib::nullable<fostlib::string> get_app_user_identity_id(
+                fostlib::pg::connection &cnx,
+                const f5::u8view app_id,
+                const f5::u8view app_user_id);
+
+        /// Save installation ID if the given user to database, this does not
         /// commit the transaction
         void set_installation_id(
                 fostlib::pg::connection &cnx,
@@ -53,6 +60,15 @@ namespace odin {
                 f5::u8view app_id,
                 f5::u8view identity_id,
                 f5::u8view installation_id);
+
+        /// Save app_user_id if the given user to database, this does not
+        /// commit the transaction
+        void set_app_user_id(
+                fostlib::pg::connection &cnx,
+                f5::u8view reference,
+                f5::u8view app_id,
+                f5::u8view identity_id,
+                f5::u8view app_user_id);
 
 
     }

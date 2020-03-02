@@ -150,6 +150,54 @@ fostlib::json odin::facebook::get_user_detail(
 }
 
 
+fostlib::json odin::facebook::app_credentials(
+        fostlib::pg::connection &cnx,
+        const f5::u8view &user_id,
+        const f5::u8view &app_id) {
+    const fostlib::string sql(
+            "SELECT "
+            "odin.identity.tableoid AS identity__tableoid, "
+            "odin.facebook_credentials.tableoid AS "
+            "facebook_credentials__tableoid, "
+            "odin.app_user.tableoid AS app_user__tableoid, "
+            "odin.identity.*, odin.facebook_credentials.*, odin.app_user.* "
+            "FROM odin.facebook_credentials "
+            "JOIN odin.identity ON "
+            "odin.identity.id=odin.facebook_credentials.identity_id "
+            "LEFT JOIN odin.app_user ON "
+            "odin.app_user.identity_id=odin.facebook_credentials.identity_id "
+            "AND "
+            "odin.app_user.app_id=$1 "
+            "WHERE odin.facebook_credentials.facebook_user_id = $2");
+    auto data = fostgres::sql(
+            cnx, sql, std::vector<fostlib::string>{app_id, user_id});
+    auto &rs = data.second;
+    auto row = rs.begin();
+    if (row == rs.end()) {
+        fostlib::log::warning(c_odin)("", "Facebook user not found")(
+                "facebook_user_id", user_id);
+        return fostlib::json();
+    }
+    auto record = *row;
+    if (++row != rs.end()) {
+        fostlib::log::error(c_odin)("", "More than one facebook user returned")(
+                "facebook_user_id", user_id);
+        return fostlib::json();
+    }
+
+    fostlib::json user;
+    for (std::size_t index{0}; index < record.size(); ++index) {
+        const auto parts = fostlib::split(data.first[index], "__");
+        if (parts.size() && parts[parts.size() - 1] == "tableoid") continue;
+        fostlib::jcursor pos;
+        for (const auto &p : parts) pos /= p;
+        fostlib::insert(user, pos, record[index]);
+    }
+
+    return user;
+}
+
+
 fostlib::json odin::facebook::credentials(
         fostlib::pg::connection &cnx, const f5::u8view &user_id) {
     static const fostlib::string sql(
@@ -200,4 +248,23 @@ void odin::facebook::set_facebook_credentials(
     fostlib::insert(user_values, "identity_id", identity_id);
     fostlib::insert(user_values, "facebook_user_id", facebook_user_id);
     cnx.insert("odin.facebook_credentials_ledger", user_values);
+}
+
+
+std::optional<f5::u8string> odin::facebook::email_owner_identity_id(
+        fostlib::pg::connection &cnx, fostlib::string email) {
+    const f5::u8string sql(
+            "SELECT oi.id FROM odin.identity oi INNER JOIN "
+            "odin.facebook_credentials fc ON oi.id = fc.identity_id WHERE "
+            "email=$1");
+    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});
+    auto &rs = data.second;
+    auto row = rs.begin();
+    if (row == rs.end()) { return {}; }
+    if (++row != rs.end()) {
+        fostlib::log::error(c_odin)("", "More than one email owner returned")(
+                "email", email);
+        return {};
+    }
+    return fostlib::coerce<f5::u8string>((*row)[std::size_t{0}]);
 }

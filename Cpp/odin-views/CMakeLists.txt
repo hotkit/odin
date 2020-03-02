@@ -1,6 +1,7 @@
 add_library(odin-views
         app_installation.cpp
         app_secure.cpp
+        app_user.cpp
         app.cpp
         app.facebook.cpp
         app.google.cpp
@@ -8,6 +9,7 @@ add_library(odin-views
         facebook.cpp
         google.cpp
         jwt.renewal.cpp
+        link.account.cpp
         login.cpp
         logout.cpp
         middleware.reference.cpp

@@ -9,10 +9,12 @@
 
 #include <odin/fg/native.hpp>
 #include <odin/nonce.hpp>
+#include <odin/odin.hpp>
 #include <odin/user.hpp>
 #include <odin/pwhashproc.hpp>
 
 #include <fost/insert>
+#include <fost/log>
 
 
 void odin::create_user(
@@ -126,3 +128,16 @@ bool odin::does_email_exist(fostlib::pg::connection &cnx, fostlib::string email)
     auto &rs = data.second;
     return rs.begin() != rs.end();
 }
+
+
+void odin::link_account(
+        fostlib::pg::connection &cnx,
+        f5::u8view from_identity_id,
+        f5::u8view to_identity_id,
+        fostlib::json annotation) {
+    fostlib::json merge_ledger_value;
+    fostlib::insert(merge_ledger_value, "from_identity_id", from_identity_id);
+    fostlib::insert(merge_ledger_value, "to_identity_id", to_identity_id);
+    fostlib::insert(merge_ledger_value, "annotation", annotation);
+    cnx.insert("odin.merge_ledger", merge_ledger_value);
+};

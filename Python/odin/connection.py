@@ -40,10 +40,14 @@ class Connection(object):
 
 
     def new_reference(self):
+        self.reference = self.create_reference()
+        self.cursor.execute("""SET LOCAL odin.reference=%s;""", (self.reference,))
+
+
+    def create_reference(self):
         epoch_time = (datetime.now(timezone.utc) - EPOCH).total_seconds()
         ref = base64.b64encode(os.urandom(3)).decode('utf8')
-        self.reference = "%s-%s" % (epoch_time, ref)
-        self.cursor.execute("""SET LOCAL odin.reference=%s;""", (self.reference,))
+        return "%s-%s" % (epoch_time, ref)
 
 
     def load_modules(self):

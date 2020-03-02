@@ -19,6 +19,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Schema/authz/002-view-user_permission.blue.sql
                 ../Schema/authz/003-alter-ledgers.blue.sql
@@ -47,6 +48,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Configuration/odin-views.json
                 db-bypass.fg
         )
@@ -110,6 +112,7 @@ if(TARGET stress OR TARGET pgtest)
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../views/merge.account.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/merge-account-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/merge-account.fg
             MAIN_DEPENDENCY merge-account.fg
@@ -124,6 +127,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Schema/authz/002-view-user_permission.blue.sql
                 ../Schema/authz/003-alter-ledgers.blue.sql
@@ -134,13 +138,17 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/app/005-alter-ledgers.blue.sql
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
                 ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/forgotten-password/001-initial.blue.sql
                 ../Schema/opts/forgotten-password/002-merge-account-function.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
@@ -150,6 +158,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/004-merge-account-function.blue.sql
                 ../Schema/opts/google/005-google-credentials-insert.blue.sql
+                ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
                 ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/004-merge-account-function.blue.sql
@@ -158,6 +167,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/logout/004-alter-ledgers.blue.sql
                 ../Schema/opts/logout/005-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
+                ../views/merge.account.json
                 merge-account.fg
         )
 
@@ -198,6 +208,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/logout/002-initial.blue.sql
                 ../Schema/opts/logout/003-fix-logout-count.blue.sql
                 ../Schema/opts/logout/004-alter-ledgers.blue.sql
@@ -226,6 +237,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Schema/authz/002-view-user_permission.blue.sql
                 ../Schema/authz/003-alter-ledgers.blue.sql
@@ -255,6 +267,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Schema/authz/002-view-user_permission.blue.sql
                 ../Schema/authz/003-alter-ledgers.blue.sql
@@ -285,20 +298,24 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/004-merge-account-function.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/004-merge-account-function.blue.sql
                 ../Schema/opts/google/005-google-credentials-insert.blue.sql
+                ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
                 ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
                 facebook-test.json
@@ -325,6 +342,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Configuration/odin-views.json
                 session.fg
                 session-test-view.json
@@ -354,6 +372,48 @@ if(TARGET stress OR TARGET pgtest)
                 forgotten-password.fg
         )
 
+    add_custom_command(OUTPUT test-link-account
+            COMMAND fostgres-test odin-test-link-account -o test-link-account
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/link.account.fg
+            MAIN_DEPENDENCY link.account.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
+                ../Schema/opts/facebook/001-initial.blue.sql
+                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+                ../Schema/opts/facebook/004-merge-account-function.blue.sql
+                ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
+                ../Schema/opts/google/001-initial.blue.sql
+                ../Schema/opts/google/003-alter-ledgers.blue.sql
+                ../Schema/opts/google/004-merge-account-function.blue.sql
+                ../Schema/opts/google/005-google-credentials-insert.blue.sql
+                ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql
+                ../Configuration/odin-views.json
+                link.account.fg
+        )
+
     add_custom_command(OUTPUT test-login-facebook
             COMMAND fostgres-test odin-test-login-facebook -o test-login-facebook
                 $<TARGET_SONAME_FILE:odin-fg>
@@ -375,13 +435,16 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
                 ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/full-name/001-initial.blue.sql
                 ../Schema/opts/full-name/003-alter-ledgers.blue.sql
                 ../Schema/opts/full-name/004-merge-account-function.blue.sql
@@ -390,49 +453,12 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/004-merge-account-function.blue.sql
+                ../Schema/opts/google/005-google-credentials-insert.blue.sql
+                ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
                 login-google-test.json
                 login-facebook.fg
-        )
-
-    add_custom_command(OUTPUT test-link-facebook
-            COMMAND fostgres-test odin-test-link-facebook -o test-link-facebook
-                $<TARGET_SONAME_FILE:odin-fg>
-                $<TARGET_SONAME_FILE:odin-views>
-                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
-                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/link-facebook.fg
-            MAIN_DEPENDENCY link-facebook.fg
-            DEPENDS
-                fostgres-test
-                fostgres
-                odin-fg
-                odin-views
-                ../Schema/bootstrap.sql
-                ../Schema/core/000-initial.blue.sql
-                ../Schema/core/002-add-merge-account.blue.sql
-                ../Schema/authn/001-initial.blue.sql
-                ../Schema/authn/002-fix-login.blue.sql
-                ../Schema/authn/003-alter-ledgers.blue.sql
-                ../Schema/opts/full-name/001-initial.blue.sql
-                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
-                ../Schema/opts/full-name/004-merge-account-function.blue.sql
-                ../Schema/opts/email/001-initial.blue.sql
-                ../Schema/opts/email/003-alter-ledgers.blue.sql
-                ../Schema/opts/email/004-merge-account-function.blue.sql
-                ../Schema/opts/facebook/001-initial.blue.sql
-                ../Schema/opts/facebook/003-alter-ledgers.blue.sql
-                ../Schema/opts/facebook/004-merge-account-function.blue.sql
-                ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
-                ../Schema/opts/logout/002-initial.blue.sql
-                ../Schema/opts/logout/003-fix-logout-count.blue.sql
-                ../Schema/opts/logout/004-alter-ledgers.blue.sql
-                ../Schema/opts/logout/005-merge-account-function.blue.sql
-                ../Configuration/odin-views.json
-                facebook-test.json
-                link-facebook.fg
         )
 
     add_custom_command(OUTPUT test-login-google
@@ -460,6 +486,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/004-merge-account-function.blue.sql
@@ -471,6 +498,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
                 ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/installation-id/001-initial.blue.sql
                 ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
                 ../Schema/opts/installation-id/004-merge-account-function.blue.sql
@@ -500,6 +528,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/logout/002-initial.blue.sql
                 ../Schema/opts/logout/003-fix-logout-count.blue.sql
                 ../Schema/opts/logout/004-alter-ledgers.blue.sql
@@ -529,12 +558,15 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/app/002-initial.blue.sql
                 ../Schema/app/003-app-role.blue.sql
                 ../Schema/app/004-app-installation.blue.sql
                 ../Schema/app/005-alter-ledgers.blue.sql
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
                 ../Configuration/odin-views.json
                 app-installation.fg
         )
@@ -561,12 +593,15 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/app/002-initial.blue.sql
                 ../Schema/app/003-app-role.blue.sql
                 ../Schema/app/004-app-installation.blue.sql
                 ../Schema/app/005-alter-ledgers.blue.sql
                 ../Schema/app/006-merge-account-function.blue.sql
                 ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
                 ../Configuration/odin-views.json
                 app.mint-test.json
                 app.mint.fg
@@ -593,12 +628,14 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
             ../Schema/authn/003-alter-ledgers.blue.sql
+            ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             ../Configuration/odin-views.json
             app-login.fg
     )
@@ -609,6 +646,7 @@ if(TARGET stress OR TARGET pgtest)
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/app-login-facebook.fg
             MAIN_DEPENDENCY app-login-facebook.fg
@@ -626,18 +664,28 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
                 ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
-                ../Schema/opts/full-name/001-initial.blue.sql
-                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
-                ../Schema/opts/full-name/004-merge-account-function.blue.sql
-                ../Schema/opts/installation-id/001-initial.blue.sql
-                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/004-merge-account-function.blue.sql
+                ../Schema/opts/google/005-google-credentials-insert.blue.sql
+                ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql
+                ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+                ../Schema/opts/full-name/004-merge-account-function.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
                 ../Configuration/odin-views.json
                 facebook-test.json
                 app-login-facebook.fg
@@ -667,20 +715,28 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/email/001-initial.blue.sql
                 ../Schema/opts/email/003-alter-ledgers.blue.sql
                 ../Schema/opts/email/004-merge-account-function.blue.sql
+                ../Schema/opts/email/005-email-not-unique.blue.sql
                 ../Schema/opts/google/001-initial.blue.sql
                 ../Schema/opts/google/003-alter-ledgers.blue.sql
                 ../Schema/opts/google/004-merge-account-function.blue.sql
                 ../Schema/opts/google/005-google-credentials-insert.blue.sql
-                ../Schema/opts/full-name/001-initial.blue.sql
-                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
-                ../Schema/opts/full-name/004-merge-account-function.blue.sql
+                ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/opts/facebook/001-initial.blue.sql
                 ../Schema/opts/facebook/003-alter-ledgers.blue.sql
                 ../Schema/opts/facebook/004-merge-account-function.blue.sql
                 ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
-                ../Schema/opts/installation-id/001-initial.blue.sql
-                ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
-                ../Schema/opts/installation-id/004-merge-account-function.blue.sql
+                ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
+                ../Schema/opts/full-name/001-initial.blue.sql
+                ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+                ../Schema/opts/full-name/004-merge-account-function.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
                 app-login-google.fg
@@ -705,12 +761,31 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
             ../Schema/authn/003-alter-ledgers.blue.sql
+            ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
+            ../Schema/opts/email/001-initial.blue.sql
+            ../Schema/opts/email/003-alter-ledgers.blue.sql
+            ../Schema/opts/email/004-merge-account-function.blue.sql
+            ../Schema/opts/email/005-email-not-unique.blue.sql
+            ../Schema/opts/facebook/001-initial.blue.sql
+            ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+            ../Schema/opts/facebook/004-merge-account-function.blue.sql
+            ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+            ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+            ../Schema/opts/full-name/004-merge-account-function.blue.sql
+            ../Schema/opts/facebook/001-initial.blue.sql
+            ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+            ../Schema/opts/facebook/004-merge-account-function.blue.sql
+            ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+            ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
             app-secure-test-view.json
             app-secure.fg
     )
@@ -735,12 +810,14 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/authn/001-initial.blue.sql
             ../Schema/authn/002-fix-login.blue.sql
             ../Schema/authn/003-alter-ledgers.blue.sql
+            ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
             ../Schema/app/002-initial.blue.sql
             ../Schema/app/003-app-role.blue.sql
             ../Schema/app/004-app-installation.blue.sql
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             app-verify.fg
     )
 
@@ -766,6 +843,7 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             app-data-test.json
             app_user-app_data.fg
     )
@@ -802,12 +880,14 @@ if(TARGET stress OR TARGET pgtest)
             ../Schema/app/005-alter-ledgers.blue.sql
             ../Schema/app/006-merge-account-function.blue.sql
             ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
             ../Schema/opts/full-name/001-initial.blue.sql
             ../Schema/opts/full-name/003-alter-ledgers.blue.sql
             ../Schema/opts/full-name/004-merge-account-function.blue.sql
             ../Schema/opts/email/001-initial.blue.sql
             ../Schema/opts/email/003-alter-ledgers.blue.sql
             ../Schema/opts/email/004-merge-account-function.blue.sql
+            ../Schema/opts/email/005-email-not-unique.blue.sql
             app-federation-test-client-view.json
             app-handover.fg
     )
@@ -833,12 +913,55 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authn/001-initial.blue.sql
                 ../Schema/authn/002-fix-login.blue.sql
                 ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
+                ../Configuration/odin-views.json
+                jwt-renewal.fg
+        )
+
+    add_custom_command(OUTPUT test-registration-app-user
+            COMMAND fostgres-test odin-test-registration-app-user -o test-registration-app-user
+                $<TARGET_SONAME_FILE:odin-fg>
+                $<TARGET_SONAME_FILE:odin-views>
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-federation-server.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/registration-app-user.fg
+            MAIN_DEPENDENCY registration-app-user.fg
+            DEPENDS
+                fostgres-test
+                fostgres
+                odin-fg
+                odin-views
+                ../Schema/bootstrap.sql
+                ../Schema/core/000-initial.blue.sql
+                ../Schema/core/002-add-merge-account.blue.sql
+                ../Schema/authn/001-initial.blue.sql
+                ../Schema/authn/002-fix-login.blue.sql
+                ../Schema/authn/003-alter-ledgers.blue.sql
+                ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
                 ../Schema/authz/001-initial.blue.sql
                 ../Schema/authz/002-view-user_permission.blue.sql
                 ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Schema/authz/004-merge-account-function.blue.sql
+                ../Schema/app/002-initial.blue.sql
+                ../Schema/app/003-app-role.blue.sql
+                ../Schema/app/004-app-installation.blue.sql
+                ../Schema/app/005-alter-ledgers.blue.sql
+                ../Schema/app/006-merge-account-function.blue.sql
+                ../Schema/app/007-app-user-data.blue.sql
+                ../Schema/app/008-app-user-id.blue.sql
+                ../Schema/app/009-app-user-id-index.blue.sql
                 ../Configuration/odin-views.json
-                jwt-renewal.fg
+                registration-app-user.fg
         )
 
     ## Because of the way cmake works we need this stuff at the end to
@@ -864,11 +987,12 @@ if(TARGET stress OR TARGET pgtest)
             test-registration-self
             test-session
             test-forgotten-password
+            test-link-account
             test-login-facebook
             test-login-google
-            test-link-facebook
             test-expire-user
             test-jwt-renewal
+            test-registration-app-user
         )
     if(TARGET stress)
         add_dependencies(stress odin-tests)

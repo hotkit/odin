@@ -28,6 +28,18 @@ namespace odin {
             const fostlib::nullable<fostlib::host> &source = fostlib::null,
             const fostlib::json &annotation = fostlib::json::object_t());
 
+    /// Return the database row for the identity together with the
+    /// credentials and app_user, but only if the supplied password is correct.
+    /// If the credentials failed to match an empty JSON instance (null) is
+    /// returned.
+    fostlib::json app_credentials(
+            fostlib::pg::connection &cnx,
+            const fostlib::string &username,
+            const fostlib::string &password,
+            const fostlib::string &app_id,
+            const fostlib::nullable<fostlib::host> &source = fostlib::null,
+            const fostlib::json &annotation = fostlib::json::object_t());
+
     /// Mint Login JWT for this user and set common fields on it
     fostlib::jwt::mint mint_login_jwt(
             const fostlib::json &user, fostlib::json payload = fostlib::json{});

@@ -4,9 +4,17 @@ odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 
+# Enable OPEN app access policy + app installation ID
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
 
 # TODO: Test GET that serve static file
 # GET odin/app /login/invite-only-app/ 200
@@ -27,8 +35,12 @@ sql.insert odin.app_ledger {
     "access_policy": "INVITE_ONLY",
     "data_sharing_policy": "ALL"
 }
-
-sql.insert odin.app_user_ledger {"reference": "ref1", "app_id": "invite-only-app", "identity_id": "invited1"}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "invite-only-app",
+    "identity_id": "invited1",
+    "app_user_id": "app_user_invited1"
+}
 
 # Validate payload
 POST odin/app /login/invite-only-app/ {} 501
@@ -48,12 +60,6 @@ POST odin/app /login/invite-only-app/ {"username": "invited1", "password": "pass
 
 # Return error to uninvited user
 POST odin/app /login/invite-only-app/ {"username": "player2", "password": "password1234"} 501
-
-# Enable OPEN app access policy + app installation ID
-odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
-odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 
 sql.insert odin.identity {"id": "open-app"}
 sql.insert odin.app_ledger {

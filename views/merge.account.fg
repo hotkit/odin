@@ -1,0 +1,2 @@
+## Test are include in ../tests/merge-account.fg
+# Note when merge registered with registered postgresql return 23503
