@@ -2,6 +2,9 @@
   Facebook and Google user with same email will merged as same user when register,
   and can login by both method
 
+2019-09-25  Pumidon Phathong  <pumidon@hot-now.com>
+ Add support changing non app jwt to app jwt when renewing.
+
 2019-08-27  Kirit Saelensminde  <kirit@felspar.com>
  JWTs may be placed in cookies and decoded from there.
 
