@@ -46,6 +46,12 @@ namespace odin {
                 f5::u8view identity_id,
                 f5::u8view facebook_user_id);
 
+        /// Return database user id that match with given email
+        /// if that user has facebook credential
+        /// If failed to match given email or multiple match return {}
+        std::optional<f5::u8string> email_owner_identity_id(
+                fostlib::pg::connection &cnx, fostlib::string email);
+
 
     }
 

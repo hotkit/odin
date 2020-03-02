@@ -19,6 +19,7 @@ odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-funct
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)

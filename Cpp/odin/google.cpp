@@ -128,3 +128,22 @@ void odin::google::set_google_credentials(
     fostlib::insert(user_values, "google_user_id", google_user_id);
     cnx.insert("odin.google_credentials_ledger", user_values);
 }
+
+
+std::optional<f5::u8string> odin::google::email_owner_identity_id(
+        fostlib::pg::connection &cnx, fostlib::string email) {
+    const f5::u8string sql(
+            "SELECT oi.id FROM odin.identity oi INNER JOIN "
+            "odin.google_credentials gc ON oi.id = gc.identity_id WHERE "
+            "email=$1");
+    auto data = fostgres::sql(cnx, sql, std::vector<fostlib::string>{email});
+    auto &rs = data.second;
+    auto row = rs.begin();
+    if (row == rs.end()) { return {}; }
+    if (++row != rs.end()) {
+        fostlib::log::error(c_odin)("", "More than one email owner returned")(
+                "email", email);
+        return {};
+    }
+    return fostlib::coerce<f5::u8string>((*row)[std::size_t{0}]);
+}

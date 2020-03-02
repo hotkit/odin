@@ -1,3 +1,7 @@
+2020-02-27  Sukit Saeo <sukit_owl@hotmail.com>
+  Facebook and Google user with same email will merged as same user when register,
+  and can login by both method
+
 2019-08-27  Kirit Saelensminde  <kirit@felspar.com>
  JWTs may be placed in cookies and decoded from there.
 

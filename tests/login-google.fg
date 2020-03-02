@@ -1,4 +1,4 @@
-# Set up the database
+## Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
@@ -10,10 +10,16 @@ odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-funct
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
 
 setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
 setting odin "Facebook" {
@@ -25,9 +31,9 @@ GET odin/test/google/login/ok / 501
 
 POST odin/test/google/login/ok / {} 501
 
-# TODO this integration test has to be setup properly later
-# set gg (odin.google.get_user_detail eyJhbGciOiJSUzI1NiIsImtpZCI6IjhjOWViOTY4ZjczNzQ0ZWFlZDQyMWU0ODAxMDE0MmJjZTUxYTA2N2YifQ.eyJhenAiOiI2Nzk3OTMxNDkwNTktbWJ2a3VnaHN0c3A3dms1aTRqb2FydDNuZjFtMnVwaGMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI2Nzk3OTMxNDkwNTktbWJ2a3VnaHN0c3A3dms1aTRqb2FydDNuZjFtMnVwaGMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDI3MTQ2ODQwMjY5NzEyNDk2NzEiLCJoZCI6InByb3RldXMtdGVjaC5jb20iLCJlbWFpbCI6Im51dEBwcm90ZXVzLXRlY2guY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiIwd1ZTeUFYOUxWZFZNM2U1R2FXYXhRIiwiZXhwIjoxNTMxOTMwMTEwLCJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwianRpIjoiM2Y1YTg2ZTNhYWM3MmQ1NjE2OTIwZWQ0YzcxYmUwMDgxZTQxZWFlMCIsImlhdCI6MTUzMTkyNjUxMCwibmFtZSI6Ik51dCBTcml0dXNuZWUiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDQuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy15bjRUOXdVNUNZTS9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BQW5uWTdxUW5pcVB1c2RTWEFZQWFkV2ZGSmFKdzJHd093L3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiJOdXQiLCJmYW1pbHlfbmFtZSI6IlNyaXR1c25lZSIsImxvY2FsZSI6ImVuIn0.kWdUbW-r6QfG9Fg6tGoVJiRGE6IIegbCvu5JPcYyCYyZG7UD8qoyKEjGIhMtQRU_0B2WEMHRORSwCsdyIlNKVphFLE38FFb7b48DWPPflxW2V-UGxD_KWO86DDkzeZLKS43u7yIvba5NPKPRDMjEc6XCkHUVb8-PhJOPpArE9c2pMUrB9WTcjAiB46CpZudA0CYK2sNTybrV11m9Q15eQPnwlLmdws1IO3XwVxjXsuT3kJzu5qO3dEJB6TkUY8k0NBoAYopP72e22cNrS83vfBF3gGcp6JQJiAgLrPHDP5BGyJKVINum8FTpn0G0QSkKPbmgcSgrdOscbOb58aFgFg)
-# contains (lookup gg) {"aud": "679793149059-mbvkughstsp7vk5i4joart3nf1m2uphc.apps.googleusercontent.com"}
+##  TODO this integration test has to be setup properly later
+##  set gg (odin.google.get_user_detail eyJhbGciOiJSUzI1NiIsImtpZCI6IjhjOWViOTY4ZjczNzQ0ZWFlZDQyMWU0ODAxMDE0MmJjZTUxYTA2N2YifQ.eyJhenAiOiI2Nzk3OTMxNDkwNTktbWJ2a3VnaHN0c3A3dms1aTRqb2FydDNuZjFtMnVwaGMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI2Nzk3OTMxNDkwNTktbWJ2a3VnaHN0c3A3dms1aTRqb2FydDNuZjFtMnVwaGMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDI3MTQ2ODQwMjY5NzEyNDk2NzEiLCJoZCI6InByb3RldXMtdGVjaC5jb20iLCJlbWFpbCI6Im51dEBwcm90ZXVzLXRlY2guY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiIwd1ZTeUFYOUxWZFZNM2U1R2FXYXhRIiwiZXhwIjoxNTMxOTMwMTEwLCJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwianRpIjoiM2Y1YTg2ZTNhYWM3MmQ1NjE2OTIwZWQ0YzcxYmUwMDgxZTQxZWFlMCIsImlhdCI6MTUzMTkyNjUxMCwibmFtZSI6Ik51dCBTcml0dXNuZWUiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDQuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy15bjRUOXdVNUNZTS9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BQW5uWTdxUW5pcVB1c2RTWEFZQWFkV2ZGSmFKdzJHd093L3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiJOdXQiLCJmYW1pbHlfbmFtZSI6IlNyaXR1c25lZSIsImxvY2FsZSI6ImVuIn0.kWdUbW-r6QfG9Fg6tGoVJiRGE6IIegbCvu5JPcYyCYyZG7UD8qoyKEjGIhMtQRU_0B2WEMHRORSwCsdyIlNKVphFLE38FFb7b48DWPPflxW2V-UGxD_KWO86DDkzeZLKS43u7yIvba5NPKPRDMjEc6XCkHUVb8-PhJOPpArE9c2pMUrB9WTcjAiB46CpZudA0CYK2sNTybrV11m9Q15eQPnwlLmdws1IO3XwVxjXsuT3kJzu5qO3dEJB6TkUY8k0NBoAYopP72e22cNrS83vfBF3gGcp6JQJiAgLrPHDP5BGyJKVINum8FTpn0G0QSkKPbmgcSgrdOscbOb58aFgFg)
+##  contains (lookup gg) {"aud": "679793149059-mbvkughstsp7vk5i4joart3nf1m2uphc.apps.googleusercontent.com"}
 
 GET odin/test/google/validate_login /count-users 200 {"count": 0}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 0}
@@ -38,24 +44,47 @@ POST odin/test/google/login/error / {"access_token": "WRONG_ACCESS_TOKEN"} 501
 GET odin/test/google/validate_login /count-users 200 {"count": 1}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 
-# Login with the same google user id should not create new identity
+##  Login with the same google user id should not create new identity
 POST odin/test/google/login/ok / {"access_token": "user_1"} 200
 GET odin/test/google/validate_login /count-users 200 {"count": 1}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 
-# Register with different google user id should create new identity
+##  Register with different google user id should create new identity
 POST odin/test/google/login/ok / {"access_token": "user_2"} 200
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 2}
 
-# If user already registered with Odin, return 422 with error message
+##  If user email already registered with Odin by username, create new user
 POST odin/register / {"username": "exist_user", "password": "password1234", "email": "exist_user@example.com"} 201
-POST odin/test/google/login/ok / {"access_token": "exist_user"} 422 {"message": "This email already exists"}
 
-odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+GET odin/test/google/validate_login /count-users 200 {"count": 3}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 2}
+
+POST odin/test/google/login/ok / {"access_token": "exist_user"} 200
+
+setting webserver views/validate-google-id {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [
+            {
+                "return": "object",
+                "path": [1],
+                "GET": "SELECT id.*, cr.login, gc.google_user_id FROM odin.google_credentials gc, odin.identity id LEFT JOIN odin.credentials cr ON cr.identity_id=id.id WHERE gc.identity_id=id.id AND gc.google_user_id=$1"
+            }
+        ]
+    }
+}
+
+GET validate-google-id /exist_user 200 {
+    "login": null, 
+    "google_user_id": "exist_user",
+    "email": "exist_user@example.com",
+    "full_name": "Test User"
+}
+
+##  google credentials added to exists user then number of users not increase
+GET odin/test/google/validate_login /count-users 200 {"count": 4}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 3}
 
 setting webserver views/odin/test/facebook/login/ok {
     "view": "odin.facebook.login",
@@ -101,10 +130,74 @@ setting webserver views/odin/test/facebook/login/ok {
     }
 }
 
+##  If user email already registered with Odin by facebook, return 200 add google credential to that registered user 
 POST odin/test/facebook/login/ok / {"access_token": "login_via_gp"} 200
-POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 422 {"message": "This email already exists"}
 
-# Enable opts/installation-id
+GET odin/test/google/validate_login /count-users 200 {"count": 5}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 3}
+
+POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
+
+setting webserver views/validate-google-id {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [
+            {
+                "return": "object",
+                "path": [1],
+                "GET": "SELECT id.*, fc.facebook_user_id, gc.google_user_id FROM odin.google_credentials gc, odin.facebook_credentials fc, odin.identity id WHERE gc.identity_id=id.id AND fc.identity_id=id.id AND gc.google_user_id=$1"
+            }
+        ]
+    }
+}
+
+GET validate-google-id /login_via_gp 200 {
+    "facebook_user_id": "778899112233445",
+    "google_user_id": "login_via_gp",
+    "email": "login_via_gp@example.com",
+    "full_name": "Test User"
+}
+
+##  google credentials added to exists facebook user then number of users not increase
+GET odin/test/google/validate_login /count-users 200 {"count": 5}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 4}
+
+sql.insert odin.identity {
+    "id": "duplicate-email-user",
+    "full_name": "duplicate-email-user",
+    "email": "duplicate-email-user@example.com"
+}
+
+GET odin/test/google/validate_login /count-users 200 {"count": 6}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 4}
+
+##  If user email already registered with Odin with no credential, return 200 create new user 
+POST odin/test/google/login/ok / {"access_token": "duplicate-email-user"} 200
+
+setting webserver views/validate-google-id {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [
+            {
+                "return": "object",
+                "path": [1],
+                "GET": "SELECT id.*, gc.google_user_id FROM odin.google_credentials gc, odin.identity id WHERE gc.identity_id=id.id AND gc.google_user_id=$1"
+            }
+        ]
+    }
+}
+
+GET validate-google-id /duplicate-email-user 200 {
+    "google_user_id": "duplicate-email-user",
+    "email": "duplicate-email-user@example.com",
+    "full_name": "Test User"
+}
+
+## create new user with new credentials
+GET odin/test/google/validate_login /count-users 200 {"count": 7}
+GET odin/test/google/validate_login /count-google-users 200 {"count": 5}
+
+##  Enable opts/installation-id
 odin.sql.file (module.path.join ../Schema/opts/installation-id/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/installation-id/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/installation-id/004-merge-account-function.blue.sql)
@@ -119,3 +212,4 @@ GET odin/test/google/validate_login /user/test-installation 200 {"installation_i
 
 POST odin/test/google/login/ok / {"access_token": "test-installation", "installation_id": ""} 501
 GET odin/test/google/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
+
