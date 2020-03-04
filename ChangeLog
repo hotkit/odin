@@ -1,3 +1,6 @@
+2020-03-04  Sukit Saeo <sukit_owl@hotmail.com>
+  allow link between two app user in odin.link.account
+
 2020-02-27  Sukit Saeo <sukit_owl@hotmail.com>
   Facebook and Google user with same email will merged as same user when register,
   and can login by both method

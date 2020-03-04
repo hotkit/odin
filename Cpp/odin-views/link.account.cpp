@@ -98,12 +98,6 @@ namespace {
                 jwt_string, [&cnx](fostlib::json h, fostlib::json b) {
                     return load_key(cnx, h, b);
                 });
-        if (not jwt) {
-            fostlib::log::debug(odin::c_odin)("detail", "JWT not valid")(
-                    "jwt", jwt_string);
-            throw fostlib::exceptions::not_implemented(
-                    __PRETTY_FUNCTION__, "JWT not valid");
-        }
         return jwt;
     }
 
@@ -153,7 +147,6 @@ namespace {
                 fostlib::string const &path,
                 fostlib::http::server::request &req,
                 fostlib::host const &host) const {
-
             if (req.method() != "POST") {
                 return respond("Link Account require POST.", 405);
             }
@@ -172,23 +165,31 @@ namespace {
                             __PRETTY_FUNCTION__,
                             "Must pass from_account and to_account field");
                 }
-
-                // from_account jwt should be app_token
+                // from_account jwt must be app_token
                 auto const from_account_jwt = load_app_jwt(
                         cnx,
                         fostlib::coerce<fostlib::string>(body["from_account"]));
-                // from_account jwt should be user_token
+                fostlib::json from_account_detail =
+                        app_user_detail_from_jwt(cnx, from_account_jwt);
+                from_identity_id = fostlib::coerce<fostlib::string>(
+                        from_account_detail["identity_id"]);
+                // to_account jwt could be user_token or user_token
                 auto const to_account_jwt = load_jwt(
                         cnx,
                         fostlib::coerce<fostlib::string>(body["to_account"]));
-                fostlib::json from_account_detail =
-                        app_user_detail_from_jwt(cnx, from_account_jwt);
-
-                from_identity_id = fostlib::coerce<fostlib::string>(
-                        from_account_detail["identity_id"]);
-                to_identity_id = fostlib::coerce<fostlib::string>(
-                        to_account_jwt.value().payload["sub"]);
-
+                if (to_account_jwt) {
+                    to_identity_id = fostlib::coerce<fostlib::string>(
+                            to_account_jwt.value().payload["sub"]);
+                } else {
+                    auto const to_account_app_jwt = load_app_jwt(
+                            cnx,
+                            fostlib::coerce<fostlib::string>(
+                                    body["to_account"]));
+                    fostlib::json to_account_detail =
+                            app_user_detail_from_jwt(cnx, to_account_app_jwt);
+                    to_identity_id = fostlib::coerce<fostlib::string>(
+                            to_account_detail["identity_id"]);
+                }
                 // Two user already merged
                 if (from_identity_id == to_identity_id) {
                     fostlib::mime::mime_headers headers;
