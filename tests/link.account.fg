@@ -57,6 +57,17 @@ sql.insert odin.app_ledger {
     "data_sharing_policy": "ALL"
 }
 
+sql.insert odin.identity {"id": "app02"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "app02",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
 # Guest is no credentials account
 # from_account must be app_token
 # to_account must be user_token
@@ -71,6 +82,22 @@ sql.insert odin.app_user_ledger {
     "identity_id": "guest1",
     "app_user_id": "app_user_guest1"
 }
+
+# from_account token jwt invalid -> failed
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.ZsZOqsbM5iIC2KrUC-AnjE6TT15VzZ0yVxHiSz54W7A",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.tyBXGNdToGtgzlDZdxgIkZDuIrOLeLJU3NdW-ak7LTw"
+} 422
+GET test/link/validate /guest1/registered2 404
+
+# to_account token jwt invalid -> failed
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.i-kp53QIFDDKgooXrmRQgj2EUGXkQKJ_vrw7l2fkR8U",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.XC1tTBdsOH9riGHpjBFEKDky4KeoeGOS9JCPmy7fRY0"
+} 422
+GET test/link/validate /guest1/registered2 404
+
+# both token valid -> passed
 POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.i-kp53QIFDDKgooXrmRQgj2EUGXkQKJ_vrw7l2fkR8U",
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMiIsImV4cGlyZXMiOjcyNTgwODAyMDN9.tyBXGNdToGtgzlDZdxgIkZDuIrOLeLJU3NdW-ak7LTw"
@@ -175,7 +202,7 @@ POST test/link/account / {
 } 422
 GET test/link/validate /guest2/registered2 404
 
-# app token - app token -> failed
+# app token - app token -> passed
 odin.user guest3 guest3
 odin.user registered4 registered4 password1234
 sql.insert odin.app_user_ledger {
@@ -186,15 +213,15 @@ sql.insert odin.app_user_ledger {
 }
 sql.insert odin.app_user_ledger {
     "reference": "ref1",
-    "app_id": "app01",
+    "app_id": "app02",
     "identity_id": "registered4",
     "app_user_id": "app_user_registered4"
 }
 POST test/link/account / {
     "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDMiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.OBR5xfCEYA-P6YYDNkQYUTXKtK7b27mHrxCHWKTTIok",
-    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkMTQiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.dVs2JgMiW-4CXdk-7uJrRcynK_BbzejsIW22PVPyFrY"
-} 422
-GET test/link/validate /guest3/registered4 404
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkNCIsImV4cGlyZXMiOjcyNTgwODAyMDMsImlzcyI6Imh0dHA6Ly9vZGluLmZlbHNwYXIuY29tL2FwcC9hcHAwMiJ9.cVgF7wto0mGFABimBoLwa76Rb-CLpgatgj9Sb4VClX4"
+} 200
+GET test/link/validate /guest3/registered4 200
 
 # user token - user token -> failed
 odin.user guest5 guest5
@@ -264,3 +291,25 @@ POST test/link/account / {
     "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWdpc3RlcmVkMTQiLCJleHBpcmVzIjo3MjU4MDgwMjAzfQ.KIt9lniaf7BLKU9GPJuDABvSMoMEbB0Qvo_9_c7EQ_0"
 } 422
 GET test/link/validate /registered11/registered14 404
+
+# app token - app token -> passed
+# link between user with same app -> failed 
+odin.user guest13 guest13
+odin.user registered15 registered15 password1234
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "guest13",
+    "app_user_id": "app_user_guest13"
+}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "registered15",
+    "app_user_id": "app_user_registered15"
+}
+POST test/link/account / {
+    "from_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9ndWVzdDEzIiwiZXhwaXJlcyI6NzI1ODA4MDIwMywiaXNzIjoiaHR0cDovL29kaW4uZmVsc3Bhci5jb20vYXBwL2FwcDAxIn0._ojj8UywjvLU2gW8pC-6ngCq-fc8AL6Ay7LSpTs9h4c",
+    "to_account": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHBfdXNlcl9yZWdpc3RlcmVkMTUiLCJleHBpcmVzIjo3MjU4MDgwMjAzLCJpc3MiOiJodHRwOi8vb2Rpbi5mZWxzcGFyLmNvbS9hcHAvYXBwMDEifQ.Xq8jEjFAiATUNIf9CnRq2BRFSAxKjNaW0SrGjYdqCgg"
+} 422
+GET test/link/validate /guest13/registered15 404
