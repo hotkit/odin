@@ -179,15 +179,16 @@ namespace {
                         fostlib::coerce<fostlib::string>(body["to_account"]));
                 if (to_account_jwt) {
                     to_identity_id = fostlib::coerce<fostlib::string>(
-                        to_account_jwt.value().payload["sub"]);                       
+                            to_account_jwt.value().payload["sub"]);
                 } else {
                     auto const to_account_app_jwt = load_app_jwt(
-                        cnx,
-                        fostlib::coerce<fostlib::string>(body["to_account"])); 
+                            cnx,
+                            fostlib::coerce<fostlib::string>(
+                                    body["to_account"]));
                     fostlib::json to_account_detail =
-                        app_user_detail_from_jwt(cnx, to_account_app_jwt);
-                to_identity_id = fostlib::coerce<fostlib::string>(
-                        to_account_detail["identity_id"]);                     
+                            app_user_detail_from_jwt(cnx, to_account_app_jwt);
+                    to_identity_id = fostlib::coerce<fostlib::string>(
+                            to_account_detail["identity_id"]);
                 }
                 // Two user already merged
                 if (from_identity_id == to_identity_id) {
