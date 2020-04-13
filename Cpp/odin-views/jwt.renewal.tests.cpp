@@ -60,7 +60,8 @@ FSL_TEST_FUNCTION(check_can_renew_jwt_with_non_app_jwt) {
 }
 
 
-FSL_TEST_FUNCTION(check_return_app_jwt_when_renew_non_app_jwt_with_app_id_is_set) {
+FSL_TEST_FUNCTION(
+        check_return_app_jwt_when_renew_non_app_jwt_with_app_id_is_set) {
 
     fostlib::json payload;
     fostlib::insert(payload, "sub", "user01");
@@ -76,15 +77,17 @@ FSL_TEST_FUNCTION(check_return_app_jwt_when_renew_non_app_jwt_with_app_id_is_set
             ("Bearer " + jwt.token(odin::c_jwt_secret.value().data())).c_str());
     req.headers().set("__user", "user01");
 
-    auto const [response, http_status_code] =
-            odin::view::jwt_renewal(configuration_with_app_id(), "/", req, fostlib::host());
+    auto const [response, http_status_code] = odin::view::jwt_renewal(
+            configuration_with_app_id(), "/", req, fostlib::host());
     auto jwt_token = response->body_as_string();
-    auto app_id = fostlib::coerce<fostlib::string>(configuration_with_app_id()["app_id"]);
-    auto load_jwt =
-            fostlib::jwt::token::load(odin::c_jwt_secret.value() + app_id, jwt_token);
+    auto app_id = fostlib::coerce<fostlib::string>(
+            configuration_with_app_id()["app_id"]);
+    auto load_jwt = fostlib::jwt::token::load(
+            odin::c_jwt_secret.value() + app_id, jwt_token);
 
     FSL_CHECK(load_jwt.has_value());
-    FSL_CHECK_EQ(load_jwt->payload["iss"], "http://odin.felspar.com/app/" + app_id);
+    FSL_CHECK_EQ(
+            load_jwt->payload["iss"], "http://odin.felspar.com/app/" + app_id);
     FSL_CHECK_EQ(load_jwt->payload["sub"], payload["sub"]);
     FSL_CHECK_EQ(load_jwt->payload["fullname"], payload["fullname"]);
     FSL_CHECK_NEQ(load_jwt->payload["exp"], payload["exp"]);

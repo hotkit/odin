@@ -137,9 +137,11 @@ namespace {
                         } catch (...) { throw; }
                         identity_id = fostlib::coerce<fostlib::string>(
                                 email_owner_id.value());
-                        auto const google_app_user = odin::app::get_app_user(cnx, app_id, identity_id);
+                        auto const google_app_user = odin::app::get_app_user(
+                                cnx, app_id, identity_id);
                         if (!google_app_user.isnull()) {
-                            app_user_id = fostlib::coerce<fostlib::string>(google_app_user["app"]["app_user_id"]);
+                            app_user_id = fostlib::coerce<fostlib::string>(
+                                    google_app_user["app"]["app_user_id"]);
                         }
                     } else {
                         odin::set_email(

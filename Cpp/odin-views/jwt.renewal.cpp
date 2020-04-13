@@ -63,7 +63,8 @@ namespace {
 
 
             auto const jwt_body = bearer_jwt(req);
-            fostlib::utf8_string new_jwt; fostlib::timestamp new_exp;
+            fostlib::utf8_string new_jwt;
+            fostlib::timestamp new_exp;
             // Check whether it is APP JWT or non APP JWT.
             // non APP JWT will be changed to APP JWT if app_id is set,
             // otherwise just renew it.
@@ -71,15 +72,15 @@ namespace {
                 auto const app_id = req.headers()["__app"].value();
                 secret = odin::c_jwt_secret.value() + app_id;
                 std::tie(new_jwt, new_exp) =
-                    odin::renew_jwt(jwt_body.value(), secret, config);
+                        odin::renew_jwt(jwt_body.value(), secret, config);
             } else if (config["app_id"].isnull()) {
                 secret = odin::c_jwt_secret.value();
                 std::tie(new_jwt, new_exp) =
-                    odin::renew_jwt(jwt_body.value(), secret, config);
+                        odin::renew_jwt(jwt_body.value(), secret, config);
             } else {
                 secret = odin::c_jwt_secret.value();
                 fostlib::nullable<fostlib::jwt::token> jwt_token =
-                    fostlib::jwt::token::load(secret, jwt_body.value());
+                        fostlib::jwt::token::load(secret, jwt_body.value());
                 fostlib::json payload = jwt_token.value().payload;
                 auto identity_id = fostlib::coerce<f5::u8view>(payload["sub"]);
                 const fostlib::jcursor sub("sub");
@@ -87,10 +88,10 @@ namespace {
                 const fostlib::jcursor exp("exp");
                 if (payload.has_key(exp)) { exp.del_key(payload); }
                 std::tie(new_jwt, new_exp) = odin::app::mint_user_jwt(
-                    identity_id,
-                    fostlib::coerce<f5::u8view>(config["app_id"]),
-                    fostlib::coerce<fostlib::timediff>(config["expires"]),
-                    payload);
+                        identity_id,
+                        fostlib::coerce<f5::u8view>(config["app_id"]),
+                        fostlib::coerce<fostlib::timediff>(config["expires"]),
+                        payload);
             }
 
             fostlib::mime::mime_headers headers;
@@ -100,8 +101,8 @@ namespace {
                             .underlying()
                             .underlying());
 
-            boost::shared_ptr<fostlib::mime> response(
-                    new fostlib::text_body(new_jwt, headers, L"application/jwt"));
+            boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
+                    new_jwt, headers, L"application/jwt"));
 
             return std::make_pair(response, 200);
         }
