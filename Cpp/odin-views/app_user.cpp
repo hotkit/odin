@@ -57,21 +57,20 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-            if (not req.headers().exists("__app")) {
-                throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__,
-                        "The odin.app_user view must be wrapped by an "
-                        "odin.app.secure"
-                        "view on the secure path so that there is a valid JWT "
-                        "to find App ID");
-            }
-
-
-            if (req.method() != "PUT") {
+            if (req.method() != "GET" && req.method() != "PUT") {
                 fostlib::json config;
                 fostlib::insert(config, "view", "fost.response.405");
+                fostlib::push_back(config, "configuration", "allow", "GET");
                 fostlib::push_back(config, "configuration", "allow", "PUT");
                 return execute(config, path, req, host);
+            }
+            fostlib::json app_data{};
+            if (req.method() == "PUT") {
+                fostlib::log::warning(odin::c_odin)(
+                        "",
+                        "'PUT' method to odin.app.user is deprecated. Use "
+                        "'GET'");
+                app_data = fostlib::json::parse(req.data()->body_as_string());
             }
 
             auto parameters = fostlib::split(path, '/');
@@ -82,8 +81,6 @@ namespace {
             }
             auto const app_id = parameters[0];
             auto const app_user_id = parameters[1];
-            auto const app_data =
-                    fostlib::json::parse(req.data()->body_as_string());
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             auto app_user = get_app_user(cnx, app_id, app_user_id);
             fostlib::string reference;
@@ -92,8 +89,9 @@ namespace {
             } else {
                 reference = odin::reference();
             }
+            fostlib::string identity_id;
             if (app_user.isnull()) {
-                auto identity_id = odin::reference();
+                identity_id = odin::reference();
                 odin::create_user(cnx, identity_id);
                 fostlib::json new_app_user;
                 const fostlib::jcursor app_user_id_cursor("app_user_id");
@@ -102,18 +100,14 @@ namespace {
                 fostlib::insert(new_app_user, "identity_id", identity_id);
                 fostlib::insert(new_app_user, "reference", reference);
                 cnx.insert("odin.app_user_ledger", new_app_user);
-
+            } else {
+                identity_id = fostlib::coerce<fostlib::string>(
+                        app_user["identity_id"]);
+            }
+            if (not app_data.isnull()) {
                 fostlib::json new_app_data;
                 fostlib::insert(new_app_data, "app_id", app_id);
                 fostlib::insert(new_app_data, "identity_id", identity_id);
-                fostlib::insert(new_app_data, "app_data", app_data);
-                fostlib::insert(new_app_data, "reference", reference);
-                cnx.insert("odin.app_user_app_data_ledger", new_app_data);
-            } else {
-                fostlib::json new_app_data;
-                fostlib::insert(new_app_data, "app_id", app_id);
-                fostlib::insert(
-                        new_app_data, "identity_id", app_user["identity_id"]);
                 fostlib::insert(new_app_data, "app_data", app_data);
                 fostlib::insert(new_app_data, "reference", reference);
                 cnx.insert("odin.app_user_app_data_ledger", new_app_data);
