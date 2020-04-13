@@ -1,3 +1,7 @@
+2020-04-13  Tle Ekkul  <e.aryuth@gmail.com>
+  Allow GET request on odin.app.user
+  Deprecate PUT request on odin.app.user
+
 2020-03-04  Sukit Saeo <sukit_owl@hotmail.com>
   allow link between two app user in odin.link.account
 

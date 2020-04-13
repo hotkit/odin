@@ -13,6 +13,7 @@ odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sq
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
 
 sql.insert odin.identity {"id": "bowling"}
 sql.insert odin.app_ledger {
