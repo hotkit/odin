@@ -37,7 +37,7 @@ This view is used when different HTTP verbs require different permissions.
             "permission": "permission2-name",
             "allowed": "example-view",
             "forbidden": "read-only-view"
-        }
+        },
         "otherwise": {
             "view": "fost.response.405",
             "configuration": {
