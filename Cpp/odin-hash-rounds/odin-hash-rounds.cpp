@@ -28,8 +28,8 @@ FSL_MAIN("odin-hash-rounds", "Password hashing timer")
     }
     {
         out << "Timing " << new_rounds << " rounds....\n";
-        fostlib::setting<int64_t> nr = {"odin-hash-rounds.cpp",
-                                        odin::c_hash_rounds, new_rounds};
+        fostlib::setting<int64_t> nr = {
+                "odin-hash-rounds.cpp", odin::c_hash_rounds, new_rounds};
         fostlib::timer time;
         odin::hash_password("password");
         auto const seconds = time.seconds();
