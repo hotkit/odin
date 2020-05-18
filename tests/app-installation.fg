@@ -1,0 +1,127 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
+
+# Set up apps
+sql.insert odin.identity {"id": "invited-only-app"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-installation",
+    "app_id": "invited-only-app",
+    "app_name": "INVITED ONLY APP",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "INVITE_ONLY",
+    "data_sharing_policy": "ALL"
+}
+
+sql.insert odin.identity {"id": "open-app"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-installation",
+    "app_id": "open-app",
+    "app_name": "OPEN APP",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+sql.insert odin.app_user_ledger {
+    "reference": "ref01",
+    "app_id": "open-app",
+    "identity_id": "open-app",
+    "app_user_id": "open-app-user-id"
+}
+
+setting webserver views/test/app/installation {
+            "view": "odin.app.installation",
+            "configuration": {
+                "expires": {
+                    "hours": 72
+                }
+            }
+        }
+
+# Must be POST
+GET test/app/installation / 501
+DELETE test/app/installation / 501
+PUT test/app/installation / {"installation_id": "ins01"} 501
+
+# Must be wrapped by odin.app.secure
+POST test/app/installation / {"installation_id": "ins01"} 501
+
+## Set up the secure wrapper for the installation API and
+## make sure this works as it should
+setting webserver views/test/sec/installation {
+        "view": "odin.app.secure",
+        "configuration": {
+            "secure": "test/app/installation",
+            "unsecure": "fost.response.403"
+        }
+    }
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+POST test/sec/installation / {"installation_id": "ins01"} 401
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app-user-id", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+POST test/sec/installation / {"installation_id": "ins01"} 201
+
+# Support only OPEN access policy
+set-path testserver.headers ["__app"] "invited-only-app"
+POST test/app/installation / {"installation_id": "invited-only-installation"} 501
+
+# Validate payload
+set-path testserver.headers ["__app"] "open-app"
+POST test/app/installation / {} 501
+
+# Cannot claim the same installation_id
+sql.insert odin.app_user_ledger {
+    "reference": "test-app-installation",
+    "app_id": "open-app",
+    "identity_id": "claimed-installation",
+    "app_user_id": "claimed-installation"
+}
+sql.insert odin.app_user_installation_id_ledger {
+    "reference": "test-app-installation",
+    "app_id": "open-app",
+    "identity_id": "claimed-installation",
+    "installation_id": "claimed-installation"
+}
+
+POST test/app/installation / {"installation_id": "claimed-installation"} 501
+
+POST test/app/installation / {"installation_id": "new-installation"} 201
+
+# odin should accept the JWT that minted by app.installation view
+set-path testserver.headers ["__app"] ""
+
+setting webserver views/test/app/installation/validate {
+            "view": "odin.app.secure",
+            "configuration": {
+                "secure": "fost.response.200",
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        }
+
+set app_jwt (odin.jwt.mint {"sub": "installation_ref", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET test/app/installation/validate / 401
+set app_jwt (odin.jwt.mint {"sub": "open-app-user-id", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+GET test/app/installation/validate / 200

@@ -1,9 +1,9 @@
-/*
-    Copyright 2016 Felspar Co Ltd. http://odin.felspar.com/
+/**
+    Copyright 2016-2019 Red Anchor Trading Co. Ltd.
+
     Distributed under the Boost Software License, Version 1.0.
-    See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt
-*/
+    See <http://www.boost.org/LICENSE_1_0.txt>
+ */
 
 
 #include <odin/odin.hpp>
@@ -65,12 +65,14 @@ FSL_TEST_FUNCTION(check_unsecure_04_wrong_token) {
 }
 
 FSL_TEST_FUNCTION(check_secure) {
-    const fostlib::setting<bool> trust_jwt{"odin-views/secure.tests.cpp",
-                                           odin::c_jwt_trust, true};
-    fostlib::jwt::mint jwt(fostlib::sha256, odin::c_jwt_secret.value());
+    const fostlib::setting<bool> trust_jwt{
+            "odin-views/secure.tests.cpp", odin::c_jwt_trust, true};
+    fostlib::jwt::mint jwt(fostlib::jwt::alg::HS256);
     jwt.subject("test-user");
     fostlib::http::server::request req("GET", "/");
-    req.headers().set("Authorization", ("Bearer " + jwt.token()).c_str());
+    req.headers().set(
+            "Authorization",
+            ("Bearer " + jwt.token(odin::c_jwt_secret.value().data())).c_str());
     auto response =
             odin::view::secure(configuration(), "/", req, fostlib::host());
     FSL_CHECK_EQ(response.second, 404);

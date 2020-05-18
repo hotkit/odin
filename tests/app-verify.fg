@@ -1,15 +1,58 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
 
 # Set up new users and apps
-odin.user owner password1234
-odin.user player1 password1234
-odin.user player2 password1234
-odin.user player3 password1234
-odin.sql.file (module.path.join app-login-test-figure.sql)
+odin.user owner owner password1234
+odin.user player1 player1 password1234
+odin.user player2 player2 password1234
+odin.user player3 player3 password1234
+# Register app01
+sql.insert odin.identity {"id": "app01"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-verify",
+    "app_id": "app01",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "INVITE_ONLY",
+    "data_sharing_policy": "ALL"
+}
+
+# Register app02
+sql.insert odin.identity {"id": "app02"}
+sql.insert odin.app_ledger {
+    "reference": "test-app-verify",
+    "app_id": "app02",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+
+# Set up app01 roles
+sql.insert odin.app_role_ledger {"reference": "test-app-verify", "app_id": "app01", "role": "pro-player"}
+
+# Invite players to app01
+sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player1", "app_user_id": "app01_player01"}
+sql.insert odin.app_user_ledger {"reference": "test-app-verify", "app_id": "app01", "identity_id": "player3", "app_user_id": "app01_player03"}
+
+sql.insert odin.app_user_role_ledger {"reference": "test-app-verify", "identity_id": "player1", "app_id": "app01", "role": "pro-player"}
 
 # Support only POST
 GET odin/app /verify/ 501
@@ -22,19 +65,18 @@ POST odin/app /verify/app01/ {"random_key": "player1"} 501
 POST odin/app /verify/random_app/ {} 501
 POST odin/app /verify/app01/ {"token": "player1"} 501
 
-set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "app01"} <JWT_SECRET>app01)
+set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set payload {}
 set-path payload ["token"] (lookup user_jwt)
 POST odin/app /verify/app01/ (lookup payload) 200 {"identity": {"id": "player1"}, "roles": ["pro-player"]}
 
-set user_jwt (odin.jwt.mint {"sub": "player3", "iss": "app01"} <JWT_SECRET>app01)
+set user_jwt (odin.jwt.mint {"sub": "player3", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
 set payload {}
 set-path payload ["token"] (lookup user_jwt)
 POST odin/app /verify/app01/ (lookup payload) 200 {"identity": {"id": "player3"}, "roles": []}
 
 # Use wrong app
-set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "app02"} <JWT_SECRET>app02)
+set user_jwt (odin.jwt.mint {"sub": "player1", "iss": "http://odin.felspar.com/app/app02"} <JWT_SECRET>app02)
 set payload {}
 set-path payload ["token"] (lookup user_jwt)
 POST odin/app /verify/app01/ (lookup payload) 501
-

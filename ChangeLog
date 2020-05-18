@@ -1,3 +1,62 @@
+2020-04-13  Tle Ekkul  <e.aryuth@gmail.com>
+  Allow GET request on odin.app.user
+  Deprecate PUT request on odin.app.user
+
+2020-03-04  Sukit Saeo <sukit_owl@hotmail.com>
+  allow link between two app user in odin.link.account
+
+2020-02-27  Sukit Saeo <sukit_owl@hotmail.com>
+  Facebook and Google user with same email will merged as same user when register,
+  and can login by both method
+
+2019-09-25  Pumidon Phathong  <pumidon@hot-now.com>
+ Add support changing non app jwt to app jwt when renewing.
+
+2019-08-27  Kirit Saelensminde  <kirit@felspar.com>
+ JWTs may be placed in cookies and decoded from there.
+
+2019-08-08  Pattarawut Imamnuaysup  <pattarawut@hot-now.com>
+ Add support for password hashing process in an array
+
+2019-04-22  Tle Ekkul  <e.aryuth@gmail.com>
+ Support multiple facebook apps
+
+2019-04-01  Tle Ekkul  <e.aryuth@gmail.com>
+ Fix view odin.password.me
+
+2019-02-06  Kirit Saelensminde  <kirit@felspar.com>
+ Add executable for timing password hashing rounds and configuration item for round count.
+
+2019-02-06  Kirit Saelensminde  <kirit@felspar.com>
+ Implement app logins for Facebook and Google.
+
+2019-01-31  Tle Ekkul  <e.aryuth@gmail.com>
+  Abandon unregister user when merge failed
+
+2019-01-29  Tle Ekkul  <e.aryuth@gmail.com>
+  Fix merge_record failed when user has app installation record
+  Trigger merge account when user token and login mismatch
+  Add merge identities
+
+2019-01-09  Tle Ekkul  <e.aryuth@gmail.com>
+  Remove usage of app token
+
+2018-12-27  Tle Ekkul  <e.aryuth@gmail.com>
+  Fix AuthN login schema
+
+2018-12-26  Tle Ekkul  <e.aryuth@gmail.com>
+  Add odin.middleware.reference view
+
+2018-12-20  Tle Ekkul  <e.aryuth@gmail.com>
+ Add odin.password.hash view
+
+2018-12-16  Tle Ekkul  <e.aryuth@gmail.com>
+ Remove deprecated warnings
+
+2018-12-10  Tle Ekkul  <e.aryuth@gmail.com>
+ Added odin.app.installation view
+ Support app OPEN access policy
+
 2018-11-08  Tle Ekkul  <e.aryuth@gmail.com>
  odin.app.secure doesn't need app_id as a prefix anymore.
 

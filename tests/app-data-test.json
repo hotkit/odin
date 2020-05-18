@@ -1,0 +1,14 @@
+{
+    "webserver": {
+        "views/test/app_user": {
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [{
+                    "path": [1, 2],
+                    "return": "object",
+                    "GET": "SELECT * FROM odin.app_user WHERE identity_id = $1 AND app_id = $2;"
+                }]
+            }
+        }
+    }
+}

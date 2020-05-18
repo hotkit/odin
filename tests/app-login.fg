@@ -1,34 +1,77 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 
-# Set up new users and apps
-odin.user owner password1234
-odin.user player1 password1234
-odin.user player2 password1234
-odin.user player3 password1234
-odin.sql.file (module.path.join app-login-test-figure.sql)
+# Enable OPEN app access policy + app installation ID
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
 
 # TODO: Test GET that serve static file
-# GET odin/app /login/app01/ 200
+# GET odin/app /login/invite-only-app/ 200
+
+# Set up new users
+odin.user owner owner password1234
+odin.user invited1 invited1 password1234
+odin.user player2 player2 password1234
+
+# Register invite-only-app
+sql.insert odin.identity {"id": "invite-only-app"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "invite-only-app",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "INVITE_ONLY",
+    "data_sharing_policy": "ALL"
+}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "invite-only-app",
+    "identity_id": "invited1",
+    "app_user_id": "app_user_invited1"
+}
 
 # Validate payload
-POST odin/app /login/app01/ {} 501
-POST odin/app /login/app01/app02/ {} 501
-POST odin/app /login/ {"username": "player1", "password": "password1234"} 501
-POST odin/app /login/app01/ {"username": "player1"} 501
-POST odin/app /login/app01/ {"password": "password1234"} 501
+POST odin/app /login/invite-only-app/ {} 501
+POST odin/app /login/invite-only-app/app02/ {} 501
+POST odin/app /login/ {"username": "invited1", "password": "password1234"} 501
+POST odin/app /login/invite-only-app/ {"username": "invited1"} 501
+POST odin/app /login/invite-only-app/ {"password": "password1234"} 501
 
 # Only registered user can login to App
-POST odin/app /login/app01/ {"username": "random_player", "password": "random_pwd"} 501
+POST odin/app /login/invite-only-app/ {"username": "random_player", "password": "random_pwd"} 501
 
 # Return error when app does not exists
-POST odin/app /login/random_app/ {"username": "player1", "password": "password1234"} 501
+POST odin/app /login/random_app/ {"username": "invited1", "password": "password1234"} 501
 
 # Return redirect url if successfully login
-POST odin/app /login/app01/ {"username": "player1", "password": "password1234"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}
+POST odin/app /login/invite-only-app/ {"username": "invited1", "password": "password1234"} 200 {"scheme": "Bearer", "redirect_url": "http://example.com"}
 
 # Return error to uninvited user
-POST odin/app /login/app01/ {"username": "player2", "password": "password1234"} 501
+POST odin/app /login/invite-only-app/ {"username": "player2", "password": "password1234"} 501
+
+sql.insert odin.identity {"id": "open-app"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "open-app",
+    "app_name": "OpenApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+
+odin.user random-player random-player password1234
+POST odin/app /login/open-app/ {"username": "random-player", "password": "password1234"} 200

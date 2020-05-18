@@ -1,0 +1,119 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
+
+# Use APP JWT
+setting webserver views/test/app-user {
+        "view": "odin.app.user",
+        "configuration": {
+            "expires": {"hours": 72}
+        }
+    }
+
+setting webserver views/test/get/app-user {
+       "view": "fostgres.sql",
+        "configuration": {
+            "sql": [
+            {
+                "return": "object",
+                "path": [1, 2],
+                "GET": "SELECT
+                        app_id,
+                        app_user_id,
+                        app_data
+                    FROM odin.app_user
+                    WHERE app_id=$1 AND app_user_id=$2"
+            }]
+        }
+    }
+
+setting webserver views/test/get/app-user/identity {
+       "view": "fostgres.sql",
+        "configuration": {
+            "sql": [
+            {
+                "return": "object",
+                "path": [1, 2],
+                "GET": "SELECT identity_id FROM odin.app_user WHERE app_id=$1 AND app_user_id=$2"
+            }]
+        }
+    }
+
+sql.insert odin.identity {"id": "app01"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "app_name": "OpenApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "app01",
+    "identity_id": "user01",
+    "app_user_id": "app_user_id01"
+}
+
+odin.user user01 user01 password1234
+set app_jwt (odin.jwt.mint {"sub": "app_user_id01", "iss": "http://odin.felspar.com/app/app01"} <JWT_SECRET>app01)
+set-path testserver.headers ["Authorization"] (cat "Bearer " (lookup app_jwt))
+
+# Can support both GET and PUT
+POST test/app-user /app01/ref-0 {} 405
+DELETE test/app-user /app01/ref-0 405
+
+# Support PUT -- deprecated
+PUT test/app-user /app01/ref-1 {} 200
+GET test/get/app-user /app01/ref-1 200 {
+    "app_id": "app01",
+    "app_user_id": "ref-1"
+}
+
+# Test return correct jwt
+set payload (odin.jwt.payload (PUT test/app-user /app01/ref-2 {} 200) "app01")
+contains (lookup payload) {"sub": "ref-2", "iss": "http://odin.felspar.com/app/app01"}
+
+#Test can put app data
+PUT test/app-user /app01/ref-3 {"test_data": "test_data_02"} 200
+GET test/get/app-user /app01/ref-3 200 {
+    "app_id": "app01",
+    "app_user_id": "ref-3",
+    "app_data": {"test_data": "test_data_02"}
+}
+set old_identity_id (GET test/get/app-user/identity /app01/ref-3 200)
+
+#Can update app data
+PUT test/app-user /app01/ref-3 {"test_data": "test_data_03", "test_key": "test_key_01"} 200
+
+# Support GET
+GET test/app-user /app01/ref-get 200
+GET test/get/app-user /app01/ref-get 200 {
+    "app_id": "app01",
+    "app_user_id": "ref-get"
+}
+
+#Test identity_id doesn't change
+contains (lookup old_identity_id) (GET test/get/app-user/identity /app01/ref-3 200)
+
+# Test parameters invalid size
+# PUT test/app-user /app01/ref-1/ {} 400 # should failed case
+PUT test/app-user /app01/ref-2/t-1 {} 404
+PUT test/app-user /app01 {} 404
+
+GET test/app-user /app01/ref-2/t-1 404
+GET test/app-user /app01 404

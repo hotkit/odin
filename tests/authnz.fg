@@ -1,10 +1,16 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
 setting odin "Trust JWT" true
-odin.user test password1234
+odin.user test test password1234
 odin.permission p1
 odin.permission p2
 odin.permission p3
@@ -37,4 +43,3 @@ odin.jwt.authorization test password1234 {"http://odin.felspar.com/p": ["p2"]}
 GET odin/test/p1 / 200
 GET odin/test/p2 / 200
 GET odin/test/p3 / 200
-

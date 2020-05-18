@@ -79,7 +79,13 @@
                     "configuration": {
                         "": "odin/secure/sql",
                         "logout/": "odin/logout",
-                        "me/password": "odin.password.me"
+                        "me/password": "odin.password.me",
+                        "renew-jwt/": {
+                            "view": "odin.jwt.renewal",
+                            "configuration": {
+                                "expires": {"hours": 72}
+                            }
+                        }
                     }
                 },
                 "unsecure": {
@@ -147,8 +153,13 @@
                         "path": ["/user", 1],
                         "GET": "SELECT
                                     identity.tableoid AS user__tableoid,
-                                    identity.*
-                                FROM odin.identity WHERE identity.id = $1",
+                                    identity.*,
+                                    credentials.tableoid AS credentials__tableoid,
+                                    credentials.login
+                                FROM odin.identity
+                                LEFT JOIN odin.credentials
+                                ON identity.id = credentials.identity_id
+                                WHERE credentials.login=$1",
                         "PUT": {
                             "table": "odin.identity_ledger",
                             "columns": {

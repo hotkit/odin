@@ -6,11 +6,17 @@ GET odin /api/login/ 501
 
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/logout/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/logout/003-fix-logout-count.blue.sql)
-odin.user test password1234
-odin.user tester password1234
+odin.sql.file (module.path.join ../Schema/opts/logout/004-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/logout/005-merge-account-function.blue.sql)
+odin.user test test password1234
+odin.user tester tester password1234
 
 # Expire user without log in should not work
 DELETE odin/api /me/ 403

@@ -1,0 +1,38 @@
+## These are the same tests as found in [`permission.fg`](./permission.fg),
+## but secured with a cookie rather than the `Authorization` header with
+## `Bearer`
+
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
+setting odin "Trust JWT" true
+
+# Set up test permissions and group
+odin.permission test-perm "Test permission"
+odin.permission not-granted "Another permission"
+odin.group public "Public access"
+odin.assign public test-perm create-group
+
+# When not logged in get a 302
+GET test/permission /not-granted/ 302
+
+# Set up a user account
+odin.user test-user test-user password1234
+odin.membership test-user public
+set-path testserver.cookies ["test-auth-cookie"] (odin.jwt.mint {"sub": "test-user"})
+
+# Check the right permissions are granted
+GET test/permission /me/permissions 200 {"columns": ["permission"],
+    "rows": [["create-group"], ["test-perm"]]}
+
+# Check the web API is also able to check the permissions
+GET test/permission /create-group/ 200
+GET test/permission /not-granted/ 403

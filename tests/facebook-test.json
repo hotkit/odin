@@ -3,15 +3,66 @@
         "views/odin/test/facebook/login/ok": {
             "view": "odin.facebook.login",
             "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": "OK"
+                "expires": {
+                    "hours": 72
+                },
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "data": [
+                                {
+                                    "id": "112233445566778",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://caveman-club/",
+                                        "name": "Caveman Club",
+                                        "id": "111111111111111"
+                                    }
+                                },
+                                {
+                                    "id": "778899112233445",
+                                    "app": {
+                                        "category": "Business",
+                                        "link": "https://bowling-friday/",
+                                        "name": "The Bowling Fridy",
+                                        "id": "222222222222222"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "me": {
+                        "body": {
+                            "name": "Fred Flintstone",
+                            "email": "login_via_fb@example.com",
+                            "id": "112233445566778"
+                        }
+                    }
+                }
             }
         },
         "views/odin/test/facebook/login/error": {
             "view": "odin.facebook.login",
             "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": "ERROR"
+                "expires": {
+                    "hours": 72
+                },
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "error": {
+                                "message": "Malformed access token ACCESS_TOKEN",
+                                "type": "OAuthException",
+                                "code": 190,
+                                "fbtrace_id": "xxxxxxxx"
+                            }
+                        }
+                    }
+                }
             }
         },
         "views/odin/test/facebook/link/ok": {
@@ -20,23 +71,71 @@
                 "secure": {
                     "view": "odin.facebook.link",
                     "configuration": {
-                        "expires": {"hours": 72},
-                        "facebook-mock": "OK"
+                        "expires": {
+                            "hours": 72
+                        },
+                        "facebook-mock": {
+                            "ids_for_business": {
+                                "status": 200,
+                                "headers": {},
+                                "body": {
+                                    "data": [
+                                        {
+                                            "id": "112233445566778",
+                                            "app": {
+                                                "category": "Business",
+                                                "link": "https://caveman-club/",
+                                                "name": "Caveman Club",
+                                                "id": "111111111111111"
+                                            }
+                                        },
+                                        {
+                                            "id": "778899112233445",
+                                            "app": {
+                                                "category": "Business",
+                                                "link": "https://bowling-friday/",
+                                                "name": "The Bowling Fridy",
+                                                "id": "222222222222222"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "me": {
+                                "body": {
+                                    "name": "Fred Flintstone",
+                                    "id": "112233445566778"
+                                }
+                            }
+                        }
                     }
                 },
                 "unsecure": {
                     "view": "fost.response.401",
-                    "configuration": {
-
-                    }
+                    "configuration": {}
                 }
             }
         },
         "views/odin/test/facebook/link/error": {
             "view": "odin.facebook.link",
             "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": "ERROR"
+                "expires": {
+                    "hours": 72
+                },
+                "facebook-mock": {
+                    "ids_for_business": {
+                        "status": 200,
+                        "headers": {},
+                        "body": {
+                            "error": {
+                                "message": "Malformed access token ACCESS_TOKEN",
+                                "type": "OAuthException",
+                                "code": 190,
+                                "fbtrace_id": "xxxxxxxx"
+                            }
+                        }
+                    }
+                }
             }
         },
         "views/odin/test/facebook/validate_login": {
@@ -45,30 +144,47 @@
                 "sql": [
                     {
                         "return": "object",
-                        "path": ["/count-facebook-users"],
+                        "path": [
+                            "/count-facebook-users"
+                        ],
                         "GET": {
                             "command": "SELECT COUNT(*) FROM odin.facebook_credentials WHERE 1=1 or identity_id=$1",
                             "arguments": [
-                                ["request", "headers", "__user"]
+                                [
+                                    "request",
+                                    "headers",
+                                    "__user"
+                                ]
                             ]
                         }
                     },
                     {
                         "return": "object",
-                        "path": ["/count-users"],
+                        "path": [
+                            "/count-users"
+                        ],
                         "GET": {
                             "command": "SELECT COUNT(*) FROM odin.identity WHERE 1=1 or id=$1",
                             "arguments": [
-                                ["request", "headers", "__user"]
+                                [
+                                    "request",
+                                    "headers",
+                                    "__user"
+                                ]
                             ]
                         }
                     },
                     {
                         "return": "object",
-                        "path": ["/user", 1],
+                        "path": [
+                            "/user",
+                            1
+                        ],
                         "GET": {
                             "command": "SELECT * FROM odin.identity WHERE id=(SELECT identity_id FROM odin.facebook_credentials_ledger WHERE facebook_user_id=$1 LIMIT 1)",
-                            "arguments": [1]
+                            "arguments": [
+                                1
+                            ]
                         }
                     }
                 ]

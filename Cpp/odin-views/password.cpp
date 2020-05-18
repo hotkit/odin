@@ -1,9 +1,9 @@
 /**
-    Copyright 2016-2018 Felspar Co Ltd. <http://odin.felspar.com/>
+    Copyright 2016-2019 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
-*/
+ */
 
 
 #include <odin/credentials.hpp>
@@ -16,6 +16,7 @@
 #include <fost/insert>
 #include <fost/log>
 #include <fostgres/sql.hpp>
+#include <fostgres/response.hpp>
 
 
 namespace {
@@ -39,9 +40,10 @@ namespace {
         const auto parts = fostlib::split(t, ".");
         if (parts.size() != 3u) {
             throw fostlib::exceptions::not_implemented(
-                    __func__, "Can't parse to jwt. This should be a 403");
+                    __PRETTY_FUNCTION__,
+                    "Can't parse to jwt. This should be a 403");
         }
-        const fostlib::base64_string b64_payload(parts[1].c_str());
+        const fostlib::base64_string b64_payload(parts[1]);
         const auto v64_payload =
                 fostlib::coerce<std::vector<unsigned char>>(b64_payload);
         const auto u8_payload =
@@ -100,7 +102,7 @@ namespace {
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             const auto reference = req.headers()["__odin_reference"].value();
             if (req.headers().exists("__user")) {
-                const auto username = req.headers()["__user"].value();
+                const auto identity_id = req.headers()["__user"].value();
                 if (!body.has_key("new-password")
                     || !body.has_key("old-password")) {
                     return respond("Must supply both old and new password");
@@ -109,19 +111,26 @@ namespace {
                         fostlib::coerce<f5::u8view>(body["old-password"]);
                 const auto new_password =
                         fostlib::coerce<f5::u8view>(body["new-password"]);
+                fostlib::json user_row = fetch_user_row(cnx, identity_id);
+                const auto username =
+                        fostlib::coerce<f5::u8view>(user_row["login"]);
                 auto user = odin::credentials(
                         cnx, username, old_password, req.remote_address());
                 cnx.commit();
                 if (user.isnull()) return respond("Wrong password");
                 if (new_password.bytes() < 8u)
                     return respond("New password is too short");
-                odin::set_password(cnx, reference, username, new_password);
+                odin::set_password(
+                        cnx, reference,
+                        fostlib::coerce<f5::u8view>(user["identity"]["id"]),
+                        username, new_password);
                 auto logout_claim = req.headers()["__jwt"].subvalue(
                         odin::c_jwt_logout_claim.value());
                 if (logout_claim)
                     odin::logout_user(
                             cnx, reference,
-                            req.headers()["__remote_addr"].value(), username);
+                            req.headers()["__remote_addr"].value(),
+                            identity_id);
                 cnx.commit();
                 return respond("", 200);
             }
@@ -163,27 +172,62 @@ namespace {
             auto jwt = fostlib::jwt::token::load(
                     odin::c_jwt_reset_forgotten_password_secret.value()
                             + fostlib::coerce<fostlib::string>(
-                                      user["password"]["hash"]),
+                                    user["password"]["hash"]),
                     reset_token);
             if (not jwt) { return respond("Invalid token", 403); }
-            auto username =
-                    fostlib::coerce<f5::u8view>(jwt.value().payload["sub"]);
-            if (odin::does_user_exist(cnx, username)) {
-                const auto reference = odin::reference();
-                const auto new_password =
-                        fostlib::coerce<f5::u8view>(body["new-password"]);
-                odin::set_password(cnx, reference, username, new_password);
-                if (odin::is_module_enabled(cnx, "opts/logout"))
-                    odin::logout_user(
-                            cnx, reference,
-                            req.headers()["__remote_addr"].value(), username);
-                cnx.commit();
-                return respond("Success", 200);
-            }
-            throw fostlib::exceptions::not_implemented(
-                    __func__, "Invalid reset-password-token.");
+            auto username = fostlib::coerce<f5::u8view>(user["login"]);
+            const auto reference = odin::reference();
+            const auto new_password =
+                    fostlib::coerce<f5::u8view>(body["new-password"]);
+            odin::set_password(
+                    cnx, reference, identity_id, username, new_password);
+            if (odin::is_module_enabled(cnx, "opts/logout"))
+                odin::logout_user(
+                        cnx, reference, req.headers()["__remote_addr"].value(),
+                        identity_id);
+            cnx.commit();
+            return respond("Success", 200);
         }
     } c_reset_password;
 
+    const class password_hash : public fostlib::urlhandler::view {
+      public:
+        password_hash() : view("odin.password.hash") {}
+
+        std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
+                const fostlib::json &config,
+                const fostlib::string &path,
+                fostlib::http::server::request &req,
+                const fostlib::host &host) const {
+            if (!config.has_key("hash") || !config.has_key("verify")
+                || !config.has_key("then")) {
+                throw fostlib::exceptions::not_implemented(
+                        __PRETTY_FUNCTION__,
+                        "Must supply 'hash', 'verify' and 'then' in the "
+                        "configuration");
+            }
+
+            auto const body_str = fostlib::coerce<fostlib::string>(
+                    fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
+            fostlib::json const body = fostlib::json::parse(body_str);
+            auto const hash_value =
+                    fostgres::datum(config["hash"], {}, body, req);
+            auto const verify =
+                    fostgres::datum(config["verify"], {}, body, req);
+            if (not hash_value || not verify || hash_value != verify) {
+                return respond("Hashing failed", 422);
+            }
+            auto const hash_result = odin::hash_password(
+                    fostlib::coerce<fostlib::string>(hash_value));
+            req.headers().set("__hash", hash_result.first);
+            req.headers().set(
+                    "__hash_process",
+                    fostlib::json::unparse(hash_result.second, false));
+            return execute(config["then"], path, req, host);
+        }
+    } c_password_hash;
+
 
 }
+
+const fostlib::urlhandler::view &odin::view::password_hash = c_password_hash;

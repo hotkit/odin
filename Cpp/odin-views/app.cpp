@@ -1,9 +1,9 @@
 /**
-    Copyright 2018 Felspar Co Ltd. <http://odin.felspar.com/>
+    Copyright 2018-2019 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
-*/
+ */
 
 #include <odin/app.hpp>
 #include <odin/credentials.hpp>
@@ -20,10 +20,11 @@
 #include <fostgres/sql.hpp>
 
 
+const fostlib::module odin::c_odin_app(odin::c_odin, "app");
+
+
 namespace {
 
-
-    const fostlib::module c_odin_app(odin::c_odin, "app.cpp");
 
     fostlib::json parse_payload(fostlib::http::server::request &req) {
         // TODO: Support multiple ContentType
@@ -54,13 +55,6 @@ namespace {
                         __PRETTY_FUNCTION__, "App not found");
             }
 
-            if (fostlib::coerce<fostlib::string>(app["app"]["access_policy"])
-                != "INVITE_ONLY") {
-                throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__,
-                        "Invalid access policy, supported only INVITE_ONLY");
-            }
-
             if (req.method() == "GET") {
                 boost::filesystem::wpath filename(
                         fostlib::coerce<boost::filesystem::wpath>(
@@ -73,15 +67,15 @@ namespace {
                         "App Login required POST, this should be a 405");
 
             fostlib::json body = parse_payload(req);
-            if (!body.has_key("username") || !body.has_key("password"))
+            if (!body.has_key("username") || !body.has_key("password")) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
                         "Must pass both username and password fields");
+            }
             const auto username =
                     fostlib::coerce<fostlib::string>(body["username"]);
             const auto password =
                     fostlib::coerce<fostlib::string>(body["password"]);
-
 
             auto user = odin::credentials(
                     cnx, username, password, req.remote_address());
@@ -90,34 +84,41 @@ namespace {
                         __PRETTY_FUNCTION__, "User not found");
             }
 
-            auto app_user = odin::app::get_app_user(
-                    cnx, app_id,
-                    fostlib::coerce<f5::u8view>(user["identity"]["id"]));
+            auto const access_policy = fostlib::coerce<fostlib::string>(
+                    app["app"]["access_policy"]);
+            auto const identity_id =
+                    fostlib::coerce<f5::u8view>(user["identity"]["id"]);
+            auto app_user = odin::app::get_app_user(cnx, app_id, identity_id);
+            auto app_user_id = odin::reference();
             if (app_user.isnull()) {
-                throw fostlib::exceptions::not_implemented(
-                        __PRETTY_FUNCTION__, "Forbidden");
+                if (access_policy == "INVITE_ONLY") {
+                    throw fostlib::exceptions::not_implemented(
+                            __PRETTY_FUNCTION__, "Forbidden");
+                } else if (access_policy == "OPEN") {
+                    odin::app::save_app_user(
+                            cnx, odin::reference(), app_id, identity_id,
+                            app_user_id);
+                    cnx.commit();
+                }
+            } else {
+                app_user_id = fostlib::coerce<f5::u8view>(
+                        app_user["app"]["app_user_id"]);
             }
-
-            auto jwt = odin::app::mint_user_jwt(user, app);
-            fostlib::mime::mime_headers headers;
-            auto exp = jwt.expires(
-                    fostlib::coerce<fostlib::timediff>(config["expires"]),
-                    false);
-            headers.add(
-                    "Expires",
-                    fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
-                            .underlying()
-                            .underlying()
-                            .c_str());
-
-            const auto jwt_token = fostlib::utf8_string(jwt.token());
+            auto jwt = odin::app::mint_user_jwt(
+                    app_user_id, app_id,
+                    fostlib::coerce<fostlib::timediff>(config["expires"]));
             const auto redirect_url = fostlib::coerce<fostlib::string>(
                     app["app"]["redirect_url"]);
-
             fostlib::json result;
-            fostlib::insert(result, "access_token", jwt_token);
+            fostlib::insert(result, "access_token", jwt.first);
             fostlib::insert(result, "scheme", "Bearer");
             fostlib::insert(result, "redirect_url", redirect_url);
+            fostlib::mime::mime_headers headers;
+            headers.add(
+                    "Expires",
+                    fostlib::coerce<fostlib::rfc1123_timestamp>(jwt.second)
+                            .underlying()
+                            .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::json::unparse(result, true), headers,
                     L"application/json"));
@@ -229,6 +230,7 @@ namespace {
             }
 
             cnx.commit();
+
             auto jwt(odin::mint_login_jwt(fed_response_data));
             auto exp = jwt.expires(
                     fostlib::coerce<fostlib::timediff>(config["expires"]),
@@ -239,11 +241,11 @@ namespace {
                     "Expires",
                     fostlib::coerce<fostlib::rfc1123_timestamp>(exp)
                             .underlying()
-                            .underlying()
-                            .c_str());
+                            .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    fostlib::utf8_string(jwt.token()), headers,
-                    L"application/jwt"));
+                    fostlib::utf8_string(
+                            jwt.token(odin::c_jwt_secret.value().data())),
+                    headers, L"application/jwt"));
             return std::make_pair(response, 200);
         }
 
@@ -294,7 +296,7 @@ namespace {
             }
             auto const iss = fostlib::coerce<fostlib::string>(
                     jwt.value().payload["iss"]);
-            if (iss != app_id) {
+            if (iss != odin::c_app_namespace.value() + app_id) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__, "app_id mismatch");
             }

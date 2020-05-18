@@ -1,0 +1,43 @@
+{
+    "webserver": {
+        "views/odin/merge-account": {
+            "view": "odin.app.secure",
+            "configuration": {
+                "secure": {
+                    "view": "fostgres.control.pg-error",
+                    "configuration": {
+                        "execute": {
+                            "view": "fostgres.sql",
+                            "configuration": {
+                                "sql": [{
+                                    "return": "object",
+                                    "path": [],
+                                    "POST": {
+                                        "table": "odin.merge_ledger",
+                                        "columns": {
+                                            "from_identity_id": {
+                                                "key": true
+                                            },
+                                            "to_identity_id": {
+                                                "key": true
+                                            }
+                                        }
+                                    }
+                                }]
+                            }
+                        },
+                        "": "fost.response.500"
+                    }
+                },
+                "unsecure": {
+                    "view": "fost.response.401",
+                    "configuration": {
+                        "schemes": {
+                            "Bearer": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

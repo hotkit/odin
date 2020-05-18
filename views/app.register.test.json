@@ -1,0 +1,29 @@
+{
+    "odin": {
+        "JWT secret": "<JWT_SECRET>"
+    },
+    "webserver": {
+        "views/odin/test/validate-register": {
+            "view": "fostgres.sql",
+            "configuration": {
+                "sql": [{
+                    "path": [1],
+                    "return": "object",
+                    "GET": {
+                        "command": "SELECT identity.*,
+                            credentials.login,
+                            app_user.app_id,
+                            app_user.app_data
+                            FROM odin.identity
+                            LEFT JOIN odin.credentials
+                            ON identity.id=credentials.identity_id
+                            LEFT JOIN odin.app_user
+                            ON identity.id=app_user.identity_id
+                            WHERE credentials.login=$1",
+                        "arguments": [1]
+                    }
+                }]
+            }
+        }
+    }
+}
