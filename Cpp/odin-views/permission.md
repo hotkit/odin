@@ -28,10 +28,10 @@ This view is used when different HTTP verbs require different permissions.
 {
     "view": "odin.permission.method",
     "configuration": {
+        "OPTIONS": "example.view",
         "GET": {
             "permission": "permission1-name",
-            "allowed": "example-view",
-            "forbidden": "fost.response.403"
+            "allowed": "example-view"
         },
         "PUT": {
             "permission": "permission2-name",
@@ -41,7 +41,7 @@ This view is used when different HTTP verbs require different permissions.
         "otherwise": {
             "view": "fost.response.405",
             "configuration": {
-                "verbs": ["GET", "HEAD", "PUT"]
+                "verbs": ["GET", "HEAD", "OPTIONS", "PUT"]
             }
         }
     }
