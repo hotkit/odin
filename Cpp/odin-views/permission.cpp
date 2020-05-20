@@ -83,4 +83,20 @@ namespace {
     } c_permission;
 
 
+    const class permission_method : public fostlib::urlhandler::view {
+      public:
+        static const fostlib::jcursor userloc;
+
+        permission_method() : view("odin.permission.method") {}
+
+        std::pair<boost::shared_ptr<fostlib::mime>, int> operator()(
+                const fostlib::json &config,
+                const fostlib::string &path,
+                fostlib::http::server::request &req,
+                const fostlib::host &host) const {
+            return check_permission(config[req.method()], config, path, req, host);
+        }
+    } c_permission_method;
+
+
 }

@@ -1,0 +1,54 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
+setting odin "Trust JWT" true
+
+# Set up test permissions and group
+odin.permission read-permission "Read permission"
+odin.permission write-permission "Write permission"
+odin.group reader "Reader"
+odin.assign reader read-permission
+odin.group writer "Writer"
+odin.assign writer read-permission write-permission
+
+# When not logged in get a 403 or 401
+GET odin/api / 401 {"odin": {"login": "./login/"}}
+GET odin/api /me/permissions 403
+GET test/permission /by-method/identity-1/ 401
+
+# Set up the read user account
+odin.user read-user read-user password1234
+odin.membership read-user reader
+odin.jwt.authorization read-user password1234
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"]]}
+
+# Check the web API is also able to check the permissions
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {} 403
+
+# Set superuser, should have all permission
+odin.superuser read-user
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"], ["write-permission"]]}
+
+# Expire the account and make sure the permissions go away
+odin.user.expire read-user
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+GET test/permission /by-method/identity-1/ 403
+PUT test/permission /by-method/identity-1/ {} 403
+
+# Set up the write user account
+odin.user writer-user writer-user password5678
+odin.membership writer-user writer
+odin.jwt.authorization writer-user password5678
