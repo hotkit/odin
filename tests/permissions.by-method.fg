@@ -11,6 +11,9 @@ odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
 setting odin "Trust JWT" true
 
+# Set up test data
+sql.insert odin.identity {"id": "identity-1"}
+
 # Set up test permissions and group
 odin.permission read-permission "Read permission"
 odin.permission write-permission "Write permission"
@@ -35,12 +38,14 @@ GET odin/api /me/permissions 200 {"columns": ["permission"],
 
 # Check the web API is also able to check the permissions
 GET test/permission /by-method/identity-1/ 200
-PUT test/permission /by-method/identity-1/ {} 403
+PUT test/permission /by-method/identity-1/ {} 200 {
+    "id": "identity-1"
+}
 
 # Set superuser, should have all permission
 odin.superuser read-user
 GET odin/api /me/permissions 200 {"columns": ["permission"],
-    "rows": [["read-permission"], ["write-permission"]]}
+    "rows": [["create-group"], ["create-user"], ["read-permission"], ["write-permission"]]}
 
 # Expire the account and make sure the permissions go away
 odin.user.expire read-user

@@ -51,6 +51,7 @@
                 "sql": [{
                     "return": "object",
                     "path": [1],
+                    "GET": "SELECT id FROM odin.identity WHERE id=$1",
                     "PUT": {
                         "table": "odin.identity",
                         "columns": {
@@ -69,7 +70,7 @@
                 "sql": [{
                     "return": "object",
                     "path": [1],
-                    "GET": "SELECT 1 FROM odin.identity WHERE id=$1"
+                    "GET": "SELECT id FROM odin.identity WHERE id=$1"
                 }]
             }
         }
