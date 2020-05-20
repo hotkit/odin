@@ -256,7 +256,7 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/permissions-test-view.by-method.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/permissions.by-method.fg
-            MAIN_DEPENDENCY permissions.fg
+            MAIN_DEPENDENCY permissions.by-method.fg
             DEPENDS
                 fostgres-test
                 fostgres
@@ -274,7 +274,7 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/authz/003-alter-ledgers.blue.sql
                 ../Schema/authz/004-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
-                permissions.fg
+                permissions.by-method.fg
                 permissions-test-view.by-method.json
         )
 

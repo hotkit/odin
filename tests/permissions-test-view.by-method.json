@@ -10,26 +10,13 @@
                         "by-method/": {
                             "view": "odin.permission.method",
                             "configuration": {
-                                "OPTIONS": "read-only-view",
                                 "GET": {
                                     "permission": "read-permission",
                                     "allowed": "permission-required-view"
                                 },
                                 "PUT": {
                                     "permission": "write-permission",
-                                    "allowed": "permission-required-view",
-                                    "forbidden": "read-only-view"
-                                },
-                                "otherwise": {
-                                    "view": "fost.response.405",
-                                    "configuration": {
-                                        "verbs": [
-                                            "GET",
-                                            "HEAD",
-                                            "OPTIONS",
-                                            "PUT"
-                                        ]
-                                    }
+                                    "allowed": "permission-required-view"
                                 }
                             }
                         }

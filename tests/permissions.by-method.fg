@@ -38,9 +38,7 @@ GET odin/api /me/permissions 200 {"columns": ["permission"],
 
 # Check the web API is also able to check the permissions
 GET test/permission /by-method/identity-1/ 200
-PUT test/permission /by-method/identity-1/ {} 200 {
-    "id": "identity-1"
-}
+PUT test/permission /by-method/identity-1/ {} 403
 
 # Set superuser, should have all permission
 odin.superuser read-user
@@ -51,11 +49,28 @@ GET odin/api /me/permissions 200 {"columns": ["permission"],
 odin.user.expire read-user
 GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
 GET test/permission /by-method/identity-1/ 403
-PUT test/permission /by-method/identity-1/ {} 200 {
-    "id": "identity-1"
-}
+PUT test/permission /by-method/identity-1/ {} 403
 
 # Set up the write user account
-odin.user writer-user writer-user password5678
-odin.membership writer-user writer
-odin.jwt.authorization writer-user password5678
+odin.user write-user write-user password5678
+odin.membership write-user writer
+odin.jwt.authorization write-user password5678
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"], ["write-permission"]]}
+
+# Check the web API is also able to check the permissions
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {} 200 
+
+# Set superuser, should have all permission
+odin.superuser write-user
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["create-group"], ["create-user"], ["read-permission"], ["write-permission"]]}
+
+# Expire the account and make sure the permissions go away
+odin.user.expire write-user
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+GET test/permission /by-method/identity-1/ 403
+PUT test/permission /by-method/identity-1/ {} 403
