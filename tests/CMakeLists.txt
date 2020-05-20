@@ -249,7 +249,7 @@ if(TARGET stress OR TARGET pgtest)
         )
 
     add_custom_command(OUTPUT test-permissions-by-method
-            COMMAND fostgres-test odin-test-permissions -o test-permissions
+            COMMAND fostgres-test odin-test-permissions-by-method -o test-permissions-by-method
                 $<TARGET_SONAME_FILE:odin-fg>
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql

@@ -51,7 +51,9 @@ GET odin/api /me/permissions 200 {"columns": ["permission"],
 odin.user.expire read-user
 GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
 GET test/permission /by-method/identity-1/ 403
-PUT test/permission /by-method/identity-1/ {} 403
+PUT test/permission /by-method/identity-1/ {} 200 {
+    "id": "identity-1"
+}
 
 # Set up the write user account
 odin.user writer-user writer-user password5678

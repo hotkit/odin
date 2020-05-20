@@ -94,7 +94,11 @@ namespace {
                 const fostlib::string &path,
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
-            return check_permission(config[req.method()], config, path, req, host);
+            auto method_config = config[req.method()]; 
+            if (not method_config.has_key("forbidden")) {
+                fostlib::insert(method_config, "forbidden", "fost.response.403");
+            }
+            return check_permission(method_config, config, path, req, host);
         }
     } c_permission_method;
 
