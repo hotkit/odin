@@ -72,7 +72,8 @@ FSL_TEST_FUNCTION(check_secure) {
     fostlib::http::server::request req("GET", "/");
     req.headers().set(
             "Authorization",
-            f5::u8string{"Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
+            f5::u8string{
+                    "Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
     auto response =
             odin::view::secure(configuration(), "/", req, fostlib::host());
     FSL_CHECK_EQ(response.second, 404);

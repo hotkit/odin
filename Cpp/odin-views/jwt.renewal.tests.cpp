@@ -43,7 +43,8 @@ FSL_TEST_FUNCTION(check_can_renew_jwt_with_non_app_jwt) {
     fostlib::http::server::request req("GET", "/");
     req.headers().set(
             "Authorization",
-            f5::u8string{"Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
+            f5::u8string{
+                    "Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
     req.headers().set("__user", "user01");
 
     auto const [response, http_status_code] =
@@ -74,7 +75,8 @@ FSL_TEST_FUNCTION(
     fostlib::http::server::request req("GET", "/");
     req.headers().set(
             "Authorization",
-            f5::u8string{"Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
+            f5::u8string{
+                    "Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
     req.headers().set("__user", "user01");
 
     auto const [response, http_status_code] = odin::view::jwt_renewal(
@@ -107,7 +109,8 @@ FSL_TEST_FUNCTION(check_can_renew_jwt_with_app_jwt) {
     fostlib::http::server::request req("GET", "/");
     auto secret = odin::c_jwt_secret.value() + app_id;
     req.headers().set(
-            "Authorization", f5::u8string{"Bearer " + jwt.token(secret.data())});
+            "Authorization",
+            f5::u8string{"Bearer " + jwt.token(secret.data())});
     req.headers().set("__user", "user01");
     req.headers().set("__app", app_id);
 

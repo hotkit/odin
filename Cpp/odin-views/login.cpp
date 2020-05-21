@@ -124,7 +124,8 @@ namespace {
                 }
             } else {
                 throw fostlib::exceptions::not_implemented{
-                        __PRETTY_FUNCTION__, "Login requires POST. This should be a 405"};
+                        __PRETTY_FUNCTION__,
+                        "Login requires POST. This should be a 405"};
             }
         }
     } c_login;
