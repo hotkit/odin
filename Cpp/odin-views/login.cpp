@@ -1,5 +1,5 @@
 /**
-    Copyright 2016-2019 Red Anchor Trading Co. Ltd.
+    Copyright 2016-2020 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -119,12 +119,12 @@ namespace {
                             new fostlib::text_body(
                                     fostlib::utf8_string(jwt.token(
                                             odin::c_jwt_secret.value().data())),
-                                    headers, L"application/jwt"));
+                                    headers, "application/jwt"));
                     return std::make_pair(response, 200);
                 }
             } else {
-                throw fostlib::exceptions::not_implemented(
-                        __func__, "Login requires POST. This should be a 405");
+                throw fostlib::exceptions::not_implemented{
+                        __PRETTY_FUNCTION__, "Login requires POST. This should be a 405"};
             }
         }
     } c_login;

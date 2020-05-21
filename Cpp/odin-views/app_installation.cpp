@@ -1,5 +1,5 @@
 /**
-    Copyright 2018-2019 Red Anchor Trading Co. Ltd.
+    Copyright 2018-2020 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -106,7 +106,7 @@ namespace {
                             .underlying()
                             .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                    jwt.first, headers, L"application/jwt"));
+                    jwt.first, headers, "application/jwt"));
 
             return std::make_pair(response, 201);
         }
