@@ -1,5 +1,5 @@
 /**
-    Copyright 2016-2019 Red Anchor Trading Co. Ltd.
+    Copyright 2016-2020 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -72,7 +72,7 @@ FSL_TEST_FUNCTION(check_secure) {
     fostlib::http::server::request req("GET", "/");
     req.headers().set(
             "Authorization",
-            ("Bearer " + jwt.token(odin::c_jwt_secret.value().data())).c_str());
+            f5::u8string{"Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
     auto response =
             odin::view::secure(configuration(), "/", req, fostlib::host());
     FSL_CHECK_EQ(response.second, 404);
