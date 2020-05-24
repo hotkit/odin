@@ -19,6 +19,16 @@
                                     "allowed": "permission-required-view"
                                 }
                             }
+                        },
+                        "by-method-specified-forbidden/": {
+                            "view": "odin.permission.method",
+                            "configuration": {
+                                "PUT": {
+                                    "permission": "write-permission",
+                                    "allowed": "permission-required-view",
+                                    "forbidden": "read-only-view"
+                                }
+                            }
                         }
                     }
                 },
@@ -38,14 +48,15 @@
                 "sql": [{
                     "return": "object",
                     "path": [1],
-                    "GET": "SELECT id FROM odin.identity WHERE id=$1",
+                    "GET": "SELECT * FROM odin.identity WHERE id=$1",
                     "PUT": {
                         "table": "odin.identity",
                         "columns": {
                             "id": {
                                 "key": true,
                                 "source": 1
-                            }
+                            },
+                            "full_name": {}
                         }
                     }
                 }]

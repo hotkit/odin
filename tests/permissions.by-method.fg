@@ -1,6 +1,7 @@
 # Set up the database
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
@@ -27,50 +28,88 @@ GET odin/api / 401 {"odin": {"login": "./login/"}}
 GET odin/api /me/permissions 403
 GET test/permission /by-method/identity-1/ 401
 
+## Test permission by method
+
 # Set up the read user account
-odin.user read-user read-user password1234
-odin.membership read-user reader
-odin.jwt.authorization read-user password1234
+odin.user read-user-1 read-user-1 password1234
+odin.membership read-user-1 reader
+odin.jwt.authorization read-user-1 password1234
 
 # Check the right permissions are granted
 GET odin/api /me/permissions 200 {"columns": ["permission"],
     "rows": [["read-permission"]]}
 
-# Check the web API is also able to check the permissions
+# Check that the web API checks the permissions for the methods
 GET test/permission /by-method/identity-1/ 200
-PUT test/permission /by-method/identity-1/ {} 403
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
 
 # Set superuser, should have all permission
-odin.superuser read-user
+odin.superuser read-user-1
 GET odin/api /me/permissions 200 {"columns": ["permission"],
     "rows": [["create-group"], ["create-user"], ["read-permission"], ["write-permission"]]}
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 200
 
 # Expire the account and make sure the permissions go away
-odin.user.expire read-user
+odin.user.expire read-user-1
 GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
 GET test/permission /by-method/identity-1/ 403
-PUT test/permission /by-method/identity-1/ {} 403
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
 
 # Set up the write user account
-odin.user write-user write-user password5678
-odin.membership write-user writer
-odin.jwt.authorization write-user password5678
+odin.user write-user-1 write-user-1 password5678
+odin.membership write-user-1 writer
+odin.jwt.authorization write-user-1 password5678
 
 # Check the right permissions are granted
 GET odin/api /me/permissions 200 {"columns": ["permission"],
     "rows": [["read-permission"], ["write-permission"]]}
 
-# Check the web API is also able to check the permissions
+# Check that the web API checks the permissions for the methods
 GET test/permission /by-method/identity-1/ 200
-PUT test/permission /by-method/identity-1/ {} 200 
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 200 
 
 # Set superuser, should have all permission
-odin.superuser write-user
+odin.superuser write-user-1
 GET odin/api /me/permissions 200 {"columns": ["permission"],
     "rows": [["create-group"], ["create-user"], ["read-permission"], ["write-permission"]]}
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 200 
 
 # Expire the account and make sure the permissions go away
-odin.user.expire write-user
+odin.user.expire write-user-1
 GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
 GET test/permission /by-method/identity-1/ 403
-PUT test/permission /by-method/identity-1/ {} 403
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
+
+## Test permission by method with specified forbidden
+
+# Set up the read user account
+odin.user read-user-2 read-user-2 password1234
+odin.membership read-user-2 reader
+odin.jwt.authorization read-user-2 password1234
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"]]}
+
+# PUT will get to a read-only view if forbidden
+PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
+
+# Expiring the account, account with no permission also forbidden and gets the read-only view
+odin.user.expire read-user-2
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
+
+# Set up the write user account
+odin.user write-user-2 write-user-2 password5678
+odin.membership write-user-2 writer
+odin.jwt.authorization write-user-2 password5678
+
+# PUT with write-permission, can update
+PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
+
+# Expiring the account, account with no permission also forbidden and gets the read-only view
+odin.user.expire write-user-2
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
