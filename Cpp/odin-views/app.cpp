@@ -1,5 +1,5 @@
 /**
-    Copyright 2018-2019 Red Anchor Trading Co. Ltd.
+    Copyright 2018-2020 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -121,7 +121,7 @@ namespace {
                             .underlying());
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::json::unparse(result, true), headers,
-                    L"application/json"));
+                    "application/json"));
             return std::make_pair(response, 200);
         }
 
@@ -245,7 +245,7 @@ namespace {
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::utf8_string(
                             jwt.token(odin::c_jwt_secret.value().data())),
-                    headers, L"application/jwt"));
+                    headers, "application/jwt"));
             return std::make_pair(response, 200);
         }
 
@@ -350,7 +350,7 @@ namespace {
             fostlib::mime::mime_headers headers;
             boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
                     fostlib::json::unparse(user, true), headers,
-                    L"application/json"));
+                    "application/json"));
             return std::make_pair(response, 200);
         }
 

@@ -1,5 +1,5 @@
 /**
-    Copyright 2016-2019 Red Anchor Trading Co. Ltd.
+    Copyright 2016-2020 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -43,7 +43,8 @@ FSL_TEST_FUNCTION(check_can_renew_jwt_with_non_app_jwt) {
     fostlib::http::server::request req("GET", "/");
     req.headers().set(
             "Authorization",
-            ("Bearer " + jwt.token(odin::c_jwt_secret.value().data())).c_str());
+            f5::u8string{
+                    "Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
     req.headers().set("__user", "user01");
 
     auto const [response, http_status_code] =
@@ -74,7 +75,8 @@ FSL_TEST_FUNCTION(
     fostlib::http::server::request req("GET", "/");
     req.headers().set(
             "Authorization",
-            ("Bearer " + jwt.token(odin::c_jwt_secret.value().data())).c_str());
+            f5::u8string{
+                    "Bearer " + jwt.token(odin::c_jwt_secret.value().data())});
     req.headers().set("__user", "user01");
 
     auto const [response, http_status_code] = odin::view::jwt_renewal(
@@ -107,7 +109,8 @@ FSL_TEST_FUNCTION(check_can_renew_jwt_with_app_jwt) {
     fostlib::http::server::request req("GET", "/");
     auto secret = odin::c_jwt_secret.value() + app_id;
     req.headers().set(
-            "Authorization", ("Bearer " + jwt.token(secret.data())).c_str());
+            "Authorization",
+            f5::u8string{"Bearer " + jwt.token(secret.data())});
     req.headers().set("__user", "user01");
     req.headers().set("__app", app_id);
 
