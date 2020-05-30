@@ -94,10 +94,21 @@ namespace {
                 const fostlib::string &path,
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
-            auto method_config = config[req.method()]; 
+
+            auto method_config = fostlib::json();
+
+            if (req.method() == "HEAD" and config.has_key("GET")) {
+                // HEAD method always use the same permission as GET
+                method_config = config["GET"];
+            } else {
+                method_config = config[req.method()]; 
+            }
+
+            // If forbidden is not defined, put default as 403 view
             if (not method_config.has_key("forbidden")) {
                 fostlib::insert(method_config, "forbidden", "fost.response.403");
             }
+
             return check_permission(method_config, config, path, req, host);
         }
     } c_permission_method;

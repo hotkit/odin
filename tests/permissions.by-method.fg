@@ -43,6 +43,9 @@ GET odin/api /me/permissions 200 {"columns": ["permission"],
 GET test/permission /by-method/identity-1/ 200
 PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
 
+# Check other HTTP methods (HEAD is supported by default with GET)
+HEAD test/permission /by-method/identity-1/ 200
+
 # Set superuser, should have all permission
 odin.superuser read-user-1
 GET odin/api /me/permissions 200 {"columns": ["permission"],
