@@ -29,6 +29,18 @@
                                     "forbidden": "read-only-view"
                                 }
                             }
+                        },
+                        "by-method-specified-otherwise/": {
+                            "view": "odin.permission.method",
+                            "configuration": {
+                                "PUT": {
+                                    "permission": "write-permission",
+                                    "allowed": "permission-required-view"
+                                },
+                                "otherwise": {
+                                    "view": "fost.response.405"
+                                }
+                            }
                         }
                     }
                 },

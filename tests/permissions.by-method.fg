@@ -119,3 +119,21 @@ PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Id
 odin.user.expire write-user-2
 GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
 PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
+
+## Test permission by method with specified otherwise
+
+# Set up the read user account
+odin.user read-user-3 read-user-3 password1234
+odin.membership read-user-3 reader
+odin.jwt.authorization read-user-3 password1234
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"]]}
+
+# Check that the web API checks the permissions for the methods
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
+
+# Default for unspecified method returns forbidden 403
+POST test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 405
