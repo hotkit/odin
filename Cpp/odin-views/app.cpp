@@ -157,7 +157,7 @@ namespace {
                 fostlib::http::user_agent ua{};
                 auto fed_data{boost::make_shared<fostlib::text_body>(
                         fostlib::json::unparse(body, true),
-                        fostlib::mime::mime_headers(), L"application/json")};
+                        fostlib::mime::mime_headers(), "application/json")};
                 auto fed_resp = ua.post(federation_url, fed_data);
                 fed_response_data =
                         fostlib::json::parse(fostlib::coerce<fostlib::string>(
