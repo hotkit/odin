@@ -30,16 +30,10 @@
                                 }
                             }
                         },
-                        "by-method-specified-otherwise/": {
+                        "by-method-no-permission-check/": {
                             "view": "odin.permission.method",
                             "configuration": {
-                                "PUT": {
-                                    "permission": "write-permission",
-                                    "allowed": "permission-required-view"
-                                },
-                                "otherwise": {
-                                    "view": "fost.response.405"
-                                }
+                                "GET": "read-only-view"     
                             }
                         }
                     }

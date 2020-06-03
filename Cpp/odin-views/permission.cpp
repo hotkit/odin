@@ -25,6 +25,13 @@ namespace {
             const fostlib::string &path,
             fostlib::http::server::request &req,
             const fostlib::host &host) {
+
+        if (not config.isobject()) {
+            // If config is not an object, expecting this to be a view, meaning always go to this view without checking permission  
+            return fostlib::urlhandler::view::execute(
+                    config, path, req, host);
+        }
+
         const auto &permission = config["permission"];
         bool granted = false;
         if (odin::c_jwt_trust.value() && req.headers().exists("__jwt")) {
@@ -40,6 +47,7 @@ namespace {
                 }
             }
         }
+
         if (not granted) {
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             fostlib::json where;
@@ -61,8 +69,14 @@ namespace {
             return fostlib::urlhandler::view::execute(
                     config["allowed"], path, req, host);
         } else {
-            return fostlib::urlhandler::view::execute(
-                    config["forbidden"], path, req, host);
+            if (config.has_key("forbidden")) {
+                return fostlib::urlhandler::view::execute(
+                        config["forbidden"], path, req, host);
+            } else {
+                // Default forbidden view is fost.response.403
+                return fostlib::urlhandler::view::execute(
+                    fostlib::json("fost.response.403"), path, req, host);
+            }
         }
     }
 
@@ -96,17 +110,11 @@ namespace {
                 const fostlib::host &host) const {
 
             auto method_config = fostlib::json();
-
             if (req.method() == "HEAD" and config.has_key("GET")) {
                 // HEAD method always use the same permission as GET
                 method_config = config["GET"];
             } else {
                 method_config = config[req.method()]; 
-            }
-
-            // If forbidden is not defined, put default as 403 view
-            if (not method_config.has_key("forbidden")) {
-                fostlib::insert(method_config, "forbidden", "fost.response.403");
             }
 
             return check_permission(method_config, config, path, req, host);
