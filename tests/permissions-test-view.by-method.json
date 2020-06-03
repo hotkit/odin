@@ -35,6 +35,18 @@
                             "configuration": {
                                 "GET": "read-only-view"     
                             }
+                        },
+                        "by-method-with-otherwise": {
+                            "view": "odin.permission.method",
+                            "configuration": {
+                                "GET": {
+                                    "permission": "read-permission",
+                                    "allowed": "permission-required-view"
+                                },
+                                "otherwise": {
+                                    "view": "fost.response.405"
+                                }
+                            }
                         }
                     }
                 },

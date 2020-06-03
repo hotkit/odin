@@ -10,6 +10,7 @@
 #include <odin/views.hpp>
 
 #include <fost/insert>
+#include <fost/push_back>
 #include <fostgres/sql.hpp>
 
 
@@ -109,15 +110,26 @@ namespace {
                 fostlib::http::server::request &req,
                 const fostlib::host &host) const {
 
-            auto method_config = fostlib::json();
             if (req.method() == "HEAD" and config.has_key("GET")) {
                 // HEAD method always use the same permission as GET
-                method_config = config["GET"];
+                return check_permission(config["GET"], config, path, req, host);
+            } else if (config.has_key(req.method())) {
+                return check_permission(config[req.method()], config, path, req, host);
             } else {
-                method_config = config[req.method()]; 
+                if (config.has_key("otherwise")) {
+                    auto otherwise = config["otherwise"];
+                    if (not otherwise.has_key("view")) {
+                        fostlib::insert(otherwise, "view", "fost.response.403");
+                    }
+                    if (not otherwise.has_key("configuration")) {
+                        fostlib::push_back(otherwise, "configuration", "allow", "POST");
+                    }
+                    return fostlib::urlhandler::view::execute(
+                        otherwise, path, req, host);
+                } else {
+                    return check_permission(fostlib::json("fost.response.403"), config, path, req, host);
+                }
             }
-
-            return check_permission(method_config, config, path, req, host);
         }
     } c_permission_method;
 

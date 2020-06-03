@@ -134,3 +134,20 @@ GET test/permission /by-method-no-permission-check/identity-1/ 200
 # Check the web API response to user with no permission
 odin.user.expire read-user-3
 GET test/permission /by-method-no-permission-check/identity-1/ 200
+
+## Test permission by method with otherwise
+
+# Set up the read user account
+odin.user read-user-4 read-user-4 password1234
+odin.membership read-user-4 reader
+odin.jwt.authorization read-user-4 password1234
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"]]}
+
+# Check the web API response for request with HTTP verb that has been configured
+GET test/permission /by-method-with-otherwise/identity-1/ 200
+
+# Check the web API response for request with HTTP verb that is not configured
+POST test/permission /by-method-with-otherwise/identity-1/ {} 405
