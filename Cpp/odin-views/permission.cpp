@@ -20,6 +20,17 @@ namespace {
     const fostlib::jcursor userloc{"headers", "__user"};
 
 
+    std::pair<boost::shared_ptr<fostlib::mime>, int> default_forbidden(
+            const fostlib::string &path,
+            fostlib::http::server::request &req,
+            const fostlib::host &host) {
+        // Default forbidden view is fost.response.403
+        return fostlib::urlhandler::view::execute(
+            fostlib::json("fost.response.403"), path, req, host);
+
+    }
+
+
     std::pair<boost::shared_ptr<fostlib::mime>, int> check_permission(
             const fostlib::json &config,
             const fostlib::json &full_config,
@@ -74,9 +85,7 @@ namespace {
                 return fostlib::urlhandler::view::execute(
                         config["forbidden"], path, req, host);
             } else {
-                // Default forbidden view is fost.response.403
-                return fostlib::urlhandler::view::execute(
-                    fostlib::json("fost.response.403"), path, req, host);
+                return default_forbidden(path, req, host);
             }
         }
     }
@@ -131,8 +140,7 @@ namespace {
                     return fostlib::urlhandler::view::execute(
                         otherwise, path, req, host);
                 } else {
-                    return fostlib::urlhandler::view::execute(
-                        fostlib::json("fost.response.403"), path, req, host);
+                    return default_forbidden(path, req, host);
                 }
             }
         }
