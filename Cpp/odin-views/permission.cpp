@@ -122,12 +122,17 @@ namespace {
                         fostlib::insert(otherwise, "view", "fost.response.403");
                     }
                     if (not otherwise.has_key("configuration")) {
-                        fostlib::push_back(otherwise, "configuration", "allow", "POST");
+                        for (auto c = config.begin(); c != config.end(); ++c) {
+                            if (c.key() != "otherwise") {
+                                fostlib::push_back(otherwise, "configuration", "allow", c.key());
+                            }
+                        }
                     }
                     return fostlib::urlhandler::view::execute(
                         otherwise, path, req, host);
                 } else {
-                    return check_permission(fostlib::json("fost.response.403"), config, path, req, host);
+                    return fostlib::urlhandler::view::execute(
+                        fostlib::json("fost.response.403"), path, req, host);
                 }
             }
         }
