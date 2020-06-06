@@ -24,7 +24,6 @@ namespace {
             const fostlib::string &path,
             fostlib::http::server::request &req,
             const fostlib::host &host) {
-        // Default forbidden view is fost.response.403
         return fostlib::urlhandler::view::execute(
             fostlib::json("fost.response.403"), path, req, host);
 
@@ -129,7 +128,17 @@ namespace {
                     return fostlib::urlhandler::view::execute(
                         config["otherwise"], path, req, host);
                 } else {
-                    return forbidden_view(path, req, host);
+                    auto otherwise_config = fostlib::json();
+                    // Default view for otherwise is method not allowed
+                    fostlib::insert(otherwise_config, "view", "fost.response.405");
+                    // Take all allowed methods from configured verbs
+                    for (auto c = config.begin(); c != config.end(); ++c) {
+                        if (c.key() != "otherwise") {
+                            fostlib::push_back(otherwise_config, "configuration", "allow", c.key());
+                        }
+                    }
+                    return fostlib::urlhandler::view::execute(
+                        otherwise_config, path, req, host);
                 }
             }
         }

@@ -46,6 +46,9 @@ PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
 # Check other HTTP methods (HEAD is supported by default with GET)
 HEAD test/permission /by-method/identity-1/ 200
 
+# Check the web API response for request with HTTP verb that is not configured
+POST test/permission /by-method/identity-1/ {} 405
+
 # Set superuser, should have all permission
 odin.superuser read-user-1
 GET odin/api /me/permissions 200 {"columns": ["permission"],
@@ -149,5 +152,5 @@ GET odin/api /me/permissions 200 {"columns": ["permission"],
 # Check the web API response for request with HTTP verb that has been configured
 GET test/permission /by-method-with-otherwise/identity-1/ 200
 
-# Check the web API response for request with HTTP verb that is not configured
-POST test/permission /by-method-with-otherwise/identity-1/ {} 405
+# Check that web API response for request with HTTP verb that is not configured will use otherwise view
+POST test/permission /by-method-with-otherwise/identity-1/ {} 403
