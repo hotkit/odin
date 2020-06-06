@@ -126,19 +126,8 @@ namespace {
                 return check_permission(config[req.method()], config, path, req, host);
             } else {
                 if (config.has_key("otherwise")) {
-                    auto otherwise = config["otherwise"];
-                    if (not otherwise.has_key("view")) {
-                        fostlib::insert(otherwise, "view", "fost.response.403");
-                    }
-                    if (not otherwise.has_key("configuration")) {
-                        for (auto c = config.begin(); c != config.end(); ++c) {
-                            if (c.key() != "otherwise") {
-                                fostlib::push_back(otherwise, "configuration", "allow", c.key());
-                            }
-                        }
-                    }
                     return fostlib::urlhandler::view::execute(
-                        otherwise, path, req, host);
+                        config["otherwise"], path, req, host);
                 } else {
                     return default_forbidden(path, req, host);
                 }

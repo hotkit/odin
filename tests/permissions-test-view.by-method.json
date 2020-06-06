@@ -44,7 +44,10 @@
                                     "allowed": "permission-required-view"
                                 },
                                 "otherwise": {
-                                    "view": "fost.response.405"
+                                    "view": "fost.response.405",
+                                    "configuration": {
+                                        "allow": ["GET", "HEAD"]
+                                    }
                                 }
                             }
                         }
