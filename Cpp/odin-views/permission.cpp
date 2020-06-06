@@ -20,7 +20,7 @@ namespace {
     const fostlib::jcursor userloc{"headers", "__user"};
 
 
-    std::pair<boost::shared_ptr<fostlib::mime>, int> default_forbidden(
+    std::pair<boost::shared_ptr<fostlib::mime>, int> forbidden_view(
             const fostlib::string &path,
             fostlib::http::server::request &req,
             const fostlib::host &host) {
@@ -85,7 +85,7 @@ namespace {
                 return fostlib::urlhandler::view::execute(
                         config["forbidden"], path, req, host);
             } else {
-                return default_forbidden(path, req, host);
+                return forbidden_view(path, req, host);
             }
         }
     }
@@ -129,7 +129,7 @@ namespace {
                     return fostlib::urlhandler::view::execute(
                         config["otherwise"], path, req, host);
                 } else {
-                    return default_forbidden(path, req, host);
+                    return forbidden_view(path, req, host);
                 }
             }
         }
