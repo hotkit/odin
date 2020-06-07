@@ -47,7 +47,7 @@ This view is used when different HTTP verbs require different permissions.
 
 `HEAD` is supported automatically if `GET` is configured and will use `GET` permission configuration.
 
-The default view configuration for forbidden is `fost.response.403`.
+The default view configuration for `forbidden` is `fost.response.403`.
 
 `otherwise` configuration needs to be a proper view configuration. The default configuration for `otherwise` is shown below where `allow` is taken from all the verbs configured. 
 
