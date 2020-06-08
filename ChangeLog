@@ -1,3 +1,6 @@
+2020-06-08  Pam suebvisai  <suebvisai.pam@gmail.com>
+  Add support for permission configuration by HTTP method
+
 2020-04-13  Tle Ekkul  <e.aryuth@gmail.com>
   Allow GET request on odin.app.user
   Deprecate PUT request on odin.app.user
