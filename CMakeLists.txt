@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.7)
 project(odin)
 
+enable_testing()
+if(NOT TARGET pgtest)
+    add_custom_target(pgtest)
+    set_property(TARGET pgtest PROPERTY EXCLUDE_FROM_ALL TRUE)
+endif()
+
 add_subdirectory(Configuration)
 add_subdirectory(Cpp)
 if(NOT DEFINED SKIP_PYTHON OR NOT ${SKIP_PYTHON})

@@ -1,0 +1,156 @@
+# Set up the database
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/002-view-user_permission.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authz/004-merge-account-function.blue.sql)
+setting odin "Trust JWT" true
+
+# Set up test data
+sql.insert odin.identity {"id": "identity-1"}
+
+# Set up test permissions and group
+odin.permission read-permission "Read permission"
+odin.permission write-permission "Write permission"
+odin.group reader "Reader"
+odin.assign reader read-permission
+odin.group writer "Writer"
+odin.assign writer read-permission write-permission
+
+# When not logged in get a 403 or 401
+GET odin/api / 401 {"odin": {"login": "./login/"}}
+GET odin/api /me/permissions 403
+GET test/permission /by-method/identity-1/ 401
+
+## Test permission by method
+
+# Set up the read user account
+odin.user read-user-1 read-user-1 password1234
+odin.membership read-user-1 reader
+odin.jwt.authorization read-user-1 password1234
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"]]}
+
+# Check that the web API checks the permissions for the methods
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
+
+# Check other HTTP methods (HEAD is supported by default with GET)
+HEAD test/permission /by-method/identity-1/ 200
+
+# Check the web API response for request with HTTP verb that is not configured
+POST test/permission /by-method/identity-1/ {} 405
+
+# Set superuser, should have all permission
+odin.superuser read-user-1
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["create-group"], ["create-user"], ["read-permission"], ["write-permission"]]}
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 200
+
+# Expire the account and make sure the permissions go away
+odin.user.expire read-user-1
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+GET test/permission /by-method/identity-1/ 403
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
+
+# Set up the write user account
+odin.user write-user-1 write-user-1 password5678
+odin.membership write-user-1 writer
+odin.jwt.authorization write-user-1 password5678
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"], ["write-permission"]]}
+
+# Check that the web API checks the permissions for the methods
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 200 
+
+# Set superuser, should have all permission
+odin.superuser write-user-1
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["create-group"], ["create-user"], ["read-permission"], ["write-permission"]]}
+GET test/permission /by-method/identity-1/ 200
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 200 
+
+# Expire the account and make sure the permissions go away
+odin.user.expire write-user-1
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+GET test/permission /by-method/identity-1/ 403
+PUT test/permission /by-method/identity-1/ {"full_name": "Identity 1"} 403
+
+## Test permission by method with specified forbidden
+
+# Set up the read user account
+odin.user read-user-2 read-user-2 password1234
+odin.membership read-user-2 reader
+odin.jwt.authorization read-user-2 password1234
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"]]}
+
+# PUT will get to a read-only view if forbidden
+PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
+
+# Expiring the account, account with no permission also forbidden and gets the read-only view
+odin.user.expire read-user-2
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
+
+# Set up the write user account
+odin.user write-user-2 write-user-2 password5678
+odin.membership write-user-2 writer
+odin.jwt.authorization write-user-2 password5678
+
+# PUT with write-permission, can update
+PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
+
+# Expiring the account, account with no permission also forbidden and gets the read-only view
+odin.user.expire write-user-2
+GET odin/api /me/permissions 200 {"columns": ["permission"], "rows": []}
+PUT test/permission /by-method-specified-forbidden/identity-1/ {"full_name": "Identity 1"} 200 {}
+
+## Test permission by method with no permission check
+
+# Set up the read user account
+odin.user read-user-3 read-user-3 password1234
+odin.membership read-user-3 reader
+odin.jwt.authorization read-user-3 password1234
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"]]}
+
+# Check the web API response to user with some permission
+GET test/permission /by-method-no-permission-check/identity-1/ 200
+
+# Check the web API response to user with no permission
+odin.user.expire read-user-3
+GET test/permission /by-method-no-permission-check/identity-1/ 200
+
+## Test permission by method with otherwise
+
+# Set up the read user account
+odin.user read-user-4 read-user-4 password1234
+odin.membership read-user-4 reader
+odin.jwt.authorization read-user-4 password1234
+
+# Check the right permissions are granted
+GET odin/api /me/permissions 200 {"columns": ["permission"],
+    "rows": [["read-permission"]]}
+
+# Check the web API response for request with HTTP verb that has been configured
+GET test/permission /by-method-with-otherwise/identity-1/ 200
+
+# Check that web API response for request with HTTP verb that is not configured will use otherwise view
+POST test/permission /by-method-with-otherwise/identity-1/ {} 403
