@@ -1,6 +1,9 @@
-# Set up the modules we need
+# Set up the database
+## module core
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+
+## module authn
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
@@ -62,24 +65,27 @@ POST odin/register / {"username": "user91", "password": "password1234", "email":
 ## Should throw exception when user input existing email
 POST odin/register / {"username": "user90", "password": "password1234", "email": "admin@example.com"} 422 {"message": "This email already exists"}
 
-# If user email already registered with Odin, return 422 with error message
+# If user email already registered return 422 with error message
+## module opts/apple
+odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+## module opts/facebook
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/google
 odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
 
-odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+POST odin/test/facebook/login/ok / {"access_token": "login_via_fb"} 200
+POST odin/register / {"username": "login_via_fb", "password": "password1234", "email": "login_via_fb@example.com"} 422 {"message": "This email already exists"}
 
 POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
 POST odin/register / {"username": "login_via_gp", "password": "password1234", "email": "login_via_gp@example.com"} 422 {"message": "This email already exists"}
-
-POST odin/test/facebook/login/ok / {"access_token": "login_via_fb"} 200
-POST odin/register / {"username": "login_via_fb", "password": "password1234", "email": "login_via_fb@example.com"} 422 {"message": "This email already exists"}
 
 sql.insert odin.identity {
     "id": "guest-user",

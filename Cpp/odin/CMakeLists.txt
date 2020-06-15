@@ -7,6 +7,7 @@ add_library(odin
         nonce.cpp
         odin.cpp
         pwhashproc.cpp
+        thirdparty.cpp
         user.cpp
     )
 target_include_directories(odin PUBLIC ../include)

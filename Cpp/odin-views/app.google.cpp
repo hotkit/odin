@@ -7,9 +7,9 @@
 
 
 #include <odin/app.hpp>
-#include <odin/facebook.hpp>
 #include <odin/google.hpp>
 #include <odin/nonce.hpp>
+#include <odin/thirdparty.hpp>
 #include <odin/user.hpp>
 #include <odin/views.hpp>
 
@@ -56,7 +56,8 @@ namespace {
                 return execute(config, path, req, host);
             }
             if (not req.headers().exists("__app")
-                || not req.headers().exists("__user")) {
+                || not req.headers().exists("__user")
+                || not req.headers().exists("__app_user")) {
                 throw fostlib::exceptions::not_implemented(
                         __PRETTY_FUNCTION__,
                         "The odin.app.google.login view must be wrapped by an "
@@ -65,6 +66,7 @@ namespace {
             }
             logger("__app", req.headers()["__app"]);
             logger("__user", req.headers()["__user"]);
+            logger("__app_user", req.headers()["__app_user"]);
 
             auto body_str = fostlib::coerce<fostlib::string>(
                     fostlib::coerce<fostlib::utf8_string>(req.data()->data()));
@@ -118,7 +120,7 @@ namespace {
                 app_user_id = req.headers()["__app_user"].value();
                 if (user_detail.has_key("email")) {
                     auto const email_owner_id =
-                            odin::facebook::email_owner_identity_id(
+                            odin::thirdparty::email_owner_identity_id(
                                     cnx,
                                     fostlib::coerce<fostlib::string>(
                                             user_detail["email"]));

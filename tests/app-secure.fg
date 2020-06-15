@@ -1,10 +1,9 @@
-## Set up the database
+# Set up the database
+## module core
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+
+## module app
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
@@ -14,18 +13,28 @@ odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
+## module authn
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/apple
+odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+## module opts/email
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
+## module opts/facebook
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/full-name
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
 
 ## Set up new users and apps
 odin.user owner owner password1234
@@ -166,7 +175,7 @@ GET test/app/secure/identity /me 401
 # Login facebook
 # Request some spp_secure view
 setting webserver views/test/app/installation {
-            "view": "odin.app.installation",
+        "view": "odin.app.installation",
             "configuration": {
                 "expires": {
                     "hours": 72
@@ -174,7 +183,7 @@ setting webserver views/test/app/installation {
             }
         }
 setting webserver views/test/sec/installation {
-        "view": "odin.app.secure",
+    "view": "odin.app.secure",
         "configuration": {
             "secure": "test/app/installation",
             "unsecure": "fost.response.403"

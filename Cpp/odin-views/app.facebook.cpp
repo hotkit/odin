@@ -8,8 +8,8 @@
 
 #include <odin/app.hpp>
 #include <odin/facebook.hpp>
-#include <odin/google.hpp>
 #include <odin/nonce.hpp>
+#include <odin/thirdparty.hpp>
 #include <odin/user.hpp>
 #include <odin/views.hpp>
 
@@ -108,7 +108,7 @@ namespace {
                 app_user_id = req.headers()["__app_user"].value();
                 if (user_detail.has_key("email")) {
                     auto const email_owner_id =
-                            odin::google::email_owner_identity_id(
+                            odin::thirdparty::email_owner_identity_id(
                                     cnx,
                                     fostlib::coerce<fostlib::string>(
                                             user_detail["email"]));
