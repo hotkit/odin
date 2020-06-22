@@ -118,14 +118,6 @@ setting webserver views/odin/test/ids-for-biz-failed {
 }
 POST odin/test/ids-for-biz-failed / {"access_token": "user_1"} 501
 
-
-# format
-ua_mock <http method> <request header> <request_url> <response status> <json response body>
-# example
-ua_mock GET {} https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=156147 200 {"sub": "test_user", "email": "test@example.com"}
-ua_mock POST {} https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=156147 405 {"message": "Method not allow"}
-
-
 setting webserver views/odin/test/ids-for-biz-not-include-allow-apps {
     "view": "odin.app.secure",
     "configuration": {
