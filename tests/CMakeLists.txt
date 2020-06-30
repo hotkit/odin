@@ -679,8 +679,8 @@ if(TARGET stress OR TARGET pgtest)
             app-login.fg
     )
 
-    add_custom_command(OUTPUT odin-test-app-login-facebook
-            COMMAND fostgres-test odin-test-app-login-facebook -o odin-test-app-login-facebook
+    add_custom_command(OUTPUT test-app-login-facebook
+            COMMAND fostgres-test test-app-login-facebook -o test-app-login-facebook
                 $<TARGET_SONAME_FILE:odin-fg>
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -732,8 +732,8 @@ if(TARGET stress OR TARGET pgtest)
                 app-login-facebook.fg
         )
 
-    add_custom_command(OUTPUT odin-test-app-login-google
-            COMMAND fostgres-test odin-test-app-login-google -o odin-test-app-login-google
+    add_custom_command(OUTPUT test-app-login-google
+            COMMAND fostgres-test test-app-login-google -o test-app-login-google
                 $<TARGET_SONAME_FILE:odin-fg>
                 $<TARGET_SONAME_FILE:odin-views>
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
@@ -1012,8 +1012,8 @@ if(TARGET stress OR TARGET pgtest)
             test-app-installation
             test-app-mint
             test-app-login
-            odin-test-app-login-facebook
-            odin-test-app-login-google
+            test-app-login-facebook
+            test-app-login-google
             test-app-secure
             test-app-verify
             test-authnz

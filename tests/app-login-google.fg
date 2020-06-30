@@ -249,37 +249,31 @@ setting webserver views/odin/test/sec/facebook/login/ok {
             "configuration": {
                 "expires": {
                     "hours": 72
-                },
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "112233445566778",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://caveman-club/",
-                                        "name": "Caveman Club",
-                                        "id": "111111111111111"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "Fred Flintstone",
-                            "email": "duplicate-email-with-facebook-user@example.com",
-                            "id": "112233445566778"
-                        }
-                    }
                 }
             }
         },
         "unsecure": "fost.response.403"
     }
+}
+
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=duplicate-email-with-facebook-user 200 {
+    "data": [
+        {
+            "id": "112233445566778",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
+            }
+        }
+    ]
+}
+
+expect GET https://graph.facebook.com/me?access_token=duplicate-email-with-facebook-user&fields=name,email 200 {
+    "name": "Fred Flintstone",
+    "email": "duplicate-email-with-facebook-user@example.com",
+    "id": "112233445566778"
 }
 
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_new_app", "iss": "http://odin.felspar.com/app/new-app"} <JWT_SECRET>new-app))
