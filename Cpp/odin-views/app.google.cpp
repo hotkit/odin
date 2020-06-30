@@ -27,18 +27,6 @@ namespace {
     fostlib::module const c_odin_app_google{odin::c_odin_app, "google"};
 
 
-    inline std::pair<boost::shared_ptr<fostlib::mime>, int>
-            respond(fostlib::string message, int code = 403) {
-        fostlib::json ret;
-        if (not message.empty())
-            fostlib::insert(ret, "message", std::move(message));
-        fostlib::mime::mime_headers headers;
-        boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                fostlib::json::unparse(ret, true), headers, "application/json"));
-        return std::make_pair(response, code);
-    }
-
-
     const class g_login : public fostlib::urlhandler::view {
       public:
         g_login() : view("odin.app.google.login") {}

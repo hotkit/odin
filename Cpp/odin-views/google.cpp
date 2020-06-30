@@ -138,6 +138,3 @@ namespace {
 
 
 }
-
-
-const fostlib::urlhandler::view &odin::view::google = c_google;

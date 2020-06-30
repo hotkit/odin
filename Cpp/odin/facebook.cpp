@@ -18,8 +18,7 @@
 
 fostlib::json odin::facebook::get_user_detail(
         fostlib::pg::connection &cnx,
-        f5::u8view user_token,
-        fostlib::json config) {
+        f5::u8view user_token) {
 
     fostlib::http::user_agent ua{};
     fostlib::url base_facebook_url(odin::c_facebook_endpoint.value());
@@ -31,9 +30,8 @@ fostlib::json odin::facebook::get_user_detail(
     ids_for_biz_url.query(ids_for_biz_qs);
 
     fostlib::json ids_for_biz;
-    try {
-        ids_for_biz = fostlib::ua::get_json(
-                ids_for_biz_url, fostlib::mime::mime_headers{});
+    try { 
+        ids_for_biz = fostlib::ua::get_json(ids_for_biz_url, fostlib::mime::mime_headers{});
     } catch (fostlib::ua::http_error &e) {
         fostlib::log::error(c_odin)("Error", "ids_for_business")(
                 "URL", ids_for_biz_url)("status", e.data()["status-code"])(
@@ -42,7 +40,7 @@ fostlib::json odin::facebook::get_user_detail(
                 __PRETTY_FUNCTION__,
                 "Cannot retrieve /me/ids_for_business from Facebook");
     }
-
+    
     fostlib::json fb_user{};
     /// Check with allow facebook apps
     auto const fb_conf = odin::c_facebook_apps.value();
@@ -81,7 +79,7 @@ fostlib::json odin::facebook::get_user_detail(
                 "token");
     }
 
-    fostlib::insert(fb_user, "id", static_cast<f5::u8view>(userid.value()));
+    fostlib::insert(fb_user, "user_id", static_cast<f5::u8view>(userid.value()));
 
     /// Retrieve facebook user detail
     fostlib::url user_detail_url(base_facebook_url, "/me");
@@ -91,9 +89,8 @@ fostlib::json odin::facebook::get_user_detail(
     user_detail_url.query(user_detail_qs);
 
     fostlib::json user_detail;
-    try {
-        user_detail = fostlib::ua::get_json(
-                user_detail_url, fostlib::mime::mime_headers{});
+    try { 
+        user_detail = fostlib::ua::get_json(user_detail_url, fostlib::mime::mime_headers{});
     } catch (fostlib::ua::http_error &e) {
         fostlib::log::error(c_odin)("Error", "ids_for_business")(
                 "URL", user_detail_url)("status", e.data()["status-code"])(
@@ -101,7 +98,7 @@ fostlib::json odin::facebook::get_user_detail(
         throw fostlib::exceptions::not_implemented(
                 __PRETTY_FUNCTION__,
                 "Cannot retrieve /me?field=name,email from Facebook");
-    }
+    }    
 
     fostlib::log::error(c_odin)("Response", user_detail);
     if (user_detail.has_key("name")) {
