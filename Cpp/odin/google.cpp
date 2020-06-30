@@ -1,5 +1,5 @@
 /**
-    Copyright 2018-2019 Red Anchor Trading Co. Ltd.
+    Copyright 2018-2020 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -9,11 +9,11 @@
 #include <odin/fg/native.hpp>
 #include <odin/odin.hpp>
 
-#include <fost/http>
-#include <fost/log>
 #include <fostgres/sql.hpp>
-
+#include <fost/http>
 #include <fost/insert>
+#include <fost/log>
+#include <fost/ua/exceptions.hpp>
 
 
 fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
@@ -22,9 +22,17 @@ fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
     fostlib::url::filepath_string api{"/oauth2/v3/tokeninfo"};
     fostlib::url gg_url(base_url, api);
     gg_url.query().append("id_token", user_token);
-    fostlib::http::user_agent ua(gg_url);
-    auto response = ua.get(gg_url);
-    fostlib::json body = fostlib::json::parse(response->body()->data());
+    fostlib::json body;
+    try {
+        body = fostlib::ua::get_json(gg_url, fostlib::mime::mime_headers{});
+        // Example body :
+        // https://developers.google.com/identity/sign-in/android/backend-auth
+    } catch (fostlib::ua::http_error &e) {
+        fostlib::log::error(c_odin)("Error", "get_user_detail")("URL", gg_url)(
+                "status", e.data()["status-code"])("body", body);
+        throw fostlib::exceptions::not_implemented(
+                __PRETTY_FUNCTION__, "Cannot retrieve user detail from google");
+    }
     auto aud = fostlib::coerce<fostlib::string>(body["aud"]);
     auto gg_aud = c_google_aud.value()["Client_ID"];
     for (const auto a : gg_aud) {

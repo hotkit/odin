@@ -316,7 +316,6 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/registration-self.fg
             MAIN_DEPENDENCY registration-self.fg
             DEPENDS
@@ -351,7 +350,6 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
-                facebook-test.json
                 registration-self.fg
         )
 
@@ -505,7 +503,6 @@ if(TARGET stress OR TARGET pgtest)
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-views.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/../Configuration/odin-webserver.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/login-google-test.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/facebook-test.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/login-google.fg
             MAIN_DEPENDENCY login-google.fg
             DEPENDS
@@ -541,7 +538,6 @@ if(TARGET stress OR TARGET pgtest)
                 ../Schema/opts/installation-id/004-merge-account-function.blue.sql
                 ../Configuration/odin-views.json
                 login-google-test.json
-                facebook-test.json
                 login-google.fg
         )
 

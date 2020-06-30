@@ -48,6 +48,9 @@ setting odin "Facebook" {
     "main": "111111111111111",
     "allowed": ["111111111111111", "222222222222222"]
 }
+setting odin "Google" {
+    "Client_ID": ["111111111111111", "222222222222222"]
+}
 
 ## ## Register app
 sql.insert odin.identity {"id": "open-app"}
@@ -105,7 +108,7 @@ setting webserver views/odin/test/facebook/login {
 
 
 # case ids-for-biz-failed
-expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 200 {
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 400 {
     "error": {
         "message": "Malformed access token ACCESS_TOKEN",
         "type": "OAuthException",
@@ -165,7 +168,7 @@ expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 20
         }
     ]
 }
-expect GET https://graph.facebook.com/me?access_token=user_1&fields=name,email 200 {
+expect GET https://graph.facebook.com/me?access_token=user_1&fields=name,email 400 {
     "error": {
         "message": "Malformed access token ACCESS_TOKEN",
         "type": "OAuthException",
@@ -486,14 +489,13 @@ expect GET https://graph.facebook.com/me?access_token=duplicate-email-with-googl
     "email": "duplicate-email-with-google@example.com"
 }
 
-setting webserver views/odin/test/sec/google/login/ok {
+setting webserver views/odin/test/sec/google/login {
     "view": "odin.app.secure",
     "configuration": {
         "secure": {
             "view": "odin.app.google.login",
             "configuration": {
-                "expires": {"hours": 72},
-                "google-mock": "OK"
+                "expires": {"hours": 72}
             }
         },
         "unsecure": "fost.response.403"
@@ -502,7 +504,13 @@ setting webserver views/odin/test/sec/google/login/ok {
 
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "g-duplicate-email-with-google"} 201))
-POST odin/test/sec/google/login/ok / {"access_token": "duplicate-email-with-google"} 200
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=duplicate-email-with-google 200 {
+    "aud": "111111111111111",	
+    "sub": "duplicate-email-with-google",
+    "name": "Test User",
+    "email": "duplicate-email-with-google@example.com"    
+}
+POST odin/test/sec/google/login / {"access_token": "duplicate-email-with-google"} 200
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}

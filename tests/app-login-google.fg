@@ -43,6 +43,9 @@ odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-ins
 odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
 
 setting odin "JWT secret" <JWT_SECRET>
+setting odin "Google" {
+    "Client_ID": ["111111111111111", "222222222222222"]
+}
 
 ## ## Register app
 sql.insert odin.identity {"id": "open-app"}
@@ -85,14 +88,13 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/inst
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 201))
 
-setting webserver views/odin/test/sec/google/login/ok {
+setting webserver views/odin/test/sec/google/login {
         "view": "odin.app.secure",
         "configuration": {
             "secure": {
                 "view": "odin.app.google.login",
                 "configuration": {
-                    "expires": {"hours": 72},
-                    "google-mock": "OK"
+                    "expires": {"hours": 72}
                 }
             },
             "unsecure": "fost.response.403"
@@ -103,20 +105,27 @@ setting webserver views/odin/test/sec/google/login/ok {
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 0}
 
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=user_1 200 {
+    "aud": "111111111111111",	
+    "sub": "user_1",
+    "name": "Test User",
+    "email": "user_1@example.com"    
+}
+
 ## Disallowed methods return a 405
-GET odin/test/sec/google/login/ok / 405
-PUT odin/test/sec/google/login/ok / {"installation_id": "ins01", "access_token": "user_1"} 405
+GET odin/test/sec/google/login / 405
+PUT odin/test/sec/google/login / {"installation_id": "ins01", "access_token": "user_1"} 405
 
 ## Need required fields
-POST odin/test/sec/google/login/ok / {} 501
+POST odin/test/sec/google/login / {} 501
 
 ## Login with Google ID that has not been seen before
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login / {"access_token": "user_1"} 200))
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 
 ## Login again later on should be just fine
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login / {"access_token": "user_1"} 200))
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 
@@ -136,7 +145,7 @@ GET odin/test/google/validate_login /count-users 200 {"count": 3}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 
 ## Login with Google ID that *has* been seen before
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login / {"access_token": "user_1"} 200))
 
 ## There is no new Google user
 GET odin/test/google/validate_login /count-users 200 {"count": 2}
@@ -180,7 +189,7 @@ GET odin/test/google/validate_login /count-users 200 {"count": 4}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 
 ## A Google login now merges the new installation with the old user
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login / {"access_token": "user_1"} 200))
 
 ## There is no new Google user, but the new installation ID has
 ## been merged to the old identity so there is one fewer user.
@@ -210,8 +219,14 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/inst
 GET odin/test/google/validate_login /count-users 200 {"count": 5}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 1}
 
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=duplicate-email-user 200 {
+    "aud": "111111111111111",	
+    "sub": "duplicate-email-user",
+    "name": "Test User",
+    "email": "duplicate-email-user@example.com"    
+}
 ## If user email already registered with Odin with no credential, return 200 create new user
-POST odin/test/sec/google/login/ok / {"access_token": "duplicate-email-user"} 200
+POST odin/test/sec/google/login / {"access_token": "duplicate-email-user"} 200
 
 setting webserver views/validate-google-id {
     "view": "fostgres.sql",
@@ -297,8 +312,14 @@ setting webserver views/odin/app_secure {
     }    
 }
 
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=duplicate-email-with-facebook-user 200 {
+    "aud": "111111111111111",	
+    "sub": "duplicate-email-with-facebook-user",
+    "name": "Test User",
+    "email": "duplicate-email-with-facebook-user@example.com"    
+}
 ## If user email already registered with Odin by facebook, return 200 add google credential to that registered user 
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login/ok / {"access_token": "duplicate-email-with-facebook-user"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/google/login / {"access_token": "duplicate-email-with-facebook-user"} 200))
 GET odin/app_secure / 200
 
 setting webserver views/validate-google-id {
@@ -338,7 +359,13 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/inst
 GET odin/test/google/validate_login /count-users 200 {"count": 8}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 3}
 
-POST odin/test/sec/google/login/ok / {"access_token": "exist_user"} 200
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=exist_user 200 {
+    "aud": "111111111111111",	
+    "sub": "exist_user",
+    "name": "Test User",
+    "email": "exist_user@example.com"    
+}
+POST odin/test/sec/google/login / {"access_token": "exist_user"} 200
 
 setting webserver views/validate-google-id {
     "view": "fostgres.sql",

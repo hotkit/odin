@@ -14,6 +14,9 @@ setting odin "Facebook" {
     "main": "111111111111111",
     "allowed": ["111111111111111", "222222222222222"]
 }
+setting odin "Google" {
+    "Client_ID": ["111111111111111", "222222222222222"]
+}
 
 # For self registration we must be not logged in
 GET odin /api/ 401 {"odin": {"login": "./login/"}}
@@ -81,10 +84,55 @@ odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function
 odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
 
-POST odin/test/facebook/login/ok / {"access_token": "login_via_fb"} 200
+## Api for register with facebook
+setting webserver views/odin/test/facebook/login {
+    "view": "odin.facebook.login",
+    "configuration": {
+        "expires": {
+            "hours": 72
+        }
+    }
+}
+
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=login_via_fb 200 {
+    "data": [
+        {
+            "id": "112233445566778",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
+            }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=login_via_fb&fields=name,email 200 {
+    "name": "Fred Flintstone",
+    "email": "login_via_fb@example.com",
+    "id": "112233445566778"
+}
+
+POST odin/test/facebook/login / {"access_token": "login_via_fb"} 200
 POST odin/register / {"username": "login_via_fb", "password": "password1234", "email": "login_via_fb@example.com"} 422 {"message": "This email already exists"}
 
-POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
+setting webserver views/odin/test/google/login {
+    "view": "odin.google.login",
+    "configuration": {
+        "expires": {
+            "hours": 72
+        }
+    }
+}
+
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=login_via_gp 200 {
+    "aud": "111111111111111",	
+    "sub": "login_via_gp",
+    "name": "Test User",
+    "email": "login_via_gp@example.com"    
+}
+
+POST odin/test/google/login / {"access_token": "login_via_gp"} 200
 POST odin/register / {"username": "login_via_gp", "password": "password1234", "email": "login_via_gp@example.com"} 422 {"message": "This email already exists"}
 
 sql.insert odin.identity {

@@ -37,122 +37,105 @@ setting odin "Facebook" {
     "main": "111111111111111",
     "allowed": ["111111111111111", "222222222222222"]
 }
+setting odin "Google" {
+    "Client_ID": ["111111111111111", "222222222222222"]
+}
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 0}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
-setting webserver views/odin/test/facebook/login/user-1 {
+setting webserver views/odin/test/facebook/login {
     "view": "odin.facebook.login",
     "configuration": {
         "expires": {
             "hours": 72
-        },
-        "facebook-mock": {
-            "ids_for_business": {
-                "body": {
-                    "data": [
-                        {
-                            "id": "112233445566778",
-                            "app": {
-                                "category": "Business",
-                                "link": "https://caveman-club/",
-                                "name": "Caveman Club",
-                                "id": "111111111111111"
-                            }
-                        }
-                    ]
-                }
-            },
-            "me": {
-                "body": {
-                    "name": "Fred Flintstone",
-                    "email": "user_1@example.com",
-                    "id": "112233445566778"
-                }
-            }
         }
     }
 }
 
-POST odin/test/facebook/login/user-1 / {"access_token": "user_1"} 200
-POST odin/test/facebook/login/error / {"access_token": "WRONG_ACCESS_TOKEN"} 501
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 200 {
+    "data": [
+        {
+            "id": "112233445566778",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
+            }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=user_1&fields=name,email 200 {
+    "name": "Fred Flintstone",
+    "email": "user_1@example.com",
+    "id": "112233445566778"
+}
+POST odin/test/facebook/login / {"access_token": "user_1"} 200
+
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=WRONG_ACCESS_TOKEN 400 {
+    "error": {
+        "message": "Malformed access token ACCESS_TOKEN",
+        "type": "OAuthException",
+        "code": 190,
+        "fbtrace_id": "xxxxxxxx"
+    }
+}
+POST odin/test/facebook/login / {"access_token": "WRONG_ACCESS_TOKEN"} 501
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+
 
 ## Login with the same facebook user id should not create new identity
-POST odin/test/facebook/login/user-1 / {"access_token": "user_1"} 200
+POST odin/test/facebook/login / {"access_token": "user_1"} 200
 GET odin/test/facebook/validate_login /count-users 200 {"count": 1}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
-setting webserver views/odin/test/facebook/login/user-2 {
-    "view": "odin.facebook.login",
-    "configuration": {
-        "expires": {
-            "hours": 72
-        },
-        "facebook-mock": {
-            "ids_for_business": {
-                "body": {
-                    "data": [
-                        {
-                            "id": "1235231612351235",
-                            "app": {
-                                "category": "Business",
-                                "link": "https://caveman-club/",
-                                "name": "Caveman Club",
-                                "id": "111111111111111"
-                            }
-                        }
-                    ]
-                }
-            },
-            "me": {
-                "body": {
-                    "name": "Fred 2 Flintstone",
-                    "email": "user_2@example.com",
-                    "id": "1235123512655"
-                }
+
+## login with new user
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_2 200 {
+    "data": [
+        {
+            "id": "1235231612351235",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
             }
         }
-    }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=user_2&fields=name,email 200 {
+    "name": "Fred 2 Flintstone",
+    "email": "user_2@example.com",
+    "id": "1235123512655"
 }
 
-POST odin/test/facebook/login/user-2 / {"access_token": "user_2"} 200
+POST odin/test/facebook/login / {"access_token": "user_2"} 200
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
 
-setting webserver views/odin/test/facebook/login/exist_user {
-    "view": "odin.facebook.login",
-    "configuration": {
-        "expires": {
-            "hours": 72
-        },
-        "facebook-mock": {
-            "ids_for_business": {
-                "body": {
-                    "data": [
-                        {
-                            "id": "3401928358612345",
-                            "app": {
-                                "category": "Business",
-                                "link": "https://caveman-club/",
-                                "name": "Caveman Club",
-                                "id": "111111111111111"
-                            }
-                        }
-                    ]
-                }
-            },
-            "me": {
-                "body": {
-                    "name": "exist_user",
-                    "email": "exist_user@example.com",
-                    "id": "3401928358612345"
-                }
+
+## Duplicate email with username user 
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=exist_user 200 {
+    "data": [
+        {
+            "id": "3401928358612345",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
             }
         }
-    }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=exist_user&fields=name,email 200 {
+    "name": "exist_user",
+    "email": "exist_user@example.com",
+    "id": "3401928358612345"
 }
 
 ## If user email already registered with Odin by username, create new user
@@ -161,7 +144,7 @@ POST odin/register / {"username": "exist_user", "password": "password1234", "ema
 GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
 
-POST odin/test/facebook/login/exist_user / {"access_token": "exist_user"} 200
+POST odin/test/facebook/login / {"access_token": "exist_user"} 200
 
 setting webserver views/validate-facebook-id {
     "view": "fostgres.sql",
@@ -186,45 +169,50 @@ GET validate-facebook-id /3401928358612345 200 {
 GET odin/test/facebook/validate_login /count-users 200 {"count": 4}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
 
-POST odin/test/google/login/ok / {"access_token": "login_via_gp"} 200
+setting webserver views/odin/test/google/login {
+    "view": "odin.google.login",
+    "configuration": {
+        "expires": {
+            "hours": 72
+        }
+    }
+}
+
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=login_via_gp 200 {
+    "aud": "111111111111111",
+    "sub": "login_via_gp",
+    "name": "Test Uesr",
+    "email": "login_via_gp@example.com"    
+}
+
+POST odin/test/google/login / {"access_token": "login_via_gp"} 200
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
 
-setting webserver views/odin/test/facebook/login/via-gp {
-    "view": "odin.facebook.login",
-    "configuration": {
-        "expires": {
-            "hours": 72
-        },
-        "facebook-mock": {
-            "ids_for_business": {
-                "body": {
-                    "data": [
-                        {
-                            "id": "12356126123612",
-                            "app": {
-                                "category": "Business",
-                                "link": "https://caveman-club/",
-                                "name": "Caveman Club",
-                                "id": "111111111111111"
-                            }
-                        }
-                    ]
-                }
-            },
-            "me": {
-                "body": {
-                    "name": "login_via_gp",
-                    "email": "login_via_gp@example.com",
-                    "id": "12356126123612"
-                }
+
+# Duplicate email with google user
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=login_via_gp 200 {
+    "data": [
+        {
+            "id": "12356126123612",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
             }
         }
-    }
+    ]
 }
+expect GET https://graph.facebook.com/me?access_token=login_via_gp&fields=name,email 200 {
+    "name": "login_via_gp",
+    "email": "login_via_gp@example.com",
+    "id": "12356126123612"
+}
+
 ## If user email already registered with Odin by google, return 200 add facebook credential to registered user 
-POST odin/test/facebook/login/via-gp / {"access_token": "login_via_gp"} 200
+POST odin/test/facebook/login / {"access_token": "login_via_gp"} 200
 
 setting webserver views/validate-facebook-id {
     "view": "fostgres.sql",
@@ -251,37 +239,24 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
 
 
-setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-user {
-    "view": "odin.facebook.login",
-    "configuration": {
-        "expires": {"hours": 72},
-        "facebook-mock": {
-            "ids_for_business": {
-                "status": 200,
-                "headers": {},
-                "body": {
-                    "data": [
-                        {
-                            "id": "222222222222222",
-                            "app": {
-                                "category": "Business",
-                                "link": "https://bowling-friday/",
-                                "name": "The Bowling Fridy",
-                                "id": "222222222222222"
-                            }
-                        }
-                    ]
-                }
-            },
-            "me": {
-                "body": {
-                    "name": "test-user-email",
-                    "id": "222222222222222",
-                    "email": "duplicate-email-user@example.com"
-                }
+## Duplicate email with no credential user
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=duplicate-email-user 200 {
+    "data": [
+        {
+            "id": "222222222222222",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
             }
         }
-    }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=duplicate-email-user&fields=name,email 200 {
+    "name": "test-user-email",
+    "id": "222222222222222",
+    "email": "duplicate-email-user@example.com"
 }
 
 sql.insert odin.identity {
@@ -293,7 +268,7 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
 
 ## If user email already registered with Odin with no credential, return 200 create new user 
-POST odin/test/sec/facebook/login/ok-login-duplicate-email-user / {"access_token": "duplicate-email-user"} 200
+POST odin/test/facebook/login / {"access_token": "duplicate-email-user"} 200
 
 setting webserver views/validate-facebook-id {
     "view": "fostgres.sql",
@@ -322,48 +297,34 @@ GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
 odin.sql.file (module.path.join ../Schema/opts/installation-id/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/installation-id/003-alter-ledgers.blue.sql)
 
-setting webserver views/odin/test/facebook/test-installation {
-    "view": "odin.facebook.login",
-    "configuration": {
-        "expires": {
-            "hours": 72
-        },
-        "facebook-mock": {
-            "ids_for_business": {
-                "body": {
-                    "data": [
-                        {
-                            "id": "test-installation",
-                            "app": {
-                                "category": "Business",
-                                "link": "https://caveman-club/",
-                                "name": "Caveman Club",
-                                "id": "111111111111111"
-                            }
-                        }
-                    ]
-                }
-            },
-            "me": {
-                "body": {
-                    "name": "test-installation",
-                    "email": "test-installation@example.com",
-                    "id": "test-installation"
-                }
+## test-installation
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=test-installation 200 {
+    "data": [
+        {
+            "id": "test-installation",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
             }
         }
-    }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=test-installation&fields=name,email 200 {
+    "name": "test-installation",
+    "email": "test-installation@example.com",
+    "id": "test-installation"
 }
 
-POST odin/test/facebook/test-installation / {"access_token": "test-installation", "installation_id": "INSTALL01"} 200
+POST odin/test/facebook/login / {"access_token": "test-installation", "installation_id": "INSTALL01"} 200
 GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL01"}
 
-POST odin/test/facebook/test-installation / {"access_token": "test-installation", "installation_id": "INSTALL02"} 200
+POST odin/test/facebook/login / {"access_token": "test-installation", "installation_id": "INSTALL02"} 200
 GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
 
-POST odin/test/facebook/test-installation / {"access_token": "test-installation", "installation_id": null} 501
+POST odin/test/facebook/login / {"access_token": "test-installation", "installation_id": null} 501
 GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
 
-POST odin/test/facebook/test-installation / {"access_token": "test-installation", "installation_id": ""} 501
+POST odin/test/facebook/login / {"access_token": "test-installation", "installation_id": ""} 501
 GET odin/test/facebook/validate_login /user/test-installation 200 {"installation_id": "INSTALL02"}
-
