@@ -57,13 +57,13 @@ namespace {
                         "odin.google.login", "Must pass access_token field");
             const auto access_token =
                     fostlib::coerce<fostlib::string>(body["access_token"]);
-            fostlib::json user_detail = odin::google::get_user_detail(access_token);
+            fostlib::pg::connection cnx{fostgres::connection(config, req)};
+            fostlib::json user_detail = odin::google::get_user_detail(cnx, access_token);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
                         "odin.google.login", "User not authenticated");
             const auto google_user_id =
-                    fostlib::coerce<f5::u8view>(user_detail["sub"]);
-            fostlib::pg::connection cnx{fostgres::connection(config, req)};
+                    fostlib::coerce<f5::u8view>(user_detail["user_id"]);
             const auto reference = odin::reference();
             auto google_user = odin::google::credentials(cnx, google_user_id);
             auto identity_id = reference;

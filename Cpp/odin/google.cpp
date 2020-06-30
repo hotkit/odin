@@ -16,27 +16,40 @@
 #include <fost/ua/exceptions.hpp>
 
 
-fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
+fostlib::json odin::google::get_user_detail(fostlib::pg::connection &cnx, f5::u8view user_token) {
     fostlib::url base_url(
             fostlib::coerce<fostlib::string>("https://www.googleapis.com"));
     fostlib::url::filepath_string api{"/oauth2/v3/tokeninfo"};
     fostlib::url gg_url(base_url, api);
     gg_url.query().append("id_token", user_token);
-    fostlib::json body;
+    
+    fostlib::json user_detail;
     try {
-        body = fostlib::ua::get_json(gg_url, fostlib::mime::mime_headers{});
-        // Example body :
+        user_detail = fostlib::ua::get_json(gg_url, fostlib::mime::mime_headers{});
+        // Example user_detail :
         // https://developers.google.com/identity/sign-in/android/backend-auth
     } catch (fostlib::ua::http_error &e) {
         fostlib::log::error(c_odin)("Error", "get_user_detail")("URL", gg_url)(
-                "status", e.data()["status-code"])("body", body);
+                "status", e.data()["status-code"])("body", user_detail);
         throw fostlib::exceptions::not_implemented(
                 __PRETTY_FUNCTION__, "Cannot retrieve user detail from google");
     }
-    auto aud = fostlib::coerce<fostlib::string>(body["aud"]);
+    auto aud = fostlib::coerce<fostlib::string>(user_detail["aud"]);
     auto gg_aud = c_google_aud.value()["Client_ID"];
     for (const auto a : gg_aud) {
-        if (aud == fostlib::coerce<fostlib::string>(a)) return body;
+        if (aud == fostlib::coerce<fostlib::string>(a)) {
+            fostlib::json gg_user;
+            if (user_detail.has_key("sub")) {
+                fostlib::insert(gg_user, "user_id", user_detail["sub"]);
+            }
+            if (user_detail.has_key("name")) {
+                fostlib::insert(gg_user, "name", user_detail["name"]);
+            }
+            if (user_detail.has_key("email")) {
+                fostlib::insert(gg_user, "email", user_detail["email"]);
+            }
+            return gg_user;
+        }
     }
     return fostlib::json();
 }
