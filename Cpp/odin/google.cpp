@@ -16,16 +16,18 @@
 #include <fost/ua/exceptions.hpp>
 
 
-fostlib::json odin::google::get_user_detail(fostlib::pg::connection &cnx, f5::u8view user_token) {
+fostlib::json odin::google::get_user_detail(
+        fostlib::pg::connection &cnx, f5::u8view user_token) {
     fostlib::url base_url(
             fostlib::coerce<fostlib::string>("https://www.googleapis.com"));
     fostlib::url::filepath_string api{"/oauth2/v3/tokeninfo"};
     fostlib::url gg_url(base_url, api);
     gg_url.query().append("id_token", user_token);
-    
+
     fostlib::json user_detail;
     try {
-        user_detail = fostlib::ua::get_json(gg_url, fostlib::mime::mime_headers{});
+        user_detail =
+                fostlib::ua::get_json(gg_url, fostlib::mime::mime_headers{});
         // Example user_detail :
         // https://developers.google.com/identity/sign-in/android/backend-auth
     } catch (fostlib::ua::http_error &e) {

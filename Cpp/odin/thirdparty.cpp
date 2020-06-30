@@ -49,18 +49,6 @@ std::optional<f5::u8string> odin::thirdparty::email_owner_identity_id(
 }
 
 
-inline std::pair<boost::shared_ptr<fostlib::mime>, int>
-        respond(fostlib::string message, int code = 403) {
-    fostlib::json ret;
-    if (not message.empty())
-        fostlib::insert(ret, "message", std::move(message));
-    fostlib::mime::mime_headers headers;
-    boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-            fostlib::json::unparse(ret, true), headers, "application/json"));
-    return std::make_pair(response, code);
-}
-
-
 std::pair<boost::shared_ptr<fostlib::mime>, int> odin::thirdparty::login(
         const fostlib::json &config,
         const fostlib::string &path,
@@ -68,21 +56,23 @@ std::pair<boost::shared_ptr<fostlib::mime>, int> odin::thirdparty::login(
         const fostlib::host &host,
         const fostlib::string &view_name,
         fostlib::log::detail::log_object &logger,
-        const std::function<
-                fostlib::json(fostlib::pg::connection &, f5::u8view)>
+        const std::function<fostlib::json(fostlib::pg::connection &, f5::u8view)>
                 &thirdparty_user_detail,
         const std::function<fostlib::json(
-                fostlib::pg::connection &, const f5::u8view &, const f5::u8view &)>
-                &thirdparty_app_credential,
+                fostlib::pg::connection &,
+                const f5::u8view &,
+                const f5::u8view &)> &thirdparty_app_credential,
         const std::function<void(
                 fostlib::pg::connection &, f5::u8view, f5::u8view, f5::u8view)>
                 &set_thirdparty_credentials) {
+
     if (req.method() != "POST") {
         fostlib::json config;
         fostlib::insert(config, "view", "fost.response.405");
         fostlib::push_back(config, "configuration", "allow", "POST");
         return fostlib::urlhandler::view::execute(config, path, req, host);
     }
+
     if (not req.headers().exists("__app") || not req.headers().exists("__user")
         || not req.headers().exists("__app_user")) {
         throw fostlib::exceptions::not_implemented(
@@ -91,6 +81,7 @@ std::pair<boost::shared_ptr<fostlib::mime>, int> odin::thirdparty::login(
                 "an odin.app.secure view on the secure path so that "
                 "there is a valid JWT to find the App ID in");
     }
+
     logger("__app", req.headers()["__app"]);
     logger("__user", req.headers()["__user"]);
     logger("__app_user", req.headers()["__app_user"]);
@@ -103,12 +94,13 @@ std::pair<boost::shared_ptr<fostlib::mime>, int> odin::thirdparty::login(
     if (not body.has_key("access_token"))
         throw fostlib::exceptions::not_implemented(
                 "odin.app.facebook.login", "Must pass access_token field");
+
     auto const access_token =
             fostlib::coerce<fostlib::string>(body["access_token"]);
-
     fostlib::pg::connection cnx{fostgres::connection(config, req)};
     auto const user_detail = thirdparty_user_detail(cnx, access_token);
     logger("user_detail", user_detail);
+
     if (user_detail.isnull())
         throw fostlib::exceptions::not_implemented(
                 view_name, "User not authenticated");
@@ -120,8 +112,10 @@ std::pair<boost::shared_ptr<fostlib::mime>, int> odin::thirdparty::login(
     auto thirdparty_user =
             thirdparty_app_credential(cnx, thirdparty_user_id, app_id);
     logger("thirdparty_user", thirdparty_user);
+
     fostlib::string identity_id;
     fostlib::string app_user_id;
+
     if (thirdparty_user.isnull()) {
         /// We've never seen this Facebook identity before,
         /// we take as a new user registration. If this is a new

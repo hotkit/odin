@@ -19,8 +19,7 @@ namespace odin {
 
         /// Return user data from Facebook
         fostlib::json get_user_detail(
-                fostlib::pg::connection &cnx,
-                f5::u8view user_token);
+                fostlib::pg::connection &cnx, f5::u8view user_token);
 
         /// Return the database row for the identity together with the
         /// facebook credentials. If the credentials failed to match an empty

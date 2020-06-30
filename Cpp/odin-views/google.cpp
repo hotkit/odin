@@ -58,7 +58,8 @@ namespace {
             const auto access_token =
                     fostlib::coerce<fostlib::string>(body["access_token"]);
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
-            fostlib::json user_detail = odin::google::get_user_detail(cnx, access_token);
+            fostlib::json user_detail =
+                    odin::google::get_user_detail(cnx, access_token);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
                         "odin.google.login", "User not authenticated");
