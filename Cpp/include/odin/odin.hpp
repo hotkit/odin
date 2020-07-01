@@ -43,6 +43,9 @@ namespace odin {
     extern const fostlib::setting<fostlib::string>
             c_jwt_reset_forgotten_password_secret;
 
+    /// Apple AUD
+    extern const fostlib::setting<fostlib::json> c_apple_aud;
+
     /// Facebook Apps
     extern const fostlib::setting<fostlib::json> c_facebook_apps;
 

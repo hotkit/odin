@@ -1,3 +1,6 @@
+2020-07-01  Sukit Saeo  <sukit_owl@hotmail.com>
+  Add odin.app.apple.login view for do apple login
+
 2020-06-08  Pam suebvisai  <suebvisai.pam@gmail.com>
   Add support for permission configuration by HTTP method
 

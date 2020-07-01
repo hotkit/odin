@@ -10,14 +10,13 @@
 #include <odin/odin.hpp>
 
 #include <fostgres/sql.hpp>
-#include <fost/http>
 #include <fost/insert>
 #include <fost/log>
 #include <fost/ua/exceptions.hpp>
 
 
 fostlib::json odin::google::get_user_detail(
-        fostlib::pg::connection &cnx, f5::u8view user_token) {
+        f5::u8view user_token) {
     fostlib::url base_url(
             fostlib::coerce<fostlib::string>("https://www.googleapis.com"));
     fostlib::url::filepath_string api{"/oauth2/v3/tokeninfo"};
@@ -41,15 +40,14 @@ fostlib::json odin::google::get_user_detail(
     for (const auto a : gg_aud) {
         if (aud == fostlib::coerce<fostlib::string>(a)) {
             fostlib::json gg_user;
-            if (user_detail.has_key("sub")) {
-                fostlib::insert(gg_user, "user_id", user_detail["sub"]);
-            }
+            fostlib::insert(gg_user, "user_id", user_detail["sub"]);
             if (user_detail.has_key("name")) {
                 fostlib::insert(gg_user, "name", user_detail["name"]);
             }
             if (user_detail.has_key("email")) {
                 fostlib::insert(gg_user, "email", user_detail["email"]);
             }
+
             return gg_user;
         }
     }

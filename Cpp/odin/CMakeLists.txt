@@ -1,5 +1,6 @@
 add_library(odin
         app.cpp
+        apple.cpp
         credentials.cpp
         facebook.cpp
         google.cpp

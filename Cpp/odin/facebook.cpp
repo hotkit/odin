@@ -10,7 +10,6 @@
 #include <odin/odin.hpp>
 
 #include <fostgres/sql.hpp>
-#include <fost/http>
 #include <fost/insert>
 #include <fost/log>
 #include <fost/ua/exceptions.hpp>
@@ -19,7 +18,6 @@
 fostlib::json odin::facebook::get_user_detail(
         fostlib::pg::connection &cnx, f5::u8view user_token) {
 
-    fostlib::http::user_agent ua{};
     fostlib::url base_facebook_url(odin::c_facebook_endpoint.value());
 
     /// Get list of ids for business from Facebook

@@ -1,0 +1,356 @@
+# Set up the database
+## module core
+odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+
+## module app
+odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
+odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
+## module authn
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/apple
+odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+## module opts/email
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
+## module opts/facebook
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/full-name
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
+## module opts/google
+odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
+
+setting odin "JWT secret" <JWT_SECRET>
+setting odin "Apple" {
+    "aud": "com.example.com"
+}
+setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
+setting odin "Facebook" {
+    "main": "111111111111111",
+    "allowed": ["111111111111111", "222222222222222"]
+}
+setting odin "Google" {
+    "Client_ID": ["111111111111111", "222222222222222"]
+}
+
+## ## Register app
+sql.insert odin.identity {"id": "open-app"}
+sql.insert odin.app_ledger {
+    "reference": "ref1",
+    "app_id": "open-app",
+    "app_name": "MyApp",
+    "token": "APP_TOKEN",
+    "redirect_url": "http://example.com",
+    "access_policy": "OPEN",
+    "data_sharing_policy": "ALL"
+}
+sql.insert odin.app_user_ledger {
+    "reference": "ref1",
+    "app_id": "open-app",
+    "identity_id": "open-app",
+    "app_user_id": "app_user_open_app"
+}
+
+## The application counts as a user
+GET odin/test/apple/validate_login /count-users 200 {"count": 1}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 0}
+
+## Set up a new installation
+setting webserver views/test/app/installation {
+            "view": "odin.app.installation",
+            "configuration": {"expires": {"hours": 72}}
+        }
+setting webserver views/test/sec/installation {
+        "view": "odin.app.secure",
+        "configuration": {
+            "secure": "test/app/installation",
+            "unsecure": "fost.response.403"
+        }
+    }
+
+setting webserver views/odin/test/apple/login {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.apple.login",
+            "configuration": {
+                "expires": {"hours": 72}
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+setting webserver views/validate-apple-id {
+    "view": "fostgres.sql",
+    "configuration": {
+        "sql": [
+            {
+                "return": "object",
+                "path": [1],
+                "GET": "SELECT * FROM odin.apple_credentials fb, odin.identity id WHERE fb.identity_id=id.id AND fb.apple_user_id=$1"
+            }
+        ]
+    }
+}
+
+## ## token header
+## {
+##   "alg": "RS256",
+##   "typ": "JWT",
+##   "kid": "86D88Kf"
+## }
+## ## token payload
+## {
+##   "sub": "test_user01",
+##   "name": "John Doe",
+##   "email": "test_user01@example.com",
+##   "aud": "com.example.com"
+## }
+## ## private key default of jwt.io 
+## {
+##     "n": "nzyis1ZjfNB0bBgKFMSvvkTtwlvBsaJq7S5wA-kzeVOVpVWwkWdVha4s38XM_pa_yr47av7-z3VTmvDRyAHcaT92whREFpLv9cj5lTeJSibyr_Mrm_YtjCZVWgaOYIhwrXwKLqPr_11inWsAkfIytvHWTxZYEcXLgAXFuUuaS3uF9gEiNQwzGTU1v0FqkqTBr4B8nW3HCN47XUu0t8Y0e-lf4s4OxQawWD79J9_5d3Ry0vbV3Am1FtGJiJvOwRsIfVChDpYStTcHTCMqtvWbV6L11BWkpzGXSW4Hv43qa-GSYOD2QU68Mb59oSk2OB-BtOLpJofmbGEGgvmwyCI9Mw",
+##     "e": "AQAB",
+##     "d": "KIBGrbCSW2O1yOyQW9nvDUkA5EdsS58Q7US7bvM4iWpuDIBwCXur7_VuKnhn_HUhURLzj_JNozynSChqYyG-CvL-ZLy82LUE3ZIBkSdv_vFLFt-VvvRtf1EcsmoqenkZl7aN7HD7DJeXBoz5tyVQKuH17WW0fsi9StGtCcUl-H6KzV9Gif0Kj0uLQbCg3THRvKuueBTwCTdjoP0PwaNADgSWb3hJPeLMm_yII4tIMGbOw-xd9wJRl-ZN9nkNtQMxszFGdKjedB6goYLQuP0WRZx-YtykaVJdM75bDUvsQar49Pc21Fp7UVk_CN11DX_hX3TmTJAUtqYADliVKkTbCQ"    
+## }
+
+## Registration of new user
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 201))
+GET odin/test/apple/validate_login /count-users 200 {"count": 2}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 0}
+
+
+## ## case no match apple public_key `kid` found
+expect GET https://appleid.apple.com/auth/keys 200 {
+    "keys": []
+}
+POST odin/test/apple/login / {"name": "John Doe", "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJ0ZXN0X3VzZXIwMSIsImVtYWlsIjoidGVzdF91c2VyMDFAZXhhbXBsZS5jb20iLCJhdWQiOiJjb20uZXhhbXBsZS5jb20ifQ.mVV8TtMRcH2rEsD5MBR6vZs78ECn6yK-eesUYdkkmEzjrAxYrHXEKldSGubOSkqZF6_fJNJXx-4qeEkzz58_vMX9AuTPOiCPK_Vp6SHrEWSNjQ_mvsKJ6by-5Xv3o88qLs2_VG1grrhfNbkGFia9XDDWksZAtSme8GjHcdA3_nVgEfZTIIfsirjLCAnaTURaEyZ4runZwoPtgsJ3Poa1qZACuHuT7A4YtC6eFlDpclFYp9UBf21dPYD1g3FuHcAD_Mdgs9QQoaBrU7ChCYqYkdbvxm7Gld-vcCoMNFVv17QcEucTTzOP63jAxGK1BWXH_kdx7X69Gu2c7WgnYbPw6Q"} 501
+
+
+## ## missing body key
+POST odin/test/apple/login / {} 501
+POST odin/test/apple/login / {"access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJ0ZXN0X3VzZXIwMSIsImVtYWlsIjoidGVzdF91c2VyMDFAZXhhbXBsZS5jb20iLCJhdWQiOiJjb20uZXhhbXBsZS5jb20ifQ.mVV8TtMRcH2rEsD5MBR6vZs78ECn6yK-eesUYdkkmEzjrAxYrHXEKldSGubOSkqZF6_fJNJXx-4qeEkzz58_vMX9AuTPOiCPK_Vp6SHrEWSNjQ_mvsKJ6by-5Xv3o88qLs2_VG1grrhfNbkGFia9XDDWksZAtSme8GjHcdA3_nVgEfZTIIfsirjLCAnaTURaEyZ4runZwoPtgsJ3Poa1qZACuHuT7A4YtC6eFlDpclFYp9UBf21dPYD1g3FuHcAD_Mdgs9QQoaBrU7ChCYqYkdbvxm7Gld-vcCoMNFVv17QcEucTTzOP63jAxGK1BWXH_kdx7X69Gu2c7WgnYbPw6Q"} 501
+POST odin/test/apple/login / {"name": "John Doe"} 501
+
+
+## ## method not allowed
+PUT odin/test/apple/login / {"access_token": "user_1"} 405
+
+
+## ## case public key validate failed
+expect GET https://appleid.apple.com/auth/keys 200 {
+    "keys": [
+        {
+            "kid": "8888888",
+            "n": "nzyis1ZjfNB0bBgKFMSvvkTtwlvBsaJq7S5wA-kzeVOVpVWwkWdVha4s38XM_pa_yr47av7-z3VTmvDRyAHcaT92whREFpLv9cj5lTeJSibyr_Mrm_YtjCZVWgaOYIhwrXwKLqPr_11inWsAkfIytvHWTxZYEcXLgAXFuUuaS3uF9gEiNQwzGTU1v0FqkqTBr4B8nW3HCN47XUu0t8Y0e-lf4s4OxQawWD79J9_5d3Ry0vbV3Am1FtGJiJvOwRsIfVChDpYStTcHTCMqtvWbV6L11BWkpzGXSW4Hv43qa-GSYOD2QU68Mb59oSk2OB-BtOLpJofmbGEGgvmwyCI9Mw",
+            "e": "Mw"
+        }        
+    ]
+}
+POST odin/test/apple/login / {"name": "John Doe", "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJ0ZXN0X3VzZXIwMSIsImVtYWlsIjoidGVzdF91c2VyMDFAZXhhbXBsZS5jb20iLCJhdWQiOiJjb20uZXhhbXBsZS5jb20ifQ.mVV8TtMRcH2rEsD5MBR6vZs78ECn6yK-eesUYdkkmEzjrAxYrHXEKldSGubOSkqZF6_fJNJXx-4qeEkzz58_vMX9AuTPOiCPK_Vp6SHrEWSNjQ_mvsKJ6by-5Xv3o88qLs2_VG1grrhfNbkGFia9XDDWksZAtSme8GjHcdA3_nVgEfZTIIfsirjLCAnaTURaEyZ4runZwoPtgsJ3Poa1qZACuHuT7A4YtC6eFlDpclFYp9UBf21dPYD1g3FuHcAD_Mdgs9QQoaBrU7ChCYqYkdbvxm7Gld-vcCoMNFVv17QcEucTTzOP63jAxGK1BWXH_kdx7X69Gu2c7WgnYbPw6Q"} 501
+
+
+## ## apple login success merge with guest user
+expect GET https://appleid.apple.com/auth/keys 200 {
+    "keys": [
+        {
+            "kid": "8888888",
+            "n": "nzyis1ZjfNB0bBgKFMSvvkTtwlvBsaJq7S5wA-kzeVOVpVWwkWdVha4s38XM_pa_yr47av7-z3VTmvDRyAHcaT92whREFpLv9cj5lTeJSibyr_Mrm_YtjCZVWgaOYIhwrXwKLqPr_11inWsAkfIytvHWTxZYEcXLgAXFuUuaS3uF9gEiNQwzGTU1v0FqkqTBr4B8nW3HCN47XUu0t8Y0e-lf4s4OxQawWD79J9_5d3Ry0vbV3Am1FtGJiJvOwRsIfVChDpYStTcHTCMqtvWbV6L11BWkpzGXSW4Hv43qa-GSYOD2QU68Mb59oSk2OB-BtOLpJofmbGEGgvmwyCI9Mw",
+            "e": "Mw"
+        },
+        {
+            "kid": "86D88Kf",
+            "n": "nzyis1ZjfNB0bBgKFMSvvkTtwlvBsaJq7S5wA-kzeVOVpVWwkWdVha4s38XM_pa_yr47av7-z3VTmvDRyAHcaT92whREFpLv9cj5lTeJSibyr_Mrm_YtjCZVWgaOYIhwrXwKLqPr_11inWsAkfIytvHWTxZYEcXLgAXFuUuaS3uF9gEiNQwzGTU1v0FqkqTBr4B8nW3HCN47XUu0t8Y0e-lf4s4OxQawWD79J9_5d3Ry0vbV3Am1FtGJiJvOwRsIfVChDpYStTcHTCMqtvWbV6L11BWkpzGXSW4Hv43qa-GSYOD2QU68Mb59oSk2OB-BtOLpJofmbGEGgvmwyCI9Mw",
+            "e": "AQAB"            
+        }
+    ]
+}
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/apple/login / {"name": "John Doe", "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJ0ZXN0X3VzZXIwMSIsImVtYWlsIjoidGVzdF91c2VyMDFAZXhhbXBsZS5jb20iLCJhdWQiOiJjb20uZXhhbXBsZS5jb20ifQ.mVV8TtMRcH2rEsD5MBR6vZs78ECn6yK-eesUYdkkmEzjrAxYrHXEKldSGubOSkqZF6_fJNJXx-4qeEkzz58_vMX9AuTPOiCPK_Vp6SHrEWSNjQ_mvsKJ6by-5Xv3o88qLs2_VG1grrhfNbkGFia9XDDWksZAtSme8GjHcdA3_nVgEfZTIIfsirjLCAnaTURaEyZ4runZwoPtgsJ3Poa1qZACuHuT7A4YtC6eFlDpclFYp9UBf21dPYD1g3FuHcAD_Mdgs9QQoaBrU7ChCYqYkdbvxm7Gld-vcCoMNFVv17QcEucTTzOP63jAxGK1BWXH_kdx7X69Gu2c7WgnYbPw6Q"} 200))
+GET odin/test/apple/validate_login /count-users 200 {"count": 2}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 1}
+GET validate-apple-id /test_user01 200 {
+    "apple_user_id": "test_user01",
+    "full_name": "John Doe"
+}
+
+## login again later should be fine
+POST odin/test/apple/login / {"name": "John Doe", "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJ0ZXN0X3VzZXIwMSIsImVtYWlsIjoidGVzdF91c2VyMDFAZXhhbXBsZS5jb20iLCJhdWQiOiJjb20uZXhhbXBsZS5jb20ifQ.mVV8TtMRcH2rEsD5MBR6vZs78ECn6yK-eesUYdkkmEzjrAxYrHXEKldSGubOSkqZF6_fJNJXx-4qeEkzz58_vMX9AuTPOiCPK_Vp6SHrEWSNjQ_mvsKJ6by-5Xv3o88qLs2_VG1grrhfNbkGFia9XDDWksZAtSme8GjHcdA3_nVgEfZTIIfsirjLCAnaTURaEyZ4runZwoPtgsJ3Poa1qZACuHuT7A4YtC6eFlDpclFYp9UBf21dPYD1g3FuHcAD_Mdgs9QQoaBrU7ChCYqYkdbvxm7Gld-vcCoMNFVv17QcEucTTzOP63jAxGK1BWXH_kdx7X69Gu2c7WgnYbPw6Q"} 200
+GET odin/test/apple/validate_login /count-users 200 {"count": 2}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 1}
+
+
+## ## apple login success add apple credential to google user when duplicate email
+## Registration of new user
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins02"} 201))
+GET odin/test/apple/validate_login /count-users 200 {"count": 3}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 1}
+
+setting webserver views/odin/test/sec/google/login {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.google.login",
+            "configuration": {
+                "expires": {"hours": 72}
+            }
+        },
+        "unsecure": "fost.response.403"
+    }    
+}
+
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=duplicate-email-with-google 200 {
+    "aud": "111111111111111",	
+    "sub": "duplicate-email-with-google",
+    "name": "Test User",
+    "email": "duplicate-email-with-google@example.com"    
+}
+
+## Registration of new google user
+POST odin/test/sec/google/login / {"access_token": "duplicate-email-with-google"} 200
+GET odin/test/apple/validate_login /count-users 200 {"count": 3}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 1}
+
+## Token payload
+## {
+##   "sub": "test_user02",
+##   "name": "John Doe2",
+##   "email": "duplicate-email-with-google@example.com"
+## }
+
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins03"} 201))
+GET odin/test/apple/validate_login /count-users 200 {"count": 4}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 1}
+
+POST odin/test/apple/login / {"name": "John Doe2", "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJ0ZXN0X3VzZXIwMiIsImVtYWlsIjoiZHVwbGljYXRlLWVtYWlsLXdpdGgtZ29vZ2xlQGV4YW1wbGUuY29tIiwiYXVkIjoiY29tLmV4YW1wbGUuY29tIn0.P0ceqVXlnEPvioIiBaXrMNuXZI9nqCQNiBHxUTvvXvcDooBw0VIzRfhmy0Q4bGN6cSW0Rr9SCQWqdO5FY3RAwcM60PT0JnUKZngMKmnyTh9PUzKLIEfyotUAEAmpk5Wktfrtw1hLKgLHOBMYEVTByfM0T1iTrA4VtAxV7et0vtY4XQoW7Oy4rpveiKHw-8D8L5hCAQLJRo5ZQQi-nUlY8dpWWXPSFTOQmgCeknQedcYOCVEok-tHPkSNBo-oZAzfHn-mxtd0WrY-hi_oj8KfhBpd_BNVsMmx1oxXTSN_sw8d8Os2oR-IGeSWfRKplyGfEXKRw8cdp4reDAiq0VlSrw"} 200
+GET odin/test/apple/validate_login /count-users 200 {"count": 3}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 2}
+GET validate-apple-id /test_user02 200 {
+    "apple_user_id": "test_user02",
+    "full_name": "John Doe2",
+    "email": "duplicate-email-with-google@example.com"
+}
+
+
+## ## apple login success add apple credential to facebook user when duplicate email
+## Registration of new user
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins04"} 201))
+GET odin/test/apple/validate_login /count-users 200 {"count": 4}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 2}
+
+setting webserver views/odin/test/sec/facebook/login {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.facebook.login",
+            "configuration": {
+                "expires": {"hours": 72}
+            }
+        },
+        "unsecure": "fost.response.403"
+    }    
+}
+
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=duplicate-email-with-facebook 200 {
+    "data": [
+        {
+            "id": "3333333333",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
+            }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=duplicate-email-with-facebook&fields=name,email 200 {
+    "name": "test-user-email",
+    "id": "3333333333",
+    "email": "duplicate-email-with-facebook@example.com"
+}
+
+## Registration of new facebook user
+POST odin/test/sec/facebook/login / {"access_token": "duplicate-email-with-facebook"} 200
+GET odin/test/apple/validate_login /count-users 200 {"count": 4}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 2}
+
+## Token payload
+## {
+##   "sub": "test_user03",
+##   "name": "John Doe3",
+##   "email": "duplicate-email-with-facebook@example.com"
+## }
+
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins05"} 201))
+GET odin/test/apple/validate_login /count-users 200 {"count": 5}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 2}
+
+POST odin/test/apple/login / {"name": "John Doe3", "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJ0ZXN0X3VzZXIwMyIsImVtYWlsIjoiZHVwbGljYXRlLWVtYWlsLXdpdGgtZmFjZWJvb2tAZXhhbXBsZS5jb20iLCJhdWQiOiJjb20uZXhhbXBsZS5jb20ifQ.FlOB1934YALJm-9M3AUyQQhbpTIkElY9ViKyHaIVhf0HUGoC5jdsBgHemAWJXLUcZE7vVU_FpGVPeUZGRotOzORfaCwG0qsLnN4EEiWmDxXlu-U0VosWcDvBfw7SMHuVGyHBToLMBsHMhiV-4ps7PhAJdQ-9vEYzcopgpuu13dv_o1aaYPyZkc0huys24HoMVY3i7T2jbHMnelV6yX2t5yd6G-r-o7lvKuXOc8FItEjEoGqWE6f0y05z0lk8Ru_z0BHbx8D1LOkq4Gvzua3xXuqm0oAFgO6iCt2yy6YsDkxLkTGXjBVY5fkdwUrctyTjdM2E-Hj6AoUtP6a6xOYnbg"} 200
+GET odin/test/apple/validate_login /count-users 200 {"count": 4}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 3}
+GET validate-apple-id /test_user03 200 {
+    "apple_user_id": "test_user03",
+    "full_name": "John Doe3",
+    "email": "duplicate-email-with-facebook@example.com"
+}
+
+
+## ## apple login success not merge with username password user when duplicate email
+## Registration of new user
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins06"} 201))
+GET odin/test/apple/validate_login /count-users 200 {"count": 5}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 3}
+
+## Registration of new facebook user
+POST odin/register / {"username": "exist_user", "password": "password1234", "email": "duplicate-email-with-username-account@example.com"} 201
+GET odin/test/apple/validate_login /count-users 200 {"count": 6}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 3}
+
+## Token payload
+## {
+##   "sub": "test_user04",
+##   "name": "John Doe4",
+##   "email": "duplicate-email-with-username-account@example.com"
+## }
+
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins07"} 201))
+GET odin/test/apple/validate_login /count-users 200 {"count": 7}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 3}
+
+POST odin/test/apple/login / {"name": "John Doe4", "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJ0ZXN0X3VzZXIwNCIsImVtYWlsIjoiZHVwbGljYXRlLWVtYWlsLXdpdGgtdXNlcm5hbWUtYWNjb3VudEBleGFtcGxlLmNvbSIsImF1ZCI6ImNvbS5leGFtcGxlLmNvbSJ9.Y_L6ONcNJZ36JgdTwJSkluBMrLBueLZtGkaHRHpyP_uIOJebmhuY-3wtJO4Iu-90FikN-o6nVOFNe9hMtXOCNMZK_tTsu25rB6eNe5auIwd6Ofs93yIiJeLt_I6_7S2PfkCoGPjz796goPUaIP5MAWAoPOt3Vnml-g8UsH7GnqzVewLlhonmjpkUdUY003vW4RDgLNRShxq70bXdnsszDDpuRKBoyU8VJWYCXq3DychtL5X3mvtE-dylbPDG3rLCQFbggTerXz8rXGfGTB1AMTSiXy7EN7IJvv7mrFQekGE3ZMYVDdgBYM3hQceAJ0Xab7FrsCaDau6tO4Wsw3JNtw"} 200
+GET odin/test/apple/validate_login /count-users 200 {"count": 7}
+GET odin/test/apple/validate_login /count-apple-users 200 {"count": 4}
+GET validate-apple-id /test_user04 200 {
+    "apple_user_id": "test_user04",
+    "full_name": "John Doe4",
+    "email": "duplicate-email-with-username-account@example.com"
+}
