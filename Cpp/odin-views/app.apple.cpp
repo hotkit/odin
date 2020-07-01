@@ -1,5 +1,5 @@
 /**
-    Copyright 2019-2020 Red Anchor Trading Co. Ltd.
+    Copyright 2020 Red Anchor Trading Co. Ltd.
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
  */
@@ -69,8 +69,7 @@ namespace {
 
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             fostlib::json user_detail;
-            user_detail =
-                    odin::apple::get_user_detail(access_token);
+            user_detail = odin::apple::get_user_detail(access_token);
             logger("user_detail", user_detail);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
@@ -80,8 +79,8 @@ namespace {
                     fostlib::coerce<f5::u8view>(user_detail["user_id"]);
             auto const reference = odin::reference();
             f5::u8view const app_id = req.headers()["__app"].value();
-            auto apple_user = odin::apple::app_credentials(
-                    cnx, apple_user_id, app_id);
+            auto apple_user =
+                    odin::apple::app_credentials(cnx, apple_user_id, app_id);
             logger("apple_user", apple_user);
             fostlib::string identity_id;
             fostlib::string app_user_id;
@@ -96,9 +95,9 @@ namespace {
                 if (user_detail.has_key("email")) {
                     auto const email_owner_id =
                             odin::thirdparty::email_owner_identity_id(
-                            cnx,
-                            fostlib::coerce<fostlib::string>(
-                                    user_detail["email"]));
+                                    cnx,
+                                    fostlib::coerce<fostlib::string>(
+                                            user_detail["email"]));
                     if (email_owner_id.has_value()) {
                         fostlib::json merge_annotation;
                         fostlib::insert(
@@ -128,7 +127,8 @@ namespace {
                     }
                 }
                 odin::set_full_name(
-                        cnx, reference, identity_id, fostlib::coerce<f5::u8view>(body["name"]));
+                        cnx, reference, identity_id,
+                        fostlib::coerce<f5::u8view>(body["name"]));
 
                 odin::apple::set_apple_credentials(
                         cnx, reference, identity_id, apple_user_id);

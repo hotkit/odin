@@ -18,8 +18,7 @@ namespace odin {
 
 
         /// Return user data from Google
-        fostlib::json get_user_detail(
-                f5::u8view user_token);
+        fostlib::json get_user_detail(f5::u8view user_token);
 
         /// Return the database row for the identity together with the
         /// google credentials. If the credentials failed to match an empty

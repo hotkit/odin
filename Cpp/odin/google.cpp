@@ -5,6 +5,7 @@
     See <http://www.boost.org/LICENSE_1_0.txt>
  */
 
+
 #include <odin/google.hpp>
 #include <odin/fg/native.hpp>
 #include <odin/odin.hpp>
@@ -15,8 +16,7 @@
 #include <fost/ua/exceptions.hpp>
 
 
-fostlib::json odin::google::get_user_detail(
-        f5::u8view user_token) {
+fostlib::json odin::google::get_user_detail(f5::u8view user_token) {
     fostlib::url base_url(
             fostlib::coerce<fostlib::string>("https://www.googleapis.com"));
     fostlib::url::filepath_string api{"/oauth2/v3/tokeninfo"};

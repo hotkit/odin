@@ -8,6 +8,7 @@
 
 #pragma once
 
+
 #include <fost/core>
 #include <fost/postgres>
 
@@ -16,6 +17,7 @@ namespace odin {
 
 
     namespace facebook {
+
 
         /// Return user data from Facebook
         fostlib::json get_user_detail(

@@ -1,3 +1,11 @@
+/**
+    Copyright 2020 Red Anchor Trading Co. Ltd.
+
+    Distributed under the Boost Software License, Version 1.0.
+    See <http://www.boost.org/LICENSE_1_0.txt>
+ */
+
+
 #include <odin/fg/native.hpp>
 
 #include <fost/insert>
@@ -5,10 +13,9 @@
 #include <fost/ua/cache.detail.hpp>
 
 
-const fg::frame::builtin odin::lib::expect = [](
-            fg::frame &stack,
-            fg::json::const_iterator pos,
-            fg::json::const_iterator end) {
+const fg::frame::builtin odin::lib::expect = [](fg::frame &stack,
+                                                fg::json::const_iterator pos,
+                                                fg::json::const_iterator end) {
 ) {
     auto http_method =  stack.resolve_string(stack.argument("http_method", pos, end));
     auto url =  fostlib::url{stack.resolve_string(stack.argument("url", pos, end))};

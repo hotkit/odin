@@ -5,6 +5,7 @@
     See <http://www.boost.org/LICENSE_1_0.txt>
  */
 
+
 #include <odin/apple.hpp>
 #include <odin/fg/native.hpp>
 #include <odin/odin.hpp>
@@ -17,19 +18,19 @@
 #include <fost/ua/exceptions.hpp>
 
 
-fostlib::json odin::apple::get_user_detail(
-        f5::u8view user_token) {
-    
+fostlib::json odin::apple::get_user_detail(f5::u8view user_token) {
+
     fostlib::url apple_key_url("https://appleid.apple.com/auth/keys");
     // Get RSA public key from apple
-    fostlib::json apple_pubic_keys = fostlib::ua::get_json(apple_key_url, fostlib::mime::mime_headers{});
-
+    fostlib::json apple_pubic_keys =
+            fostlib::ua::get_json(apple_key_url, fostlib::mime::mime_headers{});
 
     // Decode jwt use public key with correct kid
     const auto parts = fostlib::split(user_token, ".");
     if (parts.size() != 3u) return fostlib::json{};
     const fostlib::base64_string b64_header{parts[0]};
-    const auto v64_header = fostlib::coerce<std::vector<unsigned char>>(b64_header);
+    const auto v64_header =
+            fostlib::coerce<std::vector<unsigned char>>(b64_header);
     const auto u8_header = fostlib::coerce<fostlib::utf8_string>(v64_header);
     const auto str_header = fostlib::coerce<fostlib::string>(u8_header);
     const auto header = fostlib::json::parse(str_header);
@@ -37,49 +38,47 @@ fostlib::json odin::apple::get_user_detail(
     const auto public_key_kid = header["kid"];
     fostlib::json matched_key{};
     std::any_of(
-        apple_pubic_keys["keys"].begin(), apple_pubic_keys["keys"].end(), [&](auto key){
-            if (key["kid"] == public_key_kid) {
-                matched_key = key;
-                return true;
-            }
-            return false;
-        }
-    );
+            apple_pubic_keys["keys"].begin(), apple_pubic_keys["keys"].end(),
+            [&](auto key) {
+                if (key["kid"] == public_key_kid) {
+                    matched_key = key;
+                    return true;
+                }
+                return false;
+            });
 
     if (matched_key.isnull()) {
-        fostlib::log::error(c_odin)("public_key_kid", public_key_kid)
-        ("apple_pubic_keys", apple_pubic_keys);
+        fostlib::log::error(c_odin)("public_key_kid", public_key_kid)(
+                "apple_pubic_keys", apple_pubic_keys);
         throw fostlib::exceptions::not_implemented(
                 __PRETTY_FUNCTION__,
                 "No apple public key match with header kid");
     }
 
     auto key_n = fostlib::json::unparse(matched_key["n"], false);
-    auto key_e = fostlib::json::unparse(matched_key["e"], false); 
+    auto key_e = fostlib::json::unparse(matched_key["e"], false);
     std::vector<f5::byte> byte_n(key_n.begin(), key_n.end());
     std::vector<f5::byte> byte_e(key_e.begin(), key_e.end());
     byte_e.insert(byte_e.end(), f5::byte(0x00));
     byte_e.insert(byte_e.end(), byte_n.begin(), byte_n.end());
 
-    auto const jwt = fostlib::jwt::token::load(user_token,
-    [&byte_e](auto, auto) -> std::vector<f5::byte>{
-        return byte_e;
-    });
+    auto const jwt = fostlib::jwt::token::load(
+            user_token,
+            [&byte_e](auto, auto) -> std::vector<f5::byte> { return byte_e; });
 
     if (not jwt) {
         fostlib::log::error(c_odin)("Invalid apple token", "verify failed");
         throw fostlib::exceptions::not_implemented(
-                __PRETTY_FUNCTION__,
-                "Invalid apple token");
+                __PRETTY_FUNCTION__, "Invalid apple token");
     }
 
     fostlib::json user_detail = jwt.value().payload;
 
     if (user_detail["aud"] != c_apple_aud.value()["aud"]) {
-        fostlib::log::error(c_odin)("apple token aud", user_detail["aud"])("app aud", c_apple_aud.value()["aud"]);
+        fostlib::log::error(c_odin)("apple token aud", user_detail["aud"])(
+                "app aud", c_apple_aud.value()["aud"]);
         throw fostlib::exceptions::not_implemented(
-                __PRETTY_FUNCTION__,
-                "Invalid apple token aud");
+                __PRETTY_FUNCTION__, "Invalid apple token aud");
     }
 
     fostlib::json apple_user;

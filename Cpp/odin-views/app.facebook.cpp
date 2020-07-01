@@ -70,8 +70,7 @@ namespace {
 
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             fostlib::json user_detail;
-            user_detail =
-                    odin::facebook::get_user_detail(cnx, access_token);
+            user_detail = odin::facebook::get_user_detail(cnx, access_token);
             logger("user_detail", user_detail);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
@@ -97,9 +96,9 @@ namespace {
                 if (user_detail.has_key("email")) {
                     auto const email_owner_id =
                             odin::thirdparty::email_owner_identity_id(
-                            cnx,
-                            fostlib::coerce<fostlib::string>(
-                                    user_detail["email"]));
+                                    cnx,
+                                    fostlib::coerce<fostlib::string>(
+                                            user_detail["email"]));
                     if (email_owner_id.has_value()) {
                         fostlib::json merge_annotation;
                         fostlib::insert(

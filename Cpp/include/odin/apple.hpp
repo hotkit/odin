@@ -1,5 +1,5 @@
 /**
-    Copyright 2018-2019 Red Anchor Trading Co. Ltd.
+    Copyright 2018-2020 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
@@ -7,6 +7,7 @@
 
 
 #pragma once
+
 
 #include <fost/core>
 #include <fost/postgres>
@@ -17,12 +18,12 @@ namespace odin {
 
     namespace apple {
 
-        /// Return user data from apple
-        fostlib::json get_user_detail(
-                f5::u8view user_token);
 
-        /// Apple has no fostlib::json credentials like facebook and google 
-        /// cause plan to deprecate odin.secure 
+        /// Return user data from apple
+        fostlib::json get_user_detail(f5::u8view user_token);
+
+        /// Apple has no fostlib::json credentials like facebook and google
+        /// cause plan to deprecate odin.secure
 
         /// Return the database row for the identity together with the
         /// apple credentials  and app_user. If the credentials failed to
