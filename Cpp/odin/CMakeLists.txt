@@ -1,5 +1,6 @@
 add_library(odin
         app.cpp
+        apple.cpp
         credentials.cpp
         facebook.cpp
         google.cpp
@@ -7,6 +8,7 @@ add_library(odin
         nonce.cpp
         odin.cpp
         pwhashproc.cpp
+        thirdparty.cpp
         user.cpp
     )
 target_include_directories(odin PUBLIC ../include)

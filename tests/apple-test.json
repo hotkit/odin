@@ -1,16 +1,16 @@
 {
     "webserver": {
-        "views/odin/test/facebook/validate_login": {
+        "views/odin/test/apple/validate_login": {
             "view": "fostgres.sql",
             "configuration": {
                 "sql": [
                     {
                         "return": "object",
                         "path": [
-                            "/count-facebook-users"
+                            "/count-apple-users"
                         ],
                         "GET": {
-                            "command": "SELECT COUNT(*) FROM odin.facebook_credentials WHERE 1=1 or identity_id=$1",
+                            "command": "SELECT COUNT(*) FROM odin.apple_credentials WHERE 1=1 or identity_id=$1",
                             "arguments": [
                                 [
                                     "request",
@@ -43,7 +43,7 @@
                             1
                         ],
                         "GET": {
-                            "command": "SELECT * FROM odin.identity WHERE id=(SELECT identity_id FROM odin.facebook_credentials_ledger WHERE facebook_user_id=$1 LIMIT 1)",
+                            "command": "SELECT * FROM odin.identity WHERE id=(SELECT identity_id FROM odin.apple_credentials_ledger WHERE apple_user_id=$1 LIMIT 1)",
                             "arguments": [
                                 1
                             ]

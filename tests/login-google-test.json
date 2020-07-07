@@ -1,19 +1,5 @@
 {
     "webserver": {
-        "views/odin/test/google/login/ok": {
-            "view": "odin.google.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "google-mock": "OK"
-            }
-        },
-        "views/odin/test/google/login/error": {
-            "view": "odin.google.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "google-mock": "ERROR"
-            }
-        },
         "views/odin/test/google/validate_login": {
             "view": "fostgres.sql",
             "configuration": {

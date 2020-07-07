@@ -1,6 +1,6 @@
 /**
     Copyright 2019-2020 Red Anchor Trading Co. Ltd.
-
+    
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
  */
@@ -10,6 +10,7 @@
 #include <odin/facebook.hpp>
 #include <odin/google.hpp>
 #include <odin/nonce.hpp>
+#include <odin/thirdparty.hpp>
 #include <odin/user.hpp>
 #include <odin/views.hpp>
 
@@ -25,18 +26,6 @@ namespace {
 
 
     fostlib::module const c_odin_app_facebook{odin::c_odin_app, "facebook"};
-
-
-    inline std::pair<boost::shared_ptr<fostlib::mime>, int>
-            respond(fostlib::string message, int code = 403) {
-        fostlib::json ret;
-        if (not message.empty())
-            fostlib::insert(ret, "message", std::move(message));
-        fostlib::mime::mime_headers headers;
-        boost::shared_ptr<fostlib::mime> response(new fostlib::text_body(
-                fostlib::json::unparse(ret, true), headers, "application/json"));
-        return std::make_pair(response, code);
-    }
 
 
     const class fb_login : public fostlib::urlhandler::view {
@@ -82,15 +71,14 @@ namespace {
 
             fostlib::pg::connection cnx{fostgres::connection(config, req)};
             fostlib::json user_detail;
-            user_detail =
-                    odin::facebook::get_user_detail(cnx, access_token, config);
+            user_detail = odin::facebook::get_user_detail(cnx, access_token);
             logger("user_detail", user_detail);
             if (user_detail.isnull())
                 throw fostlib::exceptions::not_implemented(
                         "odin.app.facebook.login", "User not authenticated");
 
             auto const facebook_user_id =
-                    fostlib::coerce<f5::u8view>(user_detail["id"]);
+                    fostlib::coerce<f5::u8view>(user_detail["user_id"]);
             auto const reference = odin::reference();
             f5::u8view const app_id = req.headers()["__app"].value();
             auto facebook_user = odin::facebook::app_credentials(
@@ -108,7 +96,7 @@ namespace {
                 app_user_id = req.headers()["__app_user"].value();
                 if (user_detail.has_key("email")) {
                     auto const email_owner_id =
-                            odin::google::email_owner_identity_id(
+                            odin::thirdparty::email_owner_identity_id(
                                     cnx,
                                     fostlib::coerce<fostlib::string>(
                                             user_detail["email"]));

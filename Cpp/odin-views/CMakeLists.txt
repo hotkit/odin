@@ -3,6 +3,7 @@ add_library(odin-views
         app_secure.cpp
         app_user.cpp
         app.cpp
+        app.apple.cpp
         app.facebook.cpp
         app.google.cpp
         app.mint.cpp

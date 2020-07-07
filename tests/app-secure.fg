@@ -1,10 +1,9 @@
-## Set up the database
+# Set up the database
+## module core
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+
+## module app
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
@@ -14,18 +13,28 @@ odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
+## module authn
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/apple
+odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+## module opts/email
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
+## module opts/facebook
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/full-name
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
 
 ## Set up new users and apps
 odin.user owner owner password1234
@@ -166,7 +175,7 @@ GET test/app/secure/identity /me 401
 # Login facebook
 # Request some spp_secure view
 setting webserver views/test/app/installation {
-            "view": "odin.app.installation",
+        "view": "odin.app.installation",
             "configuration": {
                 "expires": {
                     "hours": 72
@@ -174,7 +183,7 @@ setting webserver views/test/app/installation {
             }
         }
 setting webserver views/test/sec/installation {
-        "view": "odin.app.secure",
+    "view": "odin.app.secure",
         "configuration": {
             "secure": "test/app/installation",
             "unsecure": "fost.response.403"
@@ -193,45 +202,39 @@ setting webserver views/test/facebook/login {
         "secure": {
             "view": "odin.app.facebook.login",
             "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "112233445566778",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://caveman-club/",
-                                        "name": "Caveman Club",
-                                        "id": "111111111111111"
-                                    }
-                                },
-                                {
-                                    "id": "778899112233445",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "Fred Flintstone",
-                            "id": "112233445566778"
-                        }
-                    }
-                }
+                "expires": {"hours": 72}
             }
         },
         "unsecure": "fost.response.403"
     }
+}
+
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user-test01 200 {
+    "data": [
+        {
+            "id": "112233445566778",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
+            }
+        },
+        {
+            "id": "778899112233445",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
+            }
+        }
+    ]
+}
+
+expect GET https://graph.facebook.com/me?access_token=user-test01&fields=name,email 200 {
+    "name": "Fred Flintstone",
+    "id": "112233445566778"
 }
 
 odin.user user-test01 user-test01

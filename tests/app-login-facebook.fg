@@ -1,22 +1,9 @@
-## Set up the database
+# Set up the database
+## module core
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+
+## module app
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
@@ -26,6 +13,29 @@ odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
+## module authn
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/apple
+odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+## module opts/email
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
+## module opts/facebook
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+## module opts/full-name
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
+## module opts/google
 odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
@@ -33,10 +43,16 @@ odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-ins
 odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
 
 setting odin "JWT secret" <JWT_SECRET>
+setting odin "Apple" {
+    "aud": "com.example.com"
+}
 setting odin "Facebook API Endpoint" "https://graph.facebook.com/v3.2"
 setting odin "Facebook" {
     "main": "111111111111111",
     "allowed": ["111111111111111", "222222222222222"]
+}
+setting odin "Google" {
+    "Client_ID": ["111111111111111", "222222222222222"]
 }
 
 ## ## Register app
@@ -74,179 +90,124 @@ setting webserver views/test/sec/installation {
         }
     }
 
-## ## Registration of new user
+## Registration of new user
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "open-app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 401))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "ins01"} 201))
 
-setting webserver views/odin/test/ids-for-biz-failed {
+setting webserver views/odin/test/facebook/login {
     "view": "odin.app.secure",
     "configuration": {
         "secure": {
             "view": "odin.app.facebook.login",
             "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "error": {
-                                "message": "Malformed access token ACCESS_TOKEN",
-                                "type": "OAuthException",
-                                "code": 190,
-                                "fbtrace_id": "xxxxxxxx"
-                            }
-                        }
-                    }
-                }
+                "expires": {"hours": 72}
             }
         },
         "unsecure": "fost.response.403"
     }
 }
-POST odin/test/ids-for-biz-failed / {"access_token": "user_1"} 501
 
-setting webserver views/odin/test/ids-for-biz-not-include-allow-apps {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "1234512351235",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://random-club/",
-                                        "name": "Random Club",
-                                        "id": "123512351235"
-                                    }
-                                },
-                                {
-                                    "id": "123612352345123",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-sunday/",
-                                        "name": "The Bowling Sunday",
-                                        "id": "123512361234"
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "unsecure": "fost.response.403"
+
+# case ids-for-biz-failed
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 400 {
+    "error": {
+        "message": "Malformed access token ACCESS_TOKEN",
+        "type": "OAuthException",
+        "code": 190,
+        "fbtrace_id": "xxxxxxxx"
     }
 }
-POST odin/test/ids-for-biz-not-include-allow-apps / {"access_token": "user_1"} 501
+POST odin/test/facebook/login / {"access_token": "user_1"} 501
 
-setting webserver views/odin/test/get-detail-failed {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "112233445566778",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://caveman-club/",
-                                        "name": "Caveman Club",
-                                        "id": "111111111111111"
-                                    }
-                                },
-                                {
-                                    "id": "778899112233445",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "error": {
-                                "message": "Malformed access token ACCESS_TOKEN",
-                                "type": "OAuthException",
-                                "code": 190,
-                                "fbtrace_id": "xxxxxxxx"
-                            }
-                        }
-                    }
-                }
+
+# case ids-for-biz-not-include-allow-apps
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 200 {
+    "data": [
+        {
+            "id": "1234512351235",
+            "app": {
+                "category": "Business",
+                "link": "https://random-club/",
+                "name": "Random Club",
+                "id": "123512351235"
             }
         },
-        "unsecure": "fost.response.403"
+        {
+            "id": "123612352345123",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-sunday/",
+                "name": "The Bowling Sunday",
+                "id": "123512361234"
+            }
+        }
+    ]
+}
+POST odin/test/facebook/login / {"access_token": "user_1"} 501
+
+
+# get-detail-failed 
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 200 {
+    "data": [
+        {
+            "id": "112233445566778",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
+            }
+        },
+        {
+            "id": "778899112233445",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
+            }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=user_1&fields=name,email 400 {
+    "error": {
+        "message": "Malformed access token ACCESS_TOKEN",
+        "type": "OAuthException",
+        "code": 190,
+        "fbtrace_id": "xxxxxxxx"
     }
 }
-POST odin/test/get-detail-failed / {"access_token": "user_1"} 501
+POST odin/test/facebook/login / {"access_token": "user_1"} 501
 
-setting webserver views/odin/test/sec/facebook/login/ok-main-app {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "112233445566778",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://caveman-club/",
-                                        "name": "Caveman Club",
-                                        "id": "111111111111111"
-                                    }
-                                },
-                                {
-                                    "id": "778899112233445",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "Fred Flintstone",
-                            "id": "112233445566778"
-                        }
-                    }
-                }
+
+# ok-main-app 
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 200 {
+    "data": [
+        {
+            "id": "112233445566778",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
             }
         },
-        "unsecure": "fost.response.403"
-    }
+        {
+            "id": "778899112233445",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
+            }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=user_1&fields=name,email 200 {
+    "name": "Fred Flintstone",
+    "id": "112233445566778"
 }
 
 ## The installation counts as an extra user
@@ -254,21 +215,22 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 0}
 
 ## Disallowed methods return a 405
-GET odin/test/sec/facebook/login/ok-main-app / 405
-PUT odin/test/sec/facebook/login/ok-main-app / {"installation_id": "ins01", "access_token": "user_1"} 405
+GET odin/test/facebook/login / 405
+PUT odin/test/facebook/login / {"installation_id": "ins01", "access_token": "user_1"} 405
 
 ## Need required fields
-POST odin/test/sec/facebook/login/ok-main-app / {} 501
+POST odin/test/facebook/login / {} 501
 
 ## Login with Facebook ID that has not been seen before
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/facebook/login / {"access_token": "user_1"} 200))
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
 ## Login again later on should be just fine
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/facebook/login / {"access_token": "user_1"} 200))
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
+
 
 ## ## Change of device
 ##
@@ -285,7 +247,7 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
 ## Login with Facebook ID that *has* been seen before
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/facebook/login / {"access_token": "user_1"} 200))
 
 ## There is no new Facebook user and merge new installation user to registered user
 GET odin/test/facebook/validate_login /count-users 200 {"count": 2}
@@ -328,65 +290,45 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/inst
 GET odin/test/facebook/validate_login /count-users 200 {"count": 4}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 ## A Facebook login now merges the new installation with the old user
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-main-app / {"access_token": "user_1"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/facebook/login / {"access_token": "user_1"} 200))
 
 ## There is no new Facebook user, but the new installation ID has
 ## been merged to the old identity so there is one fewer user.
 GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 1}
 
+
 ## Can login with allowed applications
-setting webserver views/odin/test/sec/facebook/login/ok-allow-app {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "g_first_app",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                },
-                                {
-                                    "id": "g_second_app",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://caveman-club/",
-                                        "name": "Caveman Club",
-                                        "id": "111111111111111"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "Gee g",
-                            "id": "g_second_app",
-                            "email": "gee@example.com"
-                        }
-                    }
-                }
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 200 {
+    "data": [
+        {
+            "id": "g_first_app",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
             }
         },
-        "unsecure": "fost.response.403"
-    }
+        {
+            "id": "g_second_app",
+            "app": {
+                "category": "Business",
+                "link": "https://caveman-club/",
+                "name": "Caveman Club",
+                "id": "111111111111111"
+            }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=user_1&fields=name,email 200 {
+    "name": "Gee g",
+    "id": "g_second_app",
+    "email": "gee@example.com"
 }
 
-
 ## Login with Facebook ID that has not been seen before
-POST odin/test/sec/facebook/login/ok-allow-app / {"access_token": "user_1"} 200
+POST odin/test/facebook/login / {"access_token": "user_1"} 200
 GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 2}
 
@@ -409,47 +351,28 @@ GET validate-facebook-id /g_second_app 200 {
     "email": "gee@example.com"
 }
 
-setting webserver views/odin/test/sec/facebook/login/ok-allow-app-only {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "123412351236123",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "Barney",
-                            "id": "123412351236123"
-                        }
-                    }
-                }
+
+# ok-allow-app-only
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 200 {
+    "data": [
+        {
+            "id": "123412351236123",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
             }
-        },
-        "unsecure": "fost.response.403"
-    }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=user_1&fields=name,email 200 {
+    "name": "Barney",
+    "id": "123412351236123"
 }
 
-
 ## Login with Facebook ID that has not been seen before
-POST odin/test/sec/facebook/login/ok-allow-app-only / {"access_token": "user_1"} 200
+POST odin/test/facebook/login / {"access_token": "user_1"} 200
 GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
 
@@ -458,55 +381,37 @@ GET validate-facebook-id /123412351236123 200 {
     "full_name": "Barney"
 }
 
-setting webserver views/odin/test/sec/facebook/login/ok-login-main-again {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "123412351236123",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                },
-                                {
-                                    "id": "695849682359858",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://fred-party/",
-                                        "name": "Fred Party",
-                                        "id": "111111111111111"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "Barney",
-                            "id": "695849682359858"
-                        }
-                    }
-                }
+
+# ok-login-main-again
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=user_1 200 {
+    "data": [
+        {
+            "id": "123412351236123",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
             }
         },
-        "unsecure": "fost.response.403"
-    }
+        {
+            "id": "695849682359858",
+            "app": {
+                "category": "Business",
+                "link": "https://fred-party/",
+                "name": "Fred Party",
+                "id": "111111111111111"
+            }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=user_1&fields=name,email 200 {
+    "name": "Barney",
+    "id": "695849682359858"
 }
 
 ## Login with Facebook ID that has been seen before
-POST odin/test/sec/facebook/login/ok-login-main-again / {"access_token": "user_1"} 200
+POST odin/test/facebook/login / {"access_token": "user_1"} 200
 GET odin/test/facebook/validate_login /count-users 200 {"count": 3}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
 
@@ -515,44 +420,25 @@ GET validate-facebook-id /123412351236123 200 {
     "full_name": "Barney"
 }
 
+
 ## Login with Facebook ID that has not been seen before but email already exists 
-setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-user {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "222222222222222",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "test-user-email",
-                            "id": "222222222222222",
-                            "email": "duplicate-email-user@example.com"
-                        }
-                    }
-                }
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=duplicate-email-user 200 {
+    "data": [
+        {
+            "id": "222222222222222",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
             }
-        },
-        "unsecure": "fost.response.403"
-    }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=duplicate-email-user&fields=name,email 200 {
+    "name": "test-user-email",
+    "id": "222222222222222",
+    "email": "duplicate-email-user@example.com"
 }
 
 sql.insert odin.identity {
@@ -575,7 +461,7 @@ GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 3}
 
 ## If user email already registered with Odin with no credential, return 200 create new user
-POST odin/test/sec/facebook/login/ok-login-duplicate-email-user / {"access_token": "duplicate-email-user"} 200
+POST odin/test/facebook/login / {"access_token": "duplicate-email-user"} 200
 GET validate-facebook-id /222222222222222 200 {
     "facebook_user_id": "222222222222222",
     "email": "duplicate-email-user@example.com",
@@ -585,53 +471,34 @@ GET validate-facebook-id /222222222222222 200 {
 GET odin/test/facebook/validate_login /count-users 200 {"count": 5}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
 
-setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-with-google-account {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "3333333333",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "test-user-email",
-                            "id": "3333333333",
-                            "email": "duplicate-email-with-google@example.com"
-                        }
-                    }
-                }
+
+##  ok-login-duplicate-email-with-google-account
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=duplicate-email-with-google 200 {
+    "data": [
+        {
+            "id": "3333333333",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
             }
-        },
-        "unsecure": "fost.response.403"
-    }
+        }
+    ]
+}
+expect GET https://graph.facebook.com/me?access_token=duplicate-email-with-google&fields=name,email 200 {
+    "name": "test-user-email",
+    "id": "3333333333",
+    "email": "duplicate-email-with-google@example.com"
 }
 
-setting webserver views/odin/test/sec/google/login/ok {
+setting webserver views/odin/test/sec/google/login {
     "view": "odin.app.secure",
     "configuration": {
         "secure": {
             "view": "odin.app.google.login",
             "configuration": {
-                "expires": {"hours": 72},
-                "google-mock": "OK"
+                "expires": {"hours": 72}
             }
         },
         "unsecure": "fost.response.403"
@@ -640,7 +507,13 @@ setting webserver views/odin/test/sec/google/login/ok {
 
 set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
 set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "g-duplicate-email-with-google"} 201))
-POST odin/test/sec/google/login/ok / {"access_token": "duplicate-email-with-google"} 200
+expect GET https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=duplicate-email-with-google 200 {
+    "aud": "111111111111111",	
+    "sub": "duplicate-email-with-google",
+    "name": "Test User",
+    "email": "duplicate-email-with-google@example.com"    
+}
+POST odin/test/sec/google/login / {"access_token": "duplicate-email-with-google"} 200
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 4}
@@ -659,7 +532,7 @@ setting webserver views/odin/app_secure {
 }
 
 ## If user email already registered with Odin by google, return 200 add facebbok credential to that registered user 
-set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/sec/facebook/login/ok-login-duplicate-email-with-google-account / {"access_token": "duplicate-email-with-google"} 200))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST odin/test/facebook/login / {"access_token": "duplicate-email-with-google"} 200))
 GET odin/app_secure / 200
 
 setting webserver views/validate-facebook-id {
@@ -686,45 +559,8 @@ GET validate-facebook-id /3333333333 200 {
 GET odin/test/facebook/validate_login /count-users 200 {"count": 6}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
 
-setting webserver views/odin/test/sec/facebook/login/ok-login-duplicate-email-with-username-account {
-    "view": "odin.app.secure",
-    "configuration": {
-        "secure": {
-            "view": "odin.app.facebook.login",
-            "configuration": {
-                "expires": {"hours": 72},
-                "facebook-mock": {
-                    "ids_for_business": {
-                        "status": 200,
-                        "headers": {},
-                        "body": {
-                            "data": [
-                                {
-                                    "id": "4444444444",
-                                    "app": {
-                                        "category": "Business",
-                                        "link": "https://bowling-friday/",
-                                        "name": "The Bowling Fridy",
-                                        "id": "222222222222222"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "me": {
-                        "body": {
-                            "name": "test-user-email",
-                            "id": "4444444444",
-                            "email": "duplicate-email-with-username-account@example.com"
-                        }
-                    }
-                }
-            }
-        },
-        "unsecure": "fost.response.403"
-    }
-}
 
+## Prepare registerd username account
 POST odin/register / {"username": "exist_user", "password": "password1234", "email": "duplicate-email-with-username-account@example.com"} 201
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 7}
@@ -735,8 +571,29 @@ set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/inst
 GET odin/test/facebook/validate_login /count-users 200 {"count": 8}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 5}
 
+## duplicate-email-with-username-account
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=duplicate-email-with-username-account 200 {
+    "data": [
+        {
+            "id": "4444444444",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
+            }
+        }
+    ]
+}
+
+expect GET https://graph.facebook.com/me?access_token=duplicate-email-with-username-account&fields=name,email 200 {
+    "name": "test-user-email",
+    "id": "4444444444",
+    "email": "duplicate-email-with-username-account@example.com"
+}
+
 ## If user email already registered with Odin by username, return 200 create new user
-POST odin/test/sec/facebook/login/ok-login-duplicate-email-with-username-account / {"access_token": "duplicate-email-with-username-account"} 200
+POST odin/test/facebook/login / {"access_token": "duplicate-email-with-username-account"} 200
 
 setting webserver views/validate-facebook-id {
     "view": "fostgres.sql",
@@ -760,3 +617,81 @@ GET validate-facebook-id /4444444444 200 {
 
 GET odin/test/facebook/validate_login /count-users 200 {"count": 8}
 GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 6}
+
+
+## If email duplicate with registered apple user return 200 add facebook credential to that registered user 
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "duplicate-email-with-apple"} 201))
+GET odin/test/facebook/validate_login /count-users 200 {"count": 9}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 6}
+
+setting webserver views/odin/test/apple/login {
+    "view": "odin.app.secure",
+    "configuration": {
+        "secure": {
+            "view": "odin.app.apple.login",
+            "configuration": {
+                "expires": {"hours": 72}
+            }
+        },
+        "unsecure": "fost.response.403"
+    }
+}
+
+expect GET https://appleid.apple.com/auth/keys 200 {
+    "keys": [
+        {
+            "kid": "86D88Kf",
+            "n": "nzyis1ZjfNB0bBgKFMSvvkTtwlvBsaJq7S5wA-kzeVOVpVWwkWdVha4s38XM_pa_yr47av7-z3VTmvDRyAHcaT92whREFpLv9cj5lTeJSibyr_Mrm_YtjCZVWgaOYIhwrXwKLqPr_11inWsAkfIytvHWTxZYEcXLgAXFuUuaS3uF9gEiNQwzGTU1v0FqkqTBr4B8nW3HCN47XUu0t8Y0e-lf4s4OxQawWD79J9_5d3Ry0vbV3Am1FtGJiJvOwRsIfVChDpYStTcHTCMqtvWbV6L11BWkpzGXSW4Hv43qa-GSYOD2QU68Mb59oSk2OB-BtOLpJofmbGEGgvmwyCI9Mw",
+            "e": "AQAB"            
+        }
+    ]
+}
+
+## ## token payload
+
+## {
+##  "sub": "duplicate-email-with-apple",
+##  "aud": "com.example.com",
+##  "email": "duplicate-email-with-apple@example.com"
+## }
+
+POST odin/test/apple/login / {"name": "duplicate-email-with-apple", "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijg2RDg4S2YifQ.eyJzdWIiOiJkdXBsaWNhdGUtZW1haWwtd2l0aC1hcHBsZSIsImVtYWlsIjoiZHVwbGljYXRlLWVtYWlsLXdpdGgtYXBwbGVAZXhhbXBsZS5jb20iLCJhdWQiOiJjb20uZXhhbXBsZS5jb20ifQ.PejgtxWpFA1Jq0-meWWPj0DoU9KCq481JFAWSyj1lb7KuiTrMei38QD6OBVTNE_US8-IQNsnpmspBfzI_SnCym_N1msA9sVlFp2epyyNqEUg8IHpHjfVN5HpC5gVlYZt4hwasIIGkj3HpbBtcyQNr3Fp9KIlGsUn2mmONEuMMPHTeu0lek4MVN7ypYdTuHTEBMnnCKiF7iOxmVO3nr5YQDZZKWVQox9T_eeOaA9juOm9SQxwSbLzpSh-s_l1OmTIEVMBK0vMion5hR2nufXn-PcS78sGE1fEwPzST8m-I66jHF4oUXcfbZe1igyCRHKwYt9DjHztjnSNFTcBK2utRg"} 200
+GET odin/test/facebook/validate_login /count-users 200 {"count": 9}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 6}
+
+set-path testserver.headers ["Authorization"] (cat "Bearer " (odin.jwt.mint {"sub": "app_user_open_app", "iss": "http://odin.felspar.com/app/open-app"} <JWT_SECRET>open-app))
+set-path testserver.headers ["Authorization"] (cat "Bearer " (POST test/sec/installation / {"installation_id": "duplicate-email-with-apple2"} 201))
+GET odin/test/facebook/validate_login /count-users 200 {"count": 10}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 6}
+
+expect GET https://graph.facebook.com/me/ids_for_business?access_token=duplicate-email-with-apple 200 {
+    "data": [
+        {
+            "id": "55555555",
+            "app": {
+                "category": "Business",
+                "link": "https://bowling-friday/",
+                "name": "The Bowling Fridy",
+                "id": "222222222222222"
+            }
+        }
+    ]
+}
+
+expect GET https://graph.facebook.com/me?access_token=duplicate-email-with-apple&fields=name,email 200 {
+    "name": "test-user-email",
+    "id": "55555555",
+    "email": "duplicate-email-with-apple@example.com"
+}
+
+POST odin/test/facebook/login / {"access_token": "duplicate-email-with-apple"} 200
+
+GET odin/test/facebook/validate_login /count-users 200 {"count": 9}
+GET odin/test/facebook/validate_login /count-facebook-users 200 {"count": 7}
+GET validate-facebook-id /55555555 200 {
+    "login": null,
+    "facebook_user_id": "55555555",
+    "email": "duplicate-email-with-apple@example.com",
+    "full_name": "test-user-email"
+}

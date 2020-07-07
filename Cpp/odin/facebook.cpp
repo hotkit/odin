@@ -1,53 +1,24 @@
 /**
-    Copyright 2018-2019 Red Anchor Trading Co. Ltd.
+    Copyright 2018-2020 Red Anchor Trading Co. Ltd.
 
     Distributed under the Boost Software License, Version 1.0.
     See <http://www.boost.org/LICENSE_1_0.txt>
  */
 
+
 #include <odin/facebook.hpp>
 #include <odin/fg/native.hpp>
 #include <odin/odin.hpp>
 
-#include <fost/http>
-#include <fost/log>
 #include <fostgres/sql.hpp>
-
 #include <fost/insert>
+#include <fost/log>
+#include <fost/ua/exceptions.hpp>
 
-namespace {
-
-
-    std::unique_ptr<fostlib::http::user_agent::response> get_or_mock(
-            fostlib::http::user_agent &ua,
-            fostlib::url url,
-            fostlib::json config = {}) {
-        if (config.isnull()) { return ua.get(url); }
-        /// Create mock response based on config
-        int status{200};
-        if (config.has_key("status")) {
-            status = fostlib::coerce<int>(config["status"]);
-        }
-        fostlib::json body{};
-        if (config.has_key("body")) { body = config["body"]; }
-        auto const bodydata = fostlib::json::unparse(body, false);
-        // TODO: Can set headers
-        fostlib::mime::mime_headers headers;
-        // fostlib::json headers{};
-        return std::make_unique<fostlib::http::user_agent::response>(
-                "GET", url, 200,
-                std::make_unique<fostlib::binary_body>(
-                        bodydata.memory().begin(), bodydata.memory().end(),
-                        headers));
-    }
-}
 
 fostlib::json odin::facebook::get_user_detail(
-        fostlib::pg::connection &cnx,
-        f5::u8view user_token,
-        fostlib::json config) {
+        fostlib::pg::connection &cnx, f5::u8view user_token) {
 
-    fostlib::http::user_agent ua{};
     fostlib::url base_facebook_url(odin::c_facebook_endpoint.value());
 
     /// Get list of ids for business from Facebook
@@ -55,22 +26,15 @@ fostlib::json odin::facebook::get_user_detail(
     fostlib::url::query_string ids_for_biz_qs{};
     ids_for_biz_qs.append("access_token", user_token);
     ids_for_biz_url.query(ids_for_biz_qs);
-    fostlib::json ids_for_biz_conf{};
-    if (config.has_key(fostlib::jcursor{"facebook-mock", "ids_for_business"})) {
-        ids_for_biz_conf =
-                config[fostlib::jcursor{"facebook-mock", "ids_for_business"}];
-    }
-    auto const ids_for_biz_resp =
-            get_or_mock(ua, ids_for_biz_url, ids_for_biz_conf);
-    fostlib::json const ids_for_biz =
-            fostlib::json::parse(fostlib::coerce<fostlib::string>(
-                    fostlib::coerce<fostlib::utf8_string>(
-                            ids_for_biz_resp->body()->data())));
-    if (!ids_for_biz.has_key("data")) {
+
+    fostlib::json ids_for_biz;
+    try {
+        ids_for_biz = fostlib::ua::get_json(
+                ids_for_biz_url, fostlib::mime::mime_headers{});
+    } catch (fostlib::ua::http_error &e) {
         fostlib::log::error(c_odin)("Error", "ids_for_business")(
-                "URL", ids_for_biz_url)("status", ids_for_biz_resp->status())(
+                "URL", ids_for_biz_url)("status", e.data()["status-code"])(
                 "body", ids_for_biz);
-        // TODO: Should return 422
         throw fostlib::exceptions::not_implemented(
                 __PRETTY_FUNCTION__,
                 "Cannot retrieve /me/ids_for_business from Facebook");
@@ -114,7 +78,8 @@ fostlib::json odin::facebook::get_user_detail(
                 "token");
     }
 
-    fostlib::insert(fb_user, "id", static_cast<f5::u8view>(userid.value()));
+    fostlib::insert(
+            fb_user, "user_id", static_cast<f5::u8view>(userid.value()));
 
     /// Retrieve facebook user detail
     fostlib::url user_detail_url(base_facebook_url, "/me");
@@ -122,24 +87,21 @@ fostlib::json odin::facebook::get_user_detail(
     user_detail_qs.append("access_token", user_token);
     user_detail_qs.append("fields", "name,email");
     user_detail_url.query(user_detail_qs);
-    fostlib::json me_conf{};
-    if (config.has_key(fostlib::jcursor{"facebook-mock", "me"})) {
-        me_conf = config[fostlib::jcursor{"facebook-mock", "me"}];
-    }
-    auto const user_detail_resp = get_or_mock(ua, user_detail_url, me_conf);
-    auto user_detail = fostlib::json::parse(fostlib::coerce<fostlib::string>(
-            fostlib::coerce<fostlib::utf8_string>(
-                    user_detail_resp->body()->data())));
-    fostlib::log::error(c_odin)("Response", user_detail);
-    if (user_detail.has_key("error")) {
-        fostlib::log::error(c_odin)("Error", "get-user-detail")(
-                "URL", user_detail_url)("status", user_detail_resp->status())(
+
+    fostlib::json user_detail;
+    try {
+        user_detail = fostlib::ua::get_json(
+                user_detail_url, fostlib::mime::mime_headers{});
+    } catch (fostlib::ua::http_error &e) {
+        fostlib::log::error(c_odin)("Error", "ids_for_business")(
+                "URL", user_detail_url)("status", e.data()["status-code"])(
                 "body", user_detail);
-        // TODO: Should return 422
         throw fostlib::exceptions::not_implemented(
                 __PRETTY_FUNCTION__,
                 "Cannot retrieve /me?field=name,email from Facebook");
     }
+
+    fostlib::log::error(c_odin)("Response", user_detail);
     if (user_detail.has_key("name")) {
         fostlib::insert(fb_user, "name", user_detail["name"]);
     }

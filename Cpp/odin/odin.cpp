@@ -50,6 +50,9 @@ const fostlib::setting<fostlib::string>
                 odin::nonce(),
                 true);
 
+const fostlib::setting<fostlib::json> odin::c_apple_aud(
+        "odin/odin.cpp", "odin", "Apple", fostlib::null, true);
+
 const fostlib::setting<fostlib::json> odin::c_facebook_apps(
         "odin/odin.cpp", "odin", "Facebook", fostlib::json{}, true);
 
