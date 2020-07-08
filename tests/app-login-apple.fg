@@ -1,46 +1,45 @@
 # Set up the database
-## module core
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
 
-## module app
+odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
+
+odin.sql.file (module.path.join ../Schema/core/002-add-merge-account.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/002-initial.blue.sql)
+
+odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/003-app-role.blue.sql)
+
 odin.sql.file (module.path.join ../Schema/app/004-app-installation.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
+
 odin.sql.file (module.path.join ../Schema/app/005-alter-ledgers.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
+
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
+
 odin.sql.file (module.path.join ../Schema/app/007-app-user-data.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/008-app-user-id.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/009-app-user-id-index.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/010-app-data-not-null.blue.sql)
-## module authn
-odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
-## module opts/apple
-odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
-## module opts/email
-odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/email/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.sql)
-## module opts/facebook
-odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
-## module opts/full-name
-odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/full-name/004-merge-account-function.blue.sql)
-## module opts/google
-odin.sql.file (module.path.join ../Schema/opts/google/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/google/003-alter-ledgers.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/google/004-merge-account-function.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)
+
 
 setting odin "JWT secret" <JWT_SECRET>
 setting odin "Apple" {
