@@ -1,5 +1,5 @@
 INSERT INTO odin.module VALUES('opts/apple') ON CONFLICT (name) DO NOTHING;
-INSERT INTO odin.migration VALUES('opts/apple', '001-initial.blue.sql');
+INSERT INTO odin.migration VALUES('opts/apple', '006-initial.blue.sql');
 
 CREATE TABLE odin.apple_credentials (
     identity_id text NOT NULL,

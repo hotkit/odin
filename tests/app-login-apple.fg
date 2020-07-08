@@ -2,7 +2,6 @@
 odin.sql.file (module.path.join ../Schema/core/000-initial.blue.sql)
 
 odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
-odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/full-name/001-initial.blue.sql)
@@ -31,6 +30,7 @@ odin.sql.file (module.path.join ../Schema/opts/email/005-email-not-unique.blue.s
 odin.sql.file (module.path.join ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/005-google-credentials-insert.blue.sql)
 
+odin.sql.file (module.path.join ../Schema/opts/apple/006-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/app/006-merge-account-function.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql)

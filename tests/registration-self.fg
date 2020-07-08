@@ -70,7 +70,7 @@ POST odin/register / {"username": "user90", "password": "password1234", "email":
 
 # If user email already registered return 422 with error message
 ## module opts/apple
-odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/apple/006-initial.blue.sql)
 ## module opts/facebook
 odin.sql.file (module.path.join ../Schema/opts/facebook/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/facebook/003-alter-ledgers.blue.sql)
