@@ -1052,6 +1052,67 @@ if(TARGET stress OR TARGET pgtest)
                 registration-app-user.fg
         )
 
+    add_custom_command(OUTPUT test-migration-order
+        COMMAND fostgres-test odin-test-migration-order -o test-migration-order
+            $<TARGET_SONAME_FILE:odin-fg>
+            $<TARGET_SONAME_FILE:odin-views>
+            ${CMAKE_CURRENT_SOURCE_DIR}/../Schema/bootstrap.sql
+            ${CMAKE_CURRENT_SOURCE_DIR}/migration-order.fg
+        MAIN_DEPENDENCY migration-order.fg
+        DEPENDS
+            fostgres-test
+            fostgres
+            odin-fg
+            ../Schema/bootstrap.sql
+            ../Schema/core/000-initial.blue.sql
+            ../Schema/core/002-add-merge-account.blue.sql
+            ../Schema/authn/001-initial.blue.sql
+            ../Schema/authn/002-fix-login.blue.sql
+            ../Schema/authn/003-alter-ledgers.blue.sql
+            ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql
+            ../Schema/authz/001-initial.blue.sql
+            ../Schema/authz/002-view-user_permission.blue.sql
+            ../Schema/authz/003-alter-ledgers.blue.sql
+            ../Schema/authz/004-merge-account-function.blue.sql
+            ../Schema/app/002-initial.blue.sql
+            ../Schema/app/003-app-role.blue.sql
+            ../Schema/app/004-app-installation.blue.sql
+            ../Schema/app/005-alter-ledgers.blue.sql
+            ../Schema/app/006-merge-account-function.blue.sql
+            ../Schema/app/007-app-user-data.blue.sql
+            ../Schema/app/008-app-user-id.blue.sql
+            ../Schema/app/009-app-user-id-index.blue.sql
+            ../Schema/app/010-app-data-not-null.blue.sql
+            ../Schema/opts/apple/006-initial.blue.sql
+            ../Schema/opts/email/001-initial.blue.sql
+            ../Schema/opts/email/003-alter-ledgers.blue.sql
+            ../Schema/opts/email/004-merge-account-function.blue.sql
+            ../Schema/opts/email/005-email-not-unique.blue.sql
+            ../Schema/opts/facebook/001-initial.blue.sql
+            ../Schema/opts/facebook/003-alter-ledgers.blue.sql
+            ../Schema/opts/facebook/004-merge-account-function.blue.sql
+            ../Schema/opts/facebook/005-facebook-credentials-insert.blue.sql
+            ../Schema/opts/facebook/006-not-allow-merge-registered-to-guest.blue.sql
+            ../Schema/opts/forgotten-password/001-initial.blue.sql
+            ../Schema/opts/forgotten-password/002-merge-account-function.blue.sql
+            ../Schema/opts/full-name/001-initial.blue.sql
+            ../Schema/opts/full-name/003-alter-ledgers.blue.sql
+            ../Schema/opts/full-name/004-merge-account-function.blue.sql
+            ../Schema/opts/google/001-initial.blue.sql
+            ../Schema/opts/google/003-alter-ledgers.blue.sql
+            ../Schema/opts/google/004-merge-account-function.blue.sql
+            ../Schema/opts/google/005-google-credentials-insert.blue.sql
+            ../Schema/opts/google/006-not-allow-merge-registered-to-guest.blue.sql  
+            ../Schema/opts/installation-id/001-initial.blue.sql
+            ../Schema/opts/installation-id/003-alter-ledgers.blue.sql
+            ../Schema/opts/installation-id/004-merge-account-function.blue.sql
+            ../Schema/opts/logout/002-initial.blue.sql
+            ../Schema/opts/logout/003-fix-logout-count.blue.sql
+            ../Schema/opts/logout/004-alter-ledgers.blue.sql 
+            ../Schema/opts/logout/005-merge-account-function.blue.sql                  
+            migration-order.fg
+    )
+
     ## Because of the way cmake works we need this stuff at the end to
     ## actually make the above commands run when things change.
     add_custom_target(odin-tests DEPENDS
@@ -1069,6 +1130,7 @@ if(TARGET stress OR TARGET pgtest)
             test-login
             test-logout
             test-merge-account
+            test-migration-order
             test-no-auth
             test-password
             test-permissions
