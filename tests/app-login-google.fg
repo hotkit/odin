@@ -398,7 +398,7 @@ GET odin/test/google/validate_login /count-users 200 {"count": 9}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 4}
 
 setting odin "Apple" {
-    "aud": "com.example.com"
+    "aud": ["com.unknown.com", "com.example.com"]
 }
 
 setting webserver views/odin/test/apple/login {
