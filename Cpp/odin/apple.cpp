@@ -73,20 +73,22 @@ fostlib::json odin::apple::get_user_detail(f5::u8view user_token) {
     }
 
     fostlib::json user_detail = jwt.value().payload;
-
-    if (user_detail["aud"] != c_apple_aud.value()["aud"]) {
-        fostlib::log::error(c_odin)("apple token aud", user_detail["aud"])(
-                "app aud", c_apple_aud.value()["aud"]);
-        throw fostlib::exceptions::not_implemented(
-                __PRETTY_FUNCTION__, "Invalid apple token aud");
+    auto const apple_aud = c_apple_aud.value()["aud"];
+    for (const auto aud : apple_aud) {
+        if (aud == user_detail["aud"]) {
+            fostlib::json apple_user;
+            fostlib::insert(apple_user, "user_id", user_detail["sub"]);
+            if (user_detail.has_key("email")) {
+                fostlib::insert(apple_user, "email", user_detail["email"]);
+            }
+            return apple_user;
+        }
     }
 
-    fostlib::json apple_user;
-    fostlib::insert(apple_user, "user_id", user_detail["sub"]);
-    if (user_detail.has_key("email")) {
-        fostlib::insert(apple_user, "email", user_detail["email"]);
-    }
-    return apple_user;
+    fostlib::log::error(c_odin)("apple token aud", user_detail["aud"])(
+            "app aud", c_apple_aud.value()["aud"]);
+    throw fostlib::exceptions::not_implemented(
+            __PRETTY_FUNCTION__, "Invalid apple token aud");
 }
 
 

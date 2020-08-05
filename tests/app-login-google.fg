@@ -19,7 +19,7 @@ odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/004-not-allow-merge-registered-to-guest.blue.sql)
 ## module opts/apple
-odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/apple/006-initial.blue.sql)
 ## module opts/email
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
@@ -398,7 +398,7 @@ GET odin/test/google/validate_login /count-users 200 {"count": 9}
 GET odin/test/google/validate_login /count-google-users 200 {"count": 4}
 
 setting odin "Apple" {
-    "aud": "com.example.com"
+    "aud": ["com.unknown.com", "com.example.com"]
 }
 
 setting webserver views/odin/test/apple/login {

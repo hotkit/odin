@@ -8,7 +8,7 @@ odin.sql.file (module.path.join ../Schema/authn/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/002-fix-login.blue.sql)
 odin.sql.file (module.path.join ../Schema/authn/003-alter-ledgers.blue.sql)
 ## module opts/apple
-odin.sql.file (module.path.join ../Schema/opts/apple/001-initial.blue.sql)
+odin.sql.file (module.path.join ../Schema/opts/apple/006-initial.blue.sql)
 ## module opts/email
 odin.sql.file (module.path.join ../Schema/opts/email/001-initial.blue.sql)
 odin.sql.file (module.path.join ../Schema/opts/email/003-alter-ledgers.blue.sql)
